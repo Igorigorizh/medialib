@@ -127,14 +127,14 @@ mymedialib_cfg = 'C:\\My_projects\\MyMediaLib\\mymedialib.cfg'
 class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 	def __init__(self):
 	
-		# вызываем явно конструктор родителя, чтобы в этом классе иметь доступ к атрибутам родителя
-		# таким образом инстанция контролера является одновременно инстанцией модели, зачем это???? 
-		# это сделано на начальном этапе чтобы минимально изменять старый код, когда в модели был реализовани контроллер 
-		# напрямую. в будущем сделать в модели методы, которые выдавали бы соответсвущие объекты модели 
+		# ГўГ»Г§Г»ГўГ ГҐГ¬ ГїГўГ­Г® ГЄГ®Г­Г±ГІГ°ГіГЄГІГ®Г° Г°Г®Г¤ГЁГІГҐГ«Гї, Г·ГІГ®ГЎГ» Гў ГЅГІГ®Г¬ ГЄГ«Г Г±Г±ГҐ ГЁГ¬ГҐГІГј Г¤Г®Г±ГІГіГЇ ГЄ Г ГІГ°ГЁГЎГіГІГ Г¬ Г°Г®Г¤ГЁГІГҐГ«Гї
+		# ГІГ ГЄГЁГ¬ Г®ГЎГ°Г Г§Г®Г¬ ГЁГ­Г±ГІГ Г­Г¶ГЁГї ГЄГ®Г­ГІГ°Г®Г«ГҐГ°Г  ГїГўГ«ГїГҐГІГ±Гї Г®Г¤Г­Г®ГўГ°ГҐГ¬ГҐГ­Г­Г® ГЁГ­Г±ГІГ Г­Г¶ГЁГҐГ© Г¬Г®Г¤ГҐГ«ГЁ, Г§Г Г·ГҐГ¬ ГЅГІГ®???? 
+		# ГЅГІГ® Г±Г¤ГҐГ«Г Г­Г® Г­Г  Г­Г Г·Г Г«ГјГ­Г®Г¬ ГЅГІГ ГЇГҐ Г·ГІГ®ГЎГ» Г¬ГЁГ­ГЁГ¬Г Г«ГјГ­Г® ГЁГ§Г¬ГҐГ­ГїГІГј Г±ГІГ Г°Г»Г© ГЄГ®Г¤, ГЄГ®ГЈГ¤Г  Гў Г¬Г®Г¤ГҐГ«ГЁ ГЎГ»Г« Г°ГҐГ Г«ГЁГ§Г®ГўГ Г­ГЁ ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ° 
+		# Г­Г ГЇГ°ГїГ¬ГіГѕ. Гў ГЎГіГ¤ГіГ№ГҐГ¬ Г±Г¤ГҐГ«Г ГІГј Гў Г¬Г®Г¤ГҐГ«ГЁ Г¬ГҐГІГ®Г¤Г», ГЄГ®ГІГ®Г°Г»ГҐ ГўГ»Г¤Г ГўГ Г«ГЁ ГЎГ» Г±Г®Г®ГІГўГҐГІГ±ГўГіГ№ГЁГҐ Г®ГЎГєГҐГЄГІГ» Г¬Г®Г¤ГҐГ«ГЁ 
 		#super(MediaLib_Controller, self).__init__()
 		
-		# Одной из необходимых задач контроллера MVC должна быть поодержка модели в актуальном состоянии
-		# эти функции небоходимо перенести сюда из старой фукции генерации страниц
+		# ГЋГ¤Г­Г®Г© ГЁГ§ Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г»Гµ Г§Г Г¤Г Г· ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  MVC Г¤Г®Г«Г¦Г­Г  ГЎГ»ГІГј ГЇГ®Г®Г¤ГҐГ°Г¦ГЄГ  Г¬Г®Г¤ГҐГ«ГЁ Гў Г ГЄГІГіГ Г«ГјГ­Г®Г¬ Г±Г®Г±ГІГ®ГїГ­ГЁГЁ
+		# ГЅГІГЁ ГґГіГ­ГЄГ¶ГЁГЁ Г­ГҐГЎГ®ГµГ®Г¤ГЁГ¬Г® ГЇГҐГ°ГҐГ­ГҐГ±ГІГЁ Г±ГѕГ¤Г  ГЁГ§ Г±ГІГ Г°Г®Г© ГґГіГЄГ¶ГЁГЁ ГЈГҐГ­ГҐГ°Г Г¶ГЁГЁ Г±ГІГ°Г Г­ГЁГ¶
 		#global logger
 		self.__logger = logging.getLogger('controller_logger')
 		#logger = self.__logger
@@ -191,17 +191,17 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		ignor_namesL = ['__doc__', '__module__', 'self_func']
 		self.__signatura_list_CONTROLLER = [a for a in dir(self) if a not in ignor_namesL]
 		
-		# Получить список сигнатур класса генератора представления MediaLib_ViewGen
+		# ГЏГ®Г«ГіГ·ГЁГІГј Г±ГЇГЁГ±Г®ГЄ Г±ГЁГЈГ­Г ГІГіГ° ГЄГ«Г Г±Г±Г  ГЈГҐГ­ГҐГ°Г ГІГ®Г°Г  ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї MediaLib_ViewGen
 		self.__signatura_list_VIEW = [a for a in dir(self.__instance_VIEW) if a not in ignor_namesL]
 		
 				
 		self.__logger.debug('signatura_list_VIEW:%s'%(str(self.__signatura_list_VIEW)))
-		# в этом словаре содержаться связи:
-		#		идентификатора отработавшего элемента управления:
-						#'player_control'- базовые функции плеера
-						# "navigation_control" - загрузка новых листов и навигация по листам с необходимой реакцией плеера(листы, тэги)
-		# 		метода изменения состояния муз плеера и  модели отражающей его состояние. 
-		#		списка элементов представления требующих обновления, спи
+		# Гў ГЅГІГ®Г¬ Г±Г«Г®ГўГ Г°ГҐ Г±Г®Г¤ГҐГ°Г¦Г ГІГјГ±Гї Г±ГўГїГ§ГЁ:
+		#		ГЁГ¤ГҐГ­ГІГЁГґГЁГЄГ ГІГ®Г°Г  Г®ГІГ°Г ГЎГ®ГІГ ГўГёГҐГЈГ® ГЅГ«ГҐГ¬ГҐГ­ГІГ  ГіГЇГ°Г ГўГ«ГҐГ­ГЁГї:
+						#'player_control'- ГЎГ Г§Г®ГўГ»ГҐ ГґГіГ­ГЄГ¶ГЁГЁ ГЇГ«ГҐГҐГ°Г 
+						# "navigation_control" - Г§Г ГЈГ°ГіГ§ГЄГ  Г­Г®ГўГ»Гµ Г«ГЁГ±ГІГ®Гў ГЁ Г­Г ГўГЁГЈГ Г¶ГЁГї ГЇГ® Г«ГЁГ±ГІГ Г¬ Г± Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г®Г© Г°ГҐГ ГЄГ¶ГЁГҐГ© ГЇГ«ГҐГҐГ°Г (Г«ГЁГ±ГІГ», ГІГЅГЈГЁ)
+		# 		Г¬ГҐГІГ®Г¤Г  ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї Г±Г®Г±ГІГ®ГїГ­ГЁГї Г¬ГіГ§ ГЇГ«ГҐГҐГ°Г  ГЁ  Г¬Г®Г¤ГҐГ«ГЁ Г®ГІГ°Г Г¦Г ГѕГ№ГҐГ© ГҐГЈГ® Г±Г®Г±ГІГ®ГїГ­ГЁГҐ. 
+		#		Г±ГЇГЁГ±ГЄГ  ГЅГ«ГҐГ¬ГҐГ­ГІГ®Гў ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї ГІГ°ГҐГЎГіГѕГ№ГЁГµ Г®ГЎГ­Г®ГўГ«ГҐГ­ГЁГї, Г±ГЇГЁ
 		self.__commandRoutingDic = self.__model_instance.MediaLibPlayProcessDic_viaKey('commandRouting','local')
 		if self.__commandRoutingDic <> {}:
 			
@@ -214,9 +214,9 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 						
 								  		  
 	def get_modelDic(self,view_elem_id_Dic,PlayControl_CurStatusD):
-		# Интерфес к модели: метод применяется для того чтобы получить из модели данные характеризующие состояние плеера и приложения
-		# тут не предпологается никаких вычислений, только получение уже готовый структур
-		# извлечение и вычисление происходят например в функции get_data_for_player_context
+		# Г€Г­ГІГҐГ°ГґГҐГ± ГЄ Г¬Г®Г¤ГҐГ«ГЁ: Г¬ГҐГІГ®Г¤ ГЇГ°ГЁГ¬ГҐГ­ГїГҐГІГ±Гї Г¤Г«Гї ГІГ®ГЈГ® Г·ГІГ®ГЎГ» ГЇГ®Г«ГіГ·ГЁГІГј ГЁГ§ Г¬Г®Г¤ГҐГ«ГЁ Г¤Г Г­Г­Г»ГҐ ГµГ Г°Г ГЄГІГҐГ°ГЁГ§ГіГѕГ№ГЁГҐ Г±Г®Г±ГІГ®ГїГ­ГЁГҐ ГЇГ«ГҐГҐГ°Г  ГЁ ГЇГ°ГЁГ«Г®Г¦ГҐГ­ГЁГї
+		# ГІГіГІ Г­ГҐ ГЇГ°ГҐГ¤ГЇГ®Г«Г®ГЈГ ГҐГІГ±Гї Г­ГЁГЄГ ГЄГЁГµ ГўГ»Г·ГЁГ±Г«ГҐГ­ГЁГ©, ГІГ®Г«ГјГЄГ® ГЇГ®Г«ГіГ·ГҐГ­ГЁГҐ ГіГ¦ГҐ ГЈГ®ГІГ®ГўГ»Г© Г±ГІГ°ГіГЄГІГіГ°
+		# ГЁГ§ГўГ«ГҐГ·ГҐГ­ГЁГҐ ГЁ ГўГ»Г·ГЁГ±Г«ГҐГ­ГЁГҐ ГЇГ°Г®ГЁГ±ГµГ®Г¤ГїГІ Г­Г ГЇГ°ГЁГ¬ГҐГ° Гў ГґГіГ­ГЄГ¶ГЁГЁ get_data_for_player_context
 		
 		self.__logger.info('in begin of get_modelDic [%s] START OK.'%(str(view_elem_id_Dic.keys())))
 		modelDic = self.__modelDic
@@ -228,7 +228,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		if 'tag_name' in view_elem_id_Dic:
 			
 			try:
-				# в данном случае ожидается что переменная PlayControl_CurStatusD имеет значение возвращенное из метода контроллера int
+				# Гў Г¤Г Г­Г­Г®Г¬ Г±Г«ГіГ·Г ГҐ Г®Г¦ГЁГ¤Г ГҐГІГ±Гї Г·ГІГ® ГЇГҐГ°ГҐГ¬ГҐГ­Г­Г Гї PlayControl_CurStatusD ГЁГ¬ГҐГҐГІ Г§Г­Г Г·ГҐГ­ГЁГҐ ГўГ®Г§ГўГ°Г Г№ГҐГ­Г­Г®ГҐ ГЁГ§ Г¬ГҐГІГ®Г¤Г  ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  int
 				if type(PlayControl_CurStatusD) == int:
 					res = PlayControl_CurStatusD
 					modelDic['tag_name'] = self.__model_instance.MediaLibPlayProcessDic_viaKey('TagD','local')[res]['tag_name']
@@ -245,11 +245,11 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			modelDic['SearchBufD'] = self.__model_instance.getSearchBufD()
 			modelDic['TagD'] = self.__model_instance.MediaLibPlayProcessDic_viaKey('TagD','local')
 			
-			# Сгенерируем словарь тэгов tagsLDic для связанных с ними композиций. Генерируем динамически, теоретически это можно перенести в контруктор.
+			# Г‘ГЈГҐГ­ГҐГ°ГЁГ°ГіГҐГ¬ Г±Г«Г®ГўГ Г°Гј ГІГЅГЈГ®Гў tagsLDic Г¤Г«Гї Г±ГўГїГ§Г Г­Г­Г»Гµ Г± Г­ГЁГ¬ГЁ ГЄГ®Г¬ГЇГ®Г§ГЁГ¶ГЁГ©. ГѓГҐГ­ГҐГ°ГЁГ°ГіГҐГ¬ Г¤ГЁГ­Г Г¬ГЁГ·ГҐГ±ГЄГЁ, ГІГҐГ®Г°ГҐГІГЁГ·ГҐГ±ГЄГЁ ГЅГІГ® Г¬Г®Г¦Г­Г® ГЇГҐГ°ГҐГ­ГҐГ±ГІГЁ Гў ГЄГ®Г­ГІГ°ГіГЄГІГ®Г°.
 			tagsLDic =  {}
 			DB_metaIndxD = self.__model_instance.MediaLibPlayProcessDic_viaKey('DB_metaIndxD','local')	
 			
-			# Генерируем словать соответствий индексов трэков в БД и их СРЦ32	
+			# ГѓГҐГ­ГҐГ°ГЁГ°ГіГҐГ¬ Г±Г«Г®ГўГ ГІГј Г±Г®Г®ГІГўГҐГІГ±ГІГўГЁГ© ГЁГ­Г¤ГҐГЄГ±Г®Гў ГІГ°ГЅГЄГ®Гў Гў ГЃГ„ ГЁ ГЁГµ Г‘ГђГ–32	
 			DB_metaIndxD_inverted = {}
 			for a in DB_metaIndxD:
 				DB_metaIndxD_inverted[DB_metaIndxD[a][0]] = a
@@ -266,11 +266,11 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			modelDic['SearchBufD'] = self.__model_instance.getSearchBufD()
 			modelDic['TagD'] = self.__model_instance.MediaLibPlayProcessDic_viaKey('TagD','local')
 			
-			# Сгенерируем словарь тэгов tagsLDic для связанных с ними композиций. Генерируем динамически, теоретически это можно перенести в контруктор.
+			# Г‘ГЈГҐГ­ГҐГ°ГЁГ°ГіГҐГ¬ Г±Г«Г®ГўГ Г°Гј ГІГЅГЈГ®Гў tagsLDic Г¤Г«Гї Г±ГўГїГ§Г Г­Г­Г»Гµ Г± Г­ГЁГ¬ГЁ ГЄГ®Г¬ГЇГ®Г§ГЁГ¶ГЁГ©. ГѓГҐГ­ГҐГ°ГЁГ°ГіГҐГ¬ Г¤ГЁГ­Г Г¬ГЁГ·ГҐГ±ГЄГЁ, ГІГҐГ®Г°ГҐГІГЁГ·ГҐГ±ГЄГЁ ГЅГІГ® Г¬Г®Г¦Г­Г® ГЇГҐГ°ГҐГ­ГҐГ±ГІГЁ Гў ГЄГ®Г­ГІГ°ГіГЄГІГ®Г°.
 			tagsLDic =  {}
 			DB_metaIndxD = self.__model_instance.MediaLibPlayProcessDic_viaKey('DB_metaIndxD','local')	
 			
-			# Генерируем словать соответствий индексов трэков в БД и их СРЦ32	
+			# ГѓГҐГ­ГҐГ°ГЁГ°ГіГҐГ¬ Г±Г«Г®ГўГ ГІГј Г±Г®Г®ГІГўГҐГІГ±ГІГўГЁГ© ГЁГ­Г¤ГҐГЄГ±Г®Гў ГІГ°ГЅГЄГ®Гў Гў ГЃГ„ ГЁ ГЁГµ Г‘ГђГ–32	
 			DB_metaIndxD_inverted = {}
 			for a in DB_metaIndxD:
 				DB_metaIndxD_inverted[DB_metaIndxD[a][0]] = a
@@ -283,7 +283,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			modelDic['tagsLDic'] = tagsLDic	
 			
 		if 'albumD'	 in view_elem_id_Dic:
-			# Нужен вроде для выдачи картинок, и формирования дропдаун листа альбомов
+			# ГЌГіГ¦ГҐГ­ ГўГ°Г®Г¤ГҐ Г¤Г«Гї ГўГ»Г¤Г Г·ГЁ ГЄГ Г°ГІГЁГ­Г®ГЄ, ГЁ ГґГ®Г°Г¬ГЁГ°Г®ГўГ Г­ГЁГї Г¤Г°Г®ГЇГ¤Г ГіГ­ Г«ГЁГ±ГІГ  Г Г«ГјГЎГ®Г¬Г®Гў
 			modelDic['DB_metaIndxD_album'] = self.__model_instance.MediaLibPlayProcessDic_viaKey('DB_metaIndxD_album','local')
 			self.__logger.debug('albumD get is OK')
 			
@@ -300,13 +300,13 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			
 		if 	'artist_search_vars' in view_elem_id_Dic:	
 			modelDic['Tmpl'] = self.__model_instance.MediaLibPlayProcessDic_viaKey('Tmpl','local')
-			# в данном случае ожидается что переменная PlayControl_CurStatusD имеет значение возвращенное из метода контроллера [list]
+			# Гў Г¤Г Г­Г­Г®Г¬ Г±Г«ГіГ·Г ГҐ Г®Г¦ГЁГ¤Г ГҐГІГ±Гї Г·ГІГ® ГЇГҐГ°ГҐГ¬ГҐГ­Г­Г Гї PlayControl_CurStatusD ГЁГ¬ГҐГҐГІ Г§Г­Г Г·ГҐГ­ГЁГҐ ГўГ®Г§ГўГ°Г Г№ГҐГ­Г­Г®ГҐ ГЁГ§ Г¬ГҐГІГ®Г¤Г  ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  [list]
 			view_elem_id_Dic['artist_search_vars']=PlayControl_CurStatusD
 			self.__logger.debug('artist_search_vars get is OK')
 			
 		if 	'artist_search_vars_opt' in view_elem_id_Dic:	
 			modelDic['Tmpl'] = self.__model_instance.MediaLibPlayProcessDic_viaKey('Tmpl','local')
-			# в данном случае ожидается что переменная PlayControl_CurStatusD имеет значение возвращенное из метода контроллера [list]
+			# Гў Г¤Г Г­Г­Г®Г¬ Г±Г«ГіГ·Г ГҐ Г®Г¦ГЁГ¤Г ГҐГІГ±Гї Г·ГІГ® ГЇГҐГ°ГҐГ¬ГҐГ­Г­Г Гї PlayControl_CurStatusD ГЁГ¬ГҐГҐГІ Г§Г­Г Г·ГҐГ­ГЁГҐ ГўГ®Г§ГўГ°Г Г№ГҐГ­Г­Г®ГҐ ГЁГ§ Г¬ГҐГІГ®Г¤Г  ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  [list]
 			view_elem_id_Dic['artist_search_vars_opt']=PlayControl_CurStatusD	
 			self.__logger.debug('artist_search_vars_opt get is OK')
 		if 'debug' in view_elem_id_Dic:
@@ -400,7 +400,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			self.__logger.debug('main_page_elements get is OK')
 		
 		if 'cast_frame3' in view_elem_id_Dic:
-			# Получаем  содержимое листа от контроллера плеера
+			# ГЏГ®Г«ГіГ·Г ГҐГ¬  Г±Г®Г¤ГҐГ°Г¦ГЁГ¬Г®ГҐ Г«ГЁГ±ГІГ  Г®ГІ ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  ГЇГ«ГҐГҐГ°Г 
 			print 'cast_frame3 -1'
 			modelDic['Tmpl'] = self.__model_instance.MediaLibPlayProcessDic_viaKey('Tmpl','local')
 			print 'cast_frame3 -2'
@@ -428,7 +428,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			
 		if 'frame3' in view_elem_id_Dic or 'trackL' in view_elem_id_Dic or 'albumL' in view_elem_id_Dic:
 			if 'oldvers' in view_elem_id_Dic:
-			# Получаем  содержимое листа от контроллера плеера
+			# ГЏГ®Г«ГіГ·Г ГҐГ¬  Г±Г®Г¤ГҐГ°Г¦ГЁГ¬Г®ГҐ Г«ГЁГ±ГІГ  Г®ГІ ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  ГЇГ«ГҐГҐГ°Г 
 				l_data = zlib.decompress(self.__player_handler.get_cur_pl_as_list().data)
 				modelDic['PlayListL'] = pickle.loads(l_data)
 				modelDic['Tmpl'] = self.__model_instance.MediaLibPlayProcessDic_viaKey('Tmpl','local')
@@ -619,7 +619,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				audio_path = "G:\MUSIC\REPLICA_MP3\ORIGINAL_CDTEST\VA  Denon - Digital Sound Of The Future (Test CD)\(02). Balance and Phase Check.mp3"
 				#print 'new path = ',audio_path
 			
-		# попытаемся взять реплику.
+		# ГЇГ®ГЇГ»ГІГ ГҐГ¬Г±Гї ГўГ§ГїГІГј Г°ГҐГЇГ«ГЁГЄГі.
 		
 		#print "path =", audio_path
 		if os.path.exists(audio_path):
@@ -653,7 +653,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		command = None
 		http_Reply = ''
 		self.__commandRoutingDic = self.__model_instance.MediaLibPlayProcessDic_viaKey('commandRouting','local')
-		# Ниже в цикле определяем методы представления и методы контроллера сответствующие запросу через схему self.__commandRoutingDic
+		# ГЌГЁГ¦ГҐ Гў Г¶ГЁГЄГ«ГҐ Г®ГЇГ°ГҐГ¤ГҐГ«ГїГҐГ¬ Г¬ГҐГІГ®Г¤Г» ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї ГЁ Г¬ГҐГІГ®Г¤Г» ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  Г±Г®ГІГўГҐГІГ±ГІГўГіГѕГ№ГЁГҐ Г§Г ГЇГ°Г®Г±Гі Г·ГҐГ°ГҐГ§ Г±ГµГҐГ¬Гі self.__commandRoutingDic
 		for a in signatura_pool:
 			
 			if a in self.__commandRoutingDic:
@@ -685,17 +685,17 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		ignor_namesL = ['__doc__', '__module__', 'self_func']
 		
 		#print '-->1',a,signatura
-		# Так как диспетчер универсальный то данные проверки релевантны только для процесса контроля плеера
+		# Г’Г ГЄ ГЄГ ГЄ Г¤ГЁГ±ГЇГҐГІГ·ГҐГ° ГіГ­ГЁГўГҐГ°Г±Г Г«ГјГ­Г»Г© ГІГ® Г¤Г Г­Г­Г»ГҐ ГЇГ°Г®ГўГҐГ°ГЄГЁ Г°ГҐГ«ГҐГўГ Г­ГІГ­Г» ГІГ®Г«ГјГЄГ® Г¤Г«Гї ГЇГ°Г®Г¶ГҐГ±Г±Г  ГЄГ®Г­ГІГ°Г®Г«Гї ГЇГ«ГҐГҐГ°Г 
 		if 'logic_process' in self.__commandRoutingDic[a][command]:
 			if 'player_state' in self.__commandRoutingDic[a][command]['logic_process']:
 				
 				self.__logger.debug('player_state -->1.3 %s'%str((self.__commandRoutingDic[a][command].keys())))
-				#сохранить текущее состояние модели
+				#Г±Г®ГµГ°Г Г­ГЁГІГј ГІГҐГЄГіГ№ГҐГҐ Г±Г®Г±ГІГ®ГїГ­ГЁГҐ Г¬Г®Г¤ГҐГ«ГЁ
 				old_stateDic = self.__model_instance.getMediaLibPlayProcess_State()
 				#print 'old_stateDic song key:',old_stateDic['PlayerControl']
 		
-		# Вызвать необходимый метод контроллера, - модификация модели в соответствии с данной командой и тек. состоянием плеера
-		# в зависимости от запроса вызываем метод с параметрами или без
+		# Г‚Г»Г§ГўГ ГІГј Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г»Г© Г¬ГҐГІГ®Г¤ ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г , - Г¬Г®Г¤ГЁГґГЁГЄГ Г¶ГЁГї Г¬Г®Г¤ГҐГ«ГЁ Гў Г±Г®Г®ГІГўГҐГІГ±ГІГўГЁГЁ Г± Г¤Г Г­Г­Г®Г© ГЄГ®Г¬Г Г­Г¤Г®Г© ГЁ ГІГҐГЄ. Г±Г®Г±ГІГ®ГїГ­ГЁГҐГ¬ ГЇГ«ГҐГҐГ°Г 
+		# Гў Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГЁ Г®ГІ Г§Г ГЇГ°Г®Г±Г  ГўГ»Г§Г»ГўГ ГҐГ¬ Г¬ГҐГІГ®Г¤ Г± ГЇГ Г°Г Г¬ГҐГІГ°Г Г¬ГЁ ГЁГ«ГЁ ГЎГҐГ§
 		if signatura in self.__signatura_list_CONTROLLER:
 			if len(signatura_pool)>1:
 				#print 'Doing:',signatura,signatura_pool
@@ -723,7 +723,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		
 		
 		self.__logger.debug('Before logic_process check:%s'%(str(self.__commandRoutingDic[a][command])))
-		# Так как диспетчер универсальный то данные проверки релевантны только для процесса контроля плеера
+		# Г’Г ГЄ ГЄГ ГЄ Г¤ГЁГ±ГЇГҐГІГ·ГҐГ° ГіГ­ГЁГўГҐГ°Г±Г Г«ГјГ­Г»Г© ГІГ® Г¤Г Г­Г­Г»ГҐ ГЇГ°Г®ГўГҐГ°ГЄГЁ Г°ГҐГ«ГҐГўГ Г­ГІГ­Г» ГІГ®Г«ГјГЄГ® Г¤Г«Гї ГЇГ°Г®Г¶ГҐГ±Г±Г  ГЄГ®Г­ГІГ°Г®Г«Гї ГЇГ«ГҐГҐГ°Г 
 		if 'logic_process' in self.__commandRoutingDic[a][command]:
 			if 'client_merge' in self.__commandRoutingDic[a][command]['logic_process']:
 				#print "------------------------- Client merge",signatura_pool
@@ -738,10 +738,10 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				#print '-->3'
 				listType = listDescr = "!!!"
 				
-				# Проверить произошло ли изменение текущего альбома если да то в генерации для генерации вью запросить новый список треков
+				# ГЏГ°Г®ГўГҐГ°ГЁГІГј ГЇГ°Г®ГЁГ§Г®ГёГ«Г® Г«ГЁ ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГҐ ГІГҐГЄГіГ№ГҐГЈГ® Г Г«ГјГЎГ®Г¬Г  ГҐГ±Г«ГЁ Г¤Г  ГІГ® Гў ГЈГҐГ­ГҐГ°Г Г¶ГЁГЁ Г¤Г«Гї ГЈГҐГ­ГҐГ°Г Г¶ГЁГЁ ГўГјГѕ Г§Г ГЇГ°Г®Г±ГЁГІГј Г­Г®ГўГ»Г© Г±ГЇГЁГ±Г®ГЄ ГІГ°ГҐГЄГ®Гў
 				cur_stateDic = self.__model_instance.getMediaLibPlayProcess_State()
 		
-				# Определяем нужно ли переслать картинку альбома
+				# ГЋГЇГ°ГҐГ¤ГҐГ«ГїГҐГ¬ Г­ГіГ¦Г­Г® Г«ГЁ ГЇГҐГ°ГҐГ±Г«Г ГІГј ГЄГ Г°ГІГЁГ­ГЄГі Г Г«ГјГЎГ®Г¬Г 
 				if 'cover' in view_elemD:
 					try:
 						cover_res = self.__model_instance.check_updadeCoverPage_change_state()
@@ -765,8 +765,8 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					pc['cur_track_in_album_pos'] = 0
 					#print '101'
 					
-				# Блок синхронизации данных плейлиста, его содержимого, его как срц32L представления, и мета данных с ним связанных
-				# аналого функции client_layout_merge
+				# ГЃГ«Г®ГЄ Г±ГЁГ­ГµГ°Г®Г­ГЁГ§Г Г¶ГЁГЁ Г¤Г Г­Г­Г»Гµ ГЇГ«ГҐГ©Г«ГЁГ±ГІГ , ГҐГЈГ® Г±Г®Г¤ГҐГ°Г¦ГЁГ¬Г®ГЈГ®, ГҐГЈГ® ГЄГ ГЄ Г±Г°Г¶32L ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї, ГЁ Г¬ГҐГІГ  Г¤Г Г­Г­Г»Гµ Г± Г­ГЁГ¬ Г±ГўГїГ§Г Г­Г­Г»Гµ
+				# Г Г­Г Г«Г®ГЈГ® ГґГіГ­ГЄГ¶ГЁГЁ client_layout_merge
 					try:	
 						if cur_stateDic['curList_crc32'] <> pc['pL_CRC32']:
 							#print '111'
@@ -799,7 +799,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					self.__model_instance.setStopFlag(pc['playBack_Mode'])
 		
 
-				# Проверить произошло ли изменение текущего альбома если да то в генерации для генерации вью запросить новый список треков
+				# ГЏГ°Г®ГўГҐГ°ГЁГІГј ГЇГ°Г®ГЁГ§Г®ГёГ«Г® Г«ГЁ ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГҐ ГІГҐГЄГіГ№ГҐГЈГ® Г Г«ГјГЎГ®Г¬Г  ГҐГ±Г«ГЁ Г¤Г  ГІГ® Гў ГЈГҐГ­ГҐГ°Г Г¶ГЁГЁ Г¤Г«Гї ГЈГҐГ­ГҐГ°Г Г¶ГЁГЁ ГўГјГѕ Г§Г ГЇГ°Г®Г±ГЁГІГј Г­Г®ГўГ»Г© Г±ГЇГЁГ±Г®ГЄ ГІГ°ГҐГЄГ®Гў
 				pc['cur_track_in_album_pos'] = cur_stateDic['songNum']-cur_stateDic['albumNum']
 				print "dispatcher: album positions :",cur_stateDic['songNum'], cur_stateDic['albumNum']
 				
@@ -844,7 +844,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				modelStateDic = self.__model_instance.getMediaLibPlayProcess_State()
 				#print 'before vie2'	,signatura_view_method	
 				
-		# Перед вызовов метода view MVC необходимо подготовить все управляющие структуры, словари, списки эти элементы мы берем из модели MVC
+		# ГЏГҐГ°ГҐГ¤ ГўГ»Г§Г®ГўГ®Гў Г¬ГҐГІГ®Г¤Г  view MVC Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г® ГЇГ®Г¤ГЈГ®ГІГ®ГўГЁГІГј ГўГ±ГҐ ГіГЇГ°Г ГўГ«ГїГѕГ№ГЁГҐ Г±ГІГ°ГіГЄГІГіГ°Г», Г±Г«Г®ГўГ Г°ГЁ, Г±ГЇГЁГ±ГЄГЁ ГЅГІГЁ ГЅГ«ГҐГ¬ГҐГ­ГІГ» Г¬Г» ГЎГҐГ°ГҐГ¬ ГЁГ§ Г¬Г®Г¤ГҐГ«ГЁ MVC
 		# profile  this -------------------------------
 		
 		if 'current_Album_order_Indx' not in self.__modelDic:
@@ -865,9 +865,9 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			modelDic = self.get_modelDic(view_elemD,pc)		
 		#print '-->5 %s pc=%s'%(str(signatura_view_method),str(pc))	
 		#----------------------
-		# Тут происходит вызов метода представления, возвращающего либо готовую страницу либо json ответ для части страницы
-		# self.__instance_VIEW - инстанция класса MediaLib_ViewGen (medialib_pages.py)
-		# signatura_view_method - метод класса MediaLib_ViewGen автоматически определенный через схему  self.__commandRoutingDic
+		# Г’ГіГІ ГЇГ°Г®ГЁГ±ГµГ®Г¤ГЁГІ ГўГ»Г§Г®Гў Г¬ГҐГІГ®Г¤Г  ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї, ГўГ®Г§ГўГ°Г Г№Г ГѕГ№ГҐГЈГ® Г«ГЁГЎГ® ГЈГ®ГІГ®ГўГіГѕ Г±ГІГ°Г Г­ГЁГ¶Гі Г«ГЁГЎГ® json Г®ГІГўГҐГІ Г¤Г«Гї Г·Г Г±ГІГЁ Г±ГІГ°Г Г­ГЁГ¶Г»
+		# self.__instance_VIEW - ГЁГ­Г±ГІГ Г­Г¶ГЁГї ГЄГ«Г Г±Г±Г  MediaLib_ViewGen (medialib_pages.py)
+		# signatura_view_method - Г¬ГҐГІГ®Г¤ ГЄГ«Г Г±Г±Г  MediaLib_ViewGen Г ГўГІГ®Г¬Г ГІГЁГ·ГҐГ±ГЄГЁ Г®ГЇГ°ГҐГ¤ГҐГ«ГҐГ­Г­Г»Г© Г·ГҐГ°ГҐГ§ Г±ГµГҐГ¬Гі  self.__commandRoutingDic
 		#-----------------------
 		
 		self.__logger.debug('Before view method:%s'%(str(signatura_view_method)))
@@ -903,9 +903,9 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return None
 		
 	def get_data_for_player_context(self,PlayControl_CurStatusD,modelDic,view_elemD,*args):
-	# функция - расширение для get_modelDic, сложные алгоритмы в рамках get_modelDic должны реализоваываться в подобных функциях.
-	# функция по заданиям определенным в view_elemD и анализируя текущий буфер данных modelDic
-	# собирает данные контекста плеера и помещает их по ключам в modelDic
+	# ГґГіГ­ГЄГ¶ГЁГї - Г°Г Г±ГёГЁГ°ГҐГ­ГЁГҐ Г¤Г«Гї get_modelDic, Г±Г«Г®Г¦Г­Г»ГҐ Г Г«ГЈГ®Г°ГЁГІГ¬Г» Гў Г°Г Г¬ГЄГ Гµ get_modelDic Г¤Г®Г«Г¦Г­Г» Г°ГҐГ Г«ГЁГ§Г®ГўГ Г»ГўГ ГІГјГ±Гї Гў ГЇГ®Г¤Г®ГЎГ­Г»Гµ ГґГіГ­ГЄГ¶ГЁГїГµ.
+	# ГґГіГ­ГЄГ¶ГЁГї ГЇГ® Г§Г Г¤Г Г­ГЁГїГ¬ Г®ГЇГ°ГҐГ¤ГҐГ«ГҐГ­Г­Г»Г¬ Гў view_elemD ГЁ Г Г­Г Г«ГЁГ§ГЁГ°ГіГї ГІГҐГЄГіГ№ГЁГ© ГЎГіГґГҐГ° Г¤Г Г­Г­Г»Гµ modelDic
+	# Г±Г®ГЎГЁГ°Г ГҐГІ Г¤Г Г­Г­Г»ГҐ ГЄГ®Г­ГІГҐГЄГ±ГІГ  ГЇГ«ГҐГҐГ°Г  ГЁ ГЇГ®Г¬ГҐГ№Г ГҐГІ ГЁГµ ГЇГ® ГЄГ«ГѕГ·Г Г¬ Гў modelDic
 		print "get_data_for_player_context ----> START OK",view_elemD.keys()
 		self.__logger.debug("get_data_for_player_context ----> START OK. "+str(view_elemD.keys()))
 		
@@ -978,7 +978,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			
 			self.__logger.debug("""--modelDic['obj_categDL']->"""+str(modelDic['obj_categDL']))
 		
-		# Заменить нижнюю конструкцию на взятие данных из модели.
+		# Г‡Г Г¬ГҐГ­ГЁГІГј Г­ГЁГ¦Г­ГѕГѕ ГЄГ®Г­Г±ГІГ°ГіГЄГ¶ГЁГѕ Г­Г  ГўГ§ГїГІГЁГҐ Г¤Г Г­Г­Г»Гµ ГЁГ§ Г¬Г®Г¤ГҐГ«ГЁ.
 		modelDic['PlayList_asCRC32_L'] = self.__model_instance.MediaLibPlayProcessDic()['PlayList_asCRC32_L']
 		
 		crc32L=[]
@@ -1000,7 +1000,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		self.__logger.debug("""913 Check albumD and album_initial""")
 		albumL = []
 		
-		#тут вычислить тип альбома на НСА и сохранить этот атрибут isNSA
+		#ГІГіГІ ГўГ»Г·ГЁГ±Г«ГЁГІГј ГІГЁГЇ Г Г«ГјГЎГ®Г¬Г  Г­Г  ГЌГ‘ГЂ ГЁ Г±Г®ГµГ°Г Г­ГЁГІГј ГЅГІГ®ГІ Г ГІГ°ГЁГЎГіГІ isNSA
 		isNSA = False
 		
 		#print albumD.keys()
@@ -1045,7 +1045,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			
 				if cur_track_key == track_i[3]:
 					cur_in_album_pos_flat = index_flat
-	# ВНИМАНИЕ!!! Ни в коем случае не обрезать длину названия трэка, альбома, артиста это приводи к ошибки декодирования UTF			
+	# Г‚ГЌГ€ГЊГЂГЌГ€Г…!!! ГЌГЁ Гў ГЄГ®ГҐГ¬ Г±Г«ГіГ·Г ГҐ Г­ГҐ Г®ГЎГ°ГҐГ§Г ГІГј Г¤Г«ГЁГ­Гі Г­Г Г§ГўГ Г­ГЁГї ГІГ°ГЅГЄГ , Г Г«ГјГЎГ®Г¬Г , Г Г°ГІГЁГ±ГІГ  ГЅГІГ® ГЇГ°ГЁГўГ®Г¤ГЁ ГЄ Г®ГёГЁГЎГЄГЁ Г¤ГҐГЄГ®Г¤ГЁГ°Г®ГўГ Г­ГЁГї UTF			
 				trackL_flat.append({'track':track_i[0],'artist':track_i[2],'artist_key':track_i[5],'lPos':track_i[1],'in_alb_pos':track_i[1]-albumD[a]['firstFileIndex']+1,'even_odd':'even','track_key':track_i[3],'track_time':track_i[4],'bitrate':track_i[6]})
 				index_flat+=1
 				
@@ -1053,12 +1053,12 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					#print a
 					if cur_track_key == track_i[3]:
 						cur_in_album_pos = index
-	# ВНИМАНИЕ!!! Ни в коем случае не обрезать длину названия трэка, альбома, артиста это приводи к ошибки декодирования UTF
+	# Г‚ГЌГ€ГЊГЂГЌГ€Г…!!! ГЌГЁ Гў ГЄГ®ГҐГ¬ Г±Г«ГіГ·Г ГҐ Г­ГҐ Г®ГЎГ°ГҐГ§Г ГІГј Г¤Г«ГЁГ­Гі Г­Г Г§ГўГ Г­ГЁГї ГІГ°ГЅГЄГ , Г Г«ГјГЎГ®Г¬Г , Г Г°ГІГЁГ±ГІГ  ГЅГІГ® ГЇГ°ГЁГўГ®Г¤ГЁ ГЄ Г®ГёГЁГЎГЄГЁ Г¤ГҐГЄГ®Г¤ГЁГ°Г®ГўГ Г­ГЁГї UTF
 					trackL.append({'track':track_i[0],'artist':track_i[2],'artist_key':track_i[5],'lPos':track_i[1],'in_alb_pos':track_i[1]-albumD[a]['firstFileIndex']+1,'even_odd':'even','track_key':track_i[3],'track_time':track_i[4],'bitrate':track_i[6]})
 					index+=1
 		
 			if 'album_initial' in args:
-			# тут проверить совпадает ли количество трэков в листе с количеством реальных трэков в альбоме, и если нет, то сделать список востановленных трэков
+			# ГІГіГІ ГЇГ°Г®ГўГҐГ°ГЁГІГј Г±Г®ГўГЇГ Г¤Г ГҐГІ Г«ГЁ ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ® ГІГ°ГЅГЄГ®Гў Гў Г«ГЁГ±ГІГҐ Г± ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ®Г¬ Г°ГҐГ Г«ГјГ­Г»Гµ ГІГ°ГЅГЄГ®Гў Гў Г Г«ГјГЎГ®Г¬ГҐ, ГЁ ГҐГ±Г«ГЁ Г­ГҐГІ, ГІГ® Г±Г¤ГҐГ«Г ГІГј Г±ГЇГЁГ±Г®ГЄ ГўГ®Г±ГІГ Г­Г®ГўГ«ГҐГ­Г­Г»Гµ ГІГ°ГЅГЄГ®Гў
 				trackL.sort(key=operator.itemgetter('lPos'))
 				albumItem['tbRestored'] = restoreTracks
 				albumL.append(albumItem)	
@@ -1084,7 +1084,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 						
 		
 	def client_layout_merge(self,mode,client_state,pc, view_elemD):	
-		# Определяет необходимые изменения в представлении клиента на основе его текущего статуса!!client_state!!
+		# ГЋГЇГ°ГҐГ¤ГҐГ«ГїГҐГІ Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г»ГҐ ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї Гў ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГЁ ГЄГ«ГЁГҐГ­ГІГ  Г­Г  Г®Г±Г­Г®ГўГҐ ГҐГЈГ® ГІГҐГЄГіГ№ГҐГЈГ® Г±ГІГ ГІГіГ±Г !!client_state!!
 		self.__logger.info("method client_layout_merge in MVC controller:%s"%(str(client_state)))
 		print
 		print '####################>>>>>>>>> client_layout_merge'
@@ -1129,7 +1129,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			print "---New track"
 			view_elemD['tagsL']=''
 			return	
-		# не будет изменений но надо восстановить убитые в view переменные	
+		# Г­ГҐ ГЎГіГ¤ГҐГІ ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГ© Г­Г® Г­Г Г¤Г® ГўГ®Г±Г±ГІГ Г­Г®ГўГЁГІГј ГіГЎГЁГІГ»ГҐ Гў view ГЇГҐГ°ГҐГ¬ГҐГ­Г­Г»ГҐ	
 		if 'cur_track_in_album_pos' not in self.__modelDic:
 			cur_stateDic = self.__model_instance.getMediaLibPlayProcess_State()
 			self.__modelDic['cur_track_in_album_pos'] = cur_stateDic['songNum']-cur_stateDic['albumNum']	
@@ -1219,10 +1219,10 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			self.__model_instance.update_model_state(pc)
 			
 			
-			# Получаем  содержимое листа от контроллера плеера
+			# ГЏГ®Г«ГіГ·Г ГҐГ¬  Г±Г®Г¤ГҐГ°Г¦ГЁГ¬Г®ГҐ Г«ГЁГ±ГІГ  Г®ГІ ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  ГЇГ«ГҐГҐГ°Г 
 			#l_data = zlib.decompress(self.__player_handler.get_cur_pl_as_list().data)
 			#self.__PlayListL = 	pickle.loads(l_data)
-			# Генерируем его содержимое как crc32L
+			# ГѓГҐГ­ГҐГ°ГЁГ°ГіГҐГ¬ ГҐГЈГ® Г±Г®Г¤ГҐГ°Г¦ГЁГ¬Г®ГҐ ГЄГ ГЄ crc32L
 			#try:
 			#	self.__PlayList_asCRC32_L = [zlib.crc32(a) for a in self.__PlayListL]	
 			#except:
@@ -1244,7 +1244,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			album_num = prev_next[1]	
 			#print next,album_num
 			
-		# ---> 	ВНИМАНИЕ - Необходима актуализация модели
+		# ---> 	Г‚ГЌГ€ГЊГЂГЌГ€Г… - ГЌГҐГ®ГЎГµГ®Г¤ГЁГ¬Г  Г ГЄГІГіГ Г«ГЁГ§Г Г¶ГЁГї Г¬Г®Г¤ГҐГ«ГЁ
 		self.__model_instance.setSongAlbumNums(next,album_num)
 		#print 'End of next'
 		return pc
@@ -1282,7 +1282,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			album_num = prev_next[1]	
 			#print next,album_num
 			
-		# ---> 	ВНИМАНИЕ - Необходима актуализация модели
+		# ---> 	Г‚ГЌГ€ГЊГЂГЌГ€Г… - ГЌГҐГ®ГЎГµГ®Г¤ГЁГ¬Г  Г ГЄГІГіГ Г«ГЁГ§Г Г¶ГЁГї Г¬Г®Г¤ГҐГ«ГЁ
 		self.__model_instance.setSongAlbumNums(next,album_num)
 		#print 'End of next'
 		return pc
@@ -1296,15 +1296,15 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		if prev < album_num:
 			album_num = prev_next[0]	
 			
-		# ---> 	ВНИМАНИЕ - Актуализация модели	
+		# ---> 	Г‚ГЌГ€ГЊГЂГЌГ€Г… - ГЂГЄГІГіГ Г«ГЁГ§Г Г¶ГЁГї Г¬Г®Г¤ГҐГ«ГЁ	
 		self.__model_instance.setSongAlbumNums(prev,album_num)
 			#print 'next:',prev,'album_num:',album_num
 		return pc	
 		
 	def forward(self):
 		#print 'Catch forward track!!!!'
-		# При перемотках не требуется изменение модели, так как единственно, что меняется при этом это "время до конца",
-		# а оно возвращается в статусе и передается в генератор представления напрямую
+		# ГЏГ°ГЁ ГЇГҐГ°ГҐГ¬Г®ГІГЄГ Гµ Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГҐ Г¬Г®Г¤ГҐГ«ГЁ, ГІГ ГЄ ГЄГ ГЄ ГҐГ¤ГЁГ­Г±ГІГўГҐГ­Г­Г®, Г·ГІГ® Г¬ГҐГ­ГїГҐГІГ±Гї ГЇГ°ГЁ ГЅГІГ®Г¬ ГЅГІГ® "ГўГ°ГҐГ¬Гї Г¤Г® ГЄГ®Г­Г¶Г ",
+		# Г  Г®Г­Г® ГўГ®Г§ГўГ°Г Г№Г ГҐГІГ±Гї Гў Г±ГІГ ГІГіГ±ГҐ ГЁ ГЇГҐГ°ГҐГ¤Г ГҐГІГ±Гї Гў ГЈГҐГ­ГҐГ°Г ГІГ®Г° ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї Г­Г ГЇГ°ГїГ¬ГіГѕ
 		
 		pc = self.__player_handler.forward()		
 		return pc
@@ -1315,8 +1315,8 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		if 'set_song_pos' in commandD:
 			pos = int(commandD['set_song_pos'])
 			#print "pos = ",commandD['set_song_pos']
-		# При перемотках не требуется изменение модели, так как единственно, что меняется при этом это "время до конца",
-		# а оно возвращается в статусе и передается в генератор представления напрямую
+		# ГЏГ°ГЁ ГЇГҐГ°ГҐГ¬Г®ГІГЄГ Гµ Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГҐ Г¬Г®Г¤ГҐГ«ГЁ, ГІГ ГЄ ГЄГ ГЄ ГҐГ¤ГЁГ­Г±ГІГўГҐГ­Г­Г®, Г·ГІГ® Г¬ГҐГ­ГїГҐГІГ±Гї ГЇГ°ГЁ ГЅГІГ®Г¬ ГЅГІГ® "ГўГ°ГҐГ¬Гї Г¤Г® ГЄГ®Г­Г¶Г ",
+		# Г  Г®Г­Г® ГўГ®Г§ГўГ°Г Г№Г ГҐГІГ±Гї Гў Г±ГІГ ГІГіГ±ГҐ ГЁ ГЇГҐГ°ГҐГ¤Г ГҐГІГ±Гї Гў ГЈГҐГ­ГҐГ°Г ГІГ®Г° ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї Г­Г ГЇГ°ГїГ¬ГіГѕ
 		
 			pc = self.__player_handler.set_position_within_the_track(pos)		
 			return pc	
@@ -1328,16 +1328,16 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		if 'set_song_pos_' in commandD:
 			pos = int(commandD['set_song_pos_'])
 			#print "pos = ",commandD['set_song_pos']
-		# При перемотках не требуется изменение модели, так как единственно, что меняется при этом это "время до конца",
-		# а оно возвращается в статусе и передается в генератор представления напрямую
+		# ГЏГ°ГЁ ГЇГҐГ°ГҐГ¬Г®ГІГЄГ Гµ Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГҐ Г¬Г®Г¤ГҐГ«ГЁ, ГІГ ГЄ ГЄГ ГЄ ГҐГ¤ГЁГ­Г±ГІГўГҐГ­Г­Г®, Г·ГІГ® Г¬ГҐГ­ГїГҐГІГ±Гї ГЇГ°ГЁ ГЅГІГ®Г¬ ГЅГІГ® "ГўГ°ГҐГ¬Гї Г¤Г® ГЄГ®Г­Г¶Г ",
+		# Г  Г®Г­Г® ГўГ®Г§ГўГ°Г Г№Г ГҐГІГ±Гї Гў Г±ГІГ ГІГіГ±ГҐ ГЁ ГЇГҐГ°ГҐГ¤Г ГҐГІГ±Гї Гў ГЈГҐГ­ГҐГ°Г ГІГ®Г° ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї Г­Г ГЇГ°ГїГ¬ГіГѕ
 		
 			pc = self.__player_handler.set_position_within_the_track(pos)		
 			return pc	
 		return -1		
 		
 	def rewind(self):
-		# При перемотках не требуется изменение модели, так как единственно, что меняется при этом это "время до конца",
-		# а оно возвращается в статусе и передается в генератор представления напрямую
+		# ГЏГ°ГЁ ГЇГҐГ°ГҐГ¬Г®ГІГЄГ Гµ Г­ГҐ ГІГ°ГҐГЎГіГҐГІГ±Гї ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГҐ Г¬Г®Г¤ГҐГ«ГЁ, ГІГ ГЄ ГЄГ ГЄ ГҐГ¤ГЁГ­Г±ГІГўГҐГ­Г­Г®, Г·ГІГ® Г¬ГҐГ­ГїГҐГІГ±Гї ГЇГ°ГЁ ГЅГІГ®Г¬ ГЅГІГ® "ГўГ°ГҐГ¬Гї Г¤Г® ГЄГ®Г­Г¶Г ",
+		# Г  Г®Г­Г® ГўГ®Г§ГўГ°Г Г№Г ГҐГІГ±Гї Гў Г±ГІГ ГІГіГ±ГҐ ГЁ ГЇГҐГ°ГҐГ¤Г ГҐГІГ±Гї Гў ГЈГҐГ­ГҐГ°Г ГІГ®Г° ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї Г­Г ГЇГ°ГїГ¬ГіГѕ
 		pc = self.__player_handler.rewind()
 		return pc
 	def goto_Track(self,commandD):
@@ -1412,7 +1412,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			self.__model_instance.setSongAlbumNums(trackNum,trackNum)
 		return pc	
 	
-#	Это надо модифицировать под новую архитектуру	
+#	ГќГІГ® Г­Г Г¤Г® Г¬Г®Г¤ГЁГґГЁГ¶ГЁГ°Г®ГўГ ГІГј ГЇГ®Г¤ Г­Г®ГўГіГѕ Г Г°ГµГЁГІГҐГЄГІГіГ°Гі	
 
   	def play_list_from_queueL(self,listCRC32_key):
 		
@@ -1558,14 +1558,14 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		song_pos = 0
 		
 		if title_crc32 == None:
-			# Если перегенерация на основе данных текущей композиции, то сохраняем ее СРЦ32
+			# Г…Г±Г«ГЁ ГЇГҐГ°ГҐГЈГҐГ­ГҐГ°Г Г¶ГЁГї Г­Г  Г®Г±Г­Г®ГўГҐ Г¤Г Г­Г­Г»Гµ ГІГҐГЄГіГ№ГҐГ© ГЄГ®Г¬ГЇГ®Г§ГЁГ¶ГЁГЁ, ГІГ® Г±Г®ГµГ°Г Г­ГїГҐГ¬ ГҐГҐ Г‘ГђГ–32
 			PlayControl_CurStatusD = self.__player_handler.get_status()
 			curCRC32 = PlayControl_CurStatusD['track_CRC32']	
 		elif title_crc32 == 0:
-			# Если нет, то переход в точку указанную в параметрах 
+			# Г…Г±Г«ГЁ Г­ГҐГІ, ГІГ® ГЇГҐГ°ГҐГµГ®Г¤ Гў ГІГ®Г·ГЄГі ГіГЄГ Г§Г Г­Г­ГіГѕ Гў ГЇГ Г°Г Г¬ГҐГІГ°Г Гµ 
 			curCRC32 = title_crc32	
 		else:
-			# Если нет, то переход в точку указанную в параметрах 
+			# Г…Г±Г«ГЁ Г­ГҐГІ, ГІГ® ГЇГҐГ°ГҐГµГ®Г¤ Гў ГІГ®Г·ГЄГі ГіГЄГ Г§Г Г­Г­ГіГѕ Гў ГЇГ Г°Г Г¬ГҐГІГ°Г Гµ 
 			curCRC32 = title_crc32
 		#print "DECEMBER 2015 *********** curCRC32:",curCRC32	
 		dbPath = self.__model_instance.getMediaLibPlayProcessContext()['dbPath']
@@ -1573,7 +1573,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		if tagId == None:
 			return pc
 		
-		# Проверка концепции загрузки листов минуя файловую систему	
+		# ГЏГ°Г®ГўГҐГ°ГЄГ  ГЄГ®Г­Г¶ГҐГЇГ¶ГЁГЁ Г§Г ГЈГ°ГіГ§ГЄГЁ Г«ГЁГ±ГІГ®Гў Г¬ГЁГ­ГіГї ГґГ Г©Г«Г®ГўГіГѕ Г±ГЁГ±ГІГҐГ¬Гі	
 		t_start = time.time()
 		if tagType == 'hard_tag':	
 			plS=createPlayList_viaTagId(tagId,db)
@@ -1718,7 +1718,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 	def cast_goto_Track(self,commandD):	
 		self.__logger.info('method cast_goto_Track:%s'%(str(commandD)))
 		
-		# Создаем в рамках думми сессии данные по ее текущему листу в будущем сессия создается при логине и тут вместо 1 передается настоящий индекс сессии	
+		# Г‘Г®Г§Г¤Г ГҐГ¬ Гў Г°Г Г¬ГЄГ Гµ Г¤ГіГ¬Г¬ГЁ Г±ГҐГ±Г±ГЁГЁ Г¤Г Г­Г­Г»ГҐ ГЇГ® ГҐГҐ ГІГҐГЄГіГ№ГҐГ¬Гі Г«ГЁГ±ГІГі Гў ГЎГіГ¤ГіГ№ГҐГ¬ Г±ГҐГ±Г±ГЁГї Г±Г®Г§Г¤Г ГҐГІГ±Гї ГЇГ°ГЁ Г«Г®ГЈГЁГ­ГҐ ГЁ ГІГіГІ ГўГ¬ГҐГ±ГІГ® 1 ГЇГҐГ°ГҐГ¤Г ГҐГІГ±Гї Г­Г Г±ГІГ®ГїГ№ГЁГ© ГЁГ­Г¤ГҐГЄГ± Г±ГҐГ±Г±ГЁГЁ	
 		
 
 		
@@ -1732,7 +1732,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 	def cast_next_trc(self,commandD):	
 		
 		self.__logger.info('method goto_next_tarck:%s'%(str(commandD)))
-		# Создаем в рамках думми сессии данные по ее текущему листу в будущем сессия создается при логине и тут вместо 1 передается настоящий индекс сессии	
+		# Г‘Г®Г§Г¤Г ГҐГ¬ Гў Г°Г Г¬ГЄГ Гµ Г¤ГіГ¬Г¬ГЁ Г±ГҐГ±Г±ГЁГЁ Г¤Г Г­Г­Г»ГҐ ГЇГ® ГҐГҐ ГІГҐГЄГіГ№ГҐГ¬Гі Г«ГЁГ±ГІГі Гў ГЎГіГ¤ГіГ№ГҐГ¬ Г±ГҐГ±Г±ГЁГї Г±Г®Г§Г¤Г ГҐГІГ±Гї ГЇГ°ГЁ Г«Г®ГЈГЁГ­ГҐ ГЁ ГІГіГІ ГўГ¬ГҐГ±ГІГ® 1 ГЇГҐГ°ГҐГ¤Г ГҐГІГ±Гї Г­Г Г±ГІГ®ГїГ№ГЁГ© ГЁГ­Г¤ГҐГЄГ± Г±ГҐГ±Г±ГЁГЁ	
 		
 
 		
@@ -1745,7 +1745,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 	
 	def cast_prev_trc(self,commandD):	
 		self.__logger.info('method goto_prev_tarck:%s'%(str(commandD)))
-		# Создаем в рамках думми сессии данные по ее текущему листу в будущем сессия создается при логине и тут вместо 1 передается настоящий индекс сессии	
+		# Г‘Г®Г§Г¤Г ГҐГ¬ Гў Г°Г Г¬ГЄГ Гµ Г¤ГіГ¬Г¬ГЁ Г±ГҐГ±Г±ГЁГЁ Г¤Г Г­Г­Г»ГҐ ГЇГ® ГҐГҐ ГІГҐГЄГіГ№ГҐГ¬Гі Г«ГЁГ±ГІГі Гў ГЎГіГ¤ГіГ№ГҐГ¬ Г±ГҐГ±Г±ГЁГї Г±Г®Г§Г¤Г ГҐГІГ±Гї ГЇГ°ГЁ Г«Г®ГЈГЁГ­ГҐ ГЁ ГІГіГІ ГўГ¬ГҐГ±ГІГ® 1 ГЇГҐГ°ГҐГ¤Г ГҐГІГ±Гї Г­Г Г±ГІГ®ГїГ№ГЁГ© ГЁГ­Г¤ГҐГЄГ± Г±ГҐГ±Г±ГЁГЁ	
 		try:	
 			self.__model_instance.set_CastPlayList(self.__modelDic['REMOTE_ADDR'],{'cur_track_id':commandD['track_id'],'player_status':''})	
 			#self.__modelDic['CastPlayListD'] = self.__model_instance.get_CastPlayList(1,{'cur_track_id':commandD['track_id'],'player_status':''})	
@@ -1791,7 +1791,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		for a in resD['sortedL']:
 			castL.append(resD['metaD'][a]['id_track'])
 			
-		# Создаем в рамках думми сессии данные по ее текущему листу в будущем сессия создается при логине и тут вместо 1 передается настоящий индекс сессии	
+		# Г‘Г®Г§Г¤Г ГҐГ¬ Гў Г°Г Г¬ГЄГ Гµ Г¤ГіГ¬Г¬ГЁ Г±ГҐГ±Г±ГЁГЁ Г¤Г Г­Г­Г»ГҐ ГЇГ® ГҐГҐ ГІГҐГЄГіГ№ГҐГ¬Гі Г«ГЁГ±ГІГі Гў ГЎГіГ¤ГіГ№ГҐГ¬ Г±ГҐГ±Г±ГЁГї Г±Г®Г§Г¤Г ГҐГІГ±Гї ГЇГ°ГЁ Г«Г®ГЈГЁГ­ГҐ ГЁ ГІГіГІ ГўГ¬ГҐГ±ГІГ® 1 ГЇГҐГ°ГҐГ¤Г ГҐГІГ±Гї Г­Г Г±ГІГ®ГїГ№ГЁГ© ГЁГ­Г¤ГҐГЄГ± Г±ГҐГ±Г±ГЁГЁ	
 		try:	
 			self.__model_instance.set_CastPlayList(self.__modelDic['REMOTE_ADDR'],{'cur_track_id':castL[0],'player_status':'','metaD':resD['metaD'],'castL':castL,'crc32L':resD['sortedL']})	
 		except Exception,e:
@@ -1835,7 +1835,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		for a in resD['sortedL']:
 			castL.append(resD['metaD'][a]['id_track'])
 			
-		# Создаем в рамках думми сессии данные по ее текущему листу в будущем сессия создается при логине и тут вместо 1 передается настоящий индекс сессии	
+		# Г‘Г®Г§Г¤Г ГҐГ¬ Гў Г°Г Г¬ГЄГ Гµ Г¤ГіГ¬Г¬ГЁ Г±ГҐГ±Г±ГЁГЁ Г¤Г Г­Г­Г»ГҐ ГЇГ® ГҐГҐ ГІГҐГЄГіГ№ГҐГ¬Гі Г«ГЁГ±ГІГі Гў ГЎГіГ¤ГіГ№ГҐГ¬ Г±ГҐГ±Г±ГЁГї Г±Г®Г§Г¤Г ГҐГІГ±Гї ГЇГ°ГЁ Г«Г®ГЈГЁГ­ГҐ ГЁ ГІГіГІ ГўГ¬ГҐГ±ГІГ® 1 ГЇГҐГ°ГҐГ¤Г ГҐГІГ±Гї Г­Г Г±ГІГ®ГїГ№ГЁГ© ГЁГ­Г¤ГҐГЄГ± Г±ГҐГ±Г±ГЁГЁ	
 		try:	
 			self.__model_instance.set_CastPlayList(self.__modelDic['REMOTE_ADDR'],{'cur_track_id':castL[0],'player_status':'','metaD':resD['metaD'],'castL':castL,'crc32L':resD['sortedL']})	
 		except:
@@ -1974,13 +1974,13 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		
 		mediaPath =	self.__model_instance.MediaLibPlayProcessDic_viaKey('configDict','local')['mediaPath']
 		list_path_name = mediaPath+"Plugins\\ml\\"+listKey
-		# так как пока позиция в листе неизвестна, то ставим ее на начало списка
+		# ГІГ ГЄ ГЄГ ГЄ ГЇГ®ГЄГ  ГЇГ®Г§ГЁГ¶ГЁГї Гў Г«ГЁГ±ГІГҐ Г­ГҐГЁГ§ГўГҐГ±ГІГ­Г , ГІГ® Г±ГІГ ГўГЁГ¬ ГҐГҐ Г­Г  Г­Г Г·Г Г«Г® Г±ГЇГЁГ±ГЄГ 
 		pc = self.__player_handler.new_list_load(list_path_name,track_pos)
 		
-		# Получаем  содержимое всех CRC32 значений листа от контроллера плеера
+		# ГЏГ®Г«ГіГ·Г ГҐГ¬  Г±Г®Г¤ГҐГ°Г¦ГЁГ¬Г®ГҐ ГўГ±ГҐГµ CRC32 Г§Г­Г Г·ГҐГ­ГЁГ© Г«ГЁГ±ГІГ  Г®ГІ ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  ГЇГ«ГҐГҐГ°Г 
 		PlayList_asCRC32_L = self.__player_handler.get_cur_pl_as_list_of_crc32()
 		
-		# Получаем номер позиции в списке
+		# ГЏГ®Г«ГіГ·Г ГҐГ¬ Г­Г®Г¬ГҐГ° ГЇГ®Г§ГЁГ¶ГЁГЁ Гў Г±ГЇГЁГ±ГЄГҐ
 		if entryCRC32 in PlayList_asCRC32_L:
 			track_pos = PlayList_asCRC32_L.index(entryCRC32)
 			
@@ -2007,7 +2007,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return pc
 		
 	def play_search_selectedL_new(self,commandD):	
-		# Новый метод загрузки плейлиста через список CRC32 трэков без использование буфера придыдучего поиска
+		# ГЌГ®ГўГ»Г© Г¬ГҐГІГ®Г¤ Г§Г ГЈГ°ГіГ§ГЄГЁ ГЇГ«ГҐГ©Г«ГЁГ±ГІГ  Г·ГҐГ°ГҐГ§ Г±ГЇГЁГ±Г®ГЄ CRC32 ГІГ°ГЅГЄГ®Гў ГЎГҐГ§ ГЁГ±ГЇГ®Г«ГјГ§Г®ГўГ Г­ГЁГҐ ГЎГіГґГҐГ°Г  ГЇГ°ГЁГ¤Г»Г¤ГіГ·ГҐГЈГ® ГЇГ®ГЁГ±ГЄГ 
 		self.__logger.info('method play_search_selectedL_new:%s'%(str(commandD)))
 		dbPath = self.__model_instance.getMediaLibPlayProcessContext()['dbPath']
 		
@@ -2081,7 +2081,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			search_term = searchBuf['searchTerm']
 			
 		#print 	'play_search_selectedL:',search_term,len(searchBuf['sD'])
-		# Убрать ниже стоящий буфер и брать из БД по db_id
+		# Г“ГЎГ°Г ГІГј Г­ГЁГ¦ГҐ Г±ГІГ®ГїГ№ГЁГ© ГЎГіГґГҐГ° ГЁ ГЎГ°Г ГІГј ГЁГ§ ГЃГ„ ГЇГ® db_id
 		sD = searchBuf['sD']
 		copy_sD = {}
 			
@@ -2329,7 +2329,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return 1
 		
 	def	do_artist_search(self,commandD):	
-		# В этой функции в зависимости от команды искать либо в буфере всех метаданных либо только в метаданных по базе Артистов.
+		# Г‚ ГЅГІГ®Г© ГґГіГ­ГЄГ¶ГЁГЁ Гў Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГЁ Г®ГІ ГЄГ®Г¬Г Г­Г¤Г» ГЁГ±ГЄГ ГІГј Г«ГЁГЎГ® Гў ГЎГіГґГҐГ°ГҐ ГўГ±ГҐГµ Г¬ГҐГІГ Г¤Г Г­Г­Г»Гµ Г«ГЁГЎГ® ГІГ®Г«ГјГЄГ® Гў Г¬ГҐГІГ Г¤Г Г­Г­Г»Гµ ГЇГ® ГЎГ Г§ГҐ ГЂГ°ГІГЁГ±ГІГ®Гў.
 		self.__logger.info('do_artist_search: [%s] '%(str(commandD)))
 		search_termL = commandD['search_term'].split(';')
 		srch_folder_key = ''
@@ -2386,7 +2386,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			
 			self.__logger.debug('before map_meta_artist_album_struct_to_view_json')	
 			artistD = self.map_db_artist_album_struct_to_view_json(album_artist_metaD_db,'init')	
-			# ВНИМАНИЕ! proc_state - является ключем для bufferD													
+			# Г‚ГЌГ€ГЊГЂГЌГ€Г…! proc_state - ГїГўГ«ГїГҐГІГ±Гї ГЄГ«ГѕГ·ГҐГ¬ Г¤Г«Гї bufferD													
 			vldt_art_key = zlib.crc32('art_db_buf'+str(time.time()))
 			vldt_albNSA_key = zlib.crc32('alb_NSA_db_buf'+str(time.time()))
 			self.__modelDic['artist_album_maintain_proc_buf'] = {
@@ -2405,7 +2405,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		
 		
 			
-		# Если метаданные еще не получены то нижестоящая фукция их соберет, если уже были собраны,то из нее быстрый выход
+		# Г…Г±Г«ГЁ Г¬ГҐГІГ Г¤Г Г­Г­Г»ГҐ ГҐГ№ГҐ Г­ГҐ ГЇГ®Г«ГіГ·ГҐГ­Г» ГІГ® Г­ГЁГ¦ГҐГ±ГІГ®ГїГ№Г Гї ГґГіГЄГ¶ГЁГї ГЁГµ Г±Г®ГЎГҐГ°ГҐГІ, ГҐГ±Г«ГЁ ГіГ¦ГҐ ГЎГ»Г«ГЁ Г±Г®ГЎГ°Г Г­Г»,ГІГ® ГЁГ§ Г­ГҐГҐ ГЎГ»Г±ГІГ°Г»Г© ГўГ»ГµГ®Г¤
 		elif commandD['artists_maintain'] == "search_artist_data":
 			if 'ALBLOG' in idl_param and folder_keyL <> []:
 				DbIdL = getDbIdL_viaAlbumCRC32_List(dbPath,folder_keyL,None)
@@ -2416,11 +2416,11 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			else:
 				self.__model_instance.set_All_metaD(srch_folder_key)
 				self.__logger.debug('before get_All_metaD')
-				# Получаем текущие метаданные ARTIST --> ALBUMES на основе данных из трэков
+				# ГЏГ®Г«ГіГ·Г ГҐГ¬ ГІГҐГЄГіГ№ГЁГҐ Г¬ГҐГІГ Г¤Г Г­Г­Г»ГҐ ARTIST --> ALBUMES Г­Г  Г®Г±Г­Г®ГўГҐ Г¤Г Г­Г­Г»Гµ ГЁГ§ ГІГ°ГЅГЄГ®Гў
 				All_metaD = self.__model_instance.get_All_metaD()['resD']
 				
 				folder_filter_key = self.__model_instance.get_All_metaD_filter_key()
-				# В буффере контроллера All_metaD находится только для отладочных целей, его надо удалить
+				# Г‚ ГЎГіГґГґГҐГ°ГҐ ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  All_metaD Г­Г ГµГ®Г¤ГЁГІГ±Гї ГІГ®Г«ГјГЄГ® Г¤Г«Гї Г®ГІГ«Г Г¤Г®Г·Г­Г»Гµ Г¶ГҐГ«ГҐГ©, ГҐГЈГ® Г­Г Г¤Г® ГіГ¤Г Г«ГЁГІГј
 				#print "Do not forger to delete this!!! "
 				#self.__modelDic['All_metaD'] = All_metaD
 				self.__modelDic['folder_filter_key'] = folder_filter_key
@@ -2438,11 +2438,11 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				
 			artistD = self.map_meta_artist_album_struct_to_view_json(ReportBufD,'init')	
 			
-			# Надо сделать такой же список только со стороны альбомов но не всех а только сборников по критерию песни разных артистов
+			# ГЌГ Г¤Г® Г±Г¤ГҐГ«Г ГІГј ГІГ ГЄГ®Г© Г¦ГҐ Г±ГЇГЁГ±Г®ГЄ ГІГ®Г«ГјГЄГ® Г±Г® Г±ГІГ®Г°Г®Г­Г» Г Г«ГјГЎГ®Г¬Г®Гў Г­Г® Г­ГҐ ГўГ±ГҐГµ Г  ГІГ®Г«ГјГЄГ® Г±ГЎГ®Г°Г­ГЁГЄГ®Гў ГЇГ® ГЄГ°ГЁГІГҐГ°ГЁГѕ ГЇГҐГ±Г­ГЁ Г°Г Г§Г­Г»Гµ Г Г°ГІГЁГ±ГІГ®Гў
 			#print artistD.keys()
 			
 															
-			# ВНИМАНИЕ! proc_state - является ключем для bufferD													
+			# Г‚ГЌГ€ГЊГЂГЌГ€Г…! proc_state - ГїГўГ«ГїГҐГІГ±Гї ГЄГ«ГѕГ·ГҐГ¬ Г¤Г«Гї bufferD													
 			vldt_art_key = zlib.crc32('art_buf'+str(time.time()))
 			vldt_albNSA_key = zlib.crc32('alb_NSA_buf'+str(time.time()))
 			self.__modelDic['artist_album_maintain_proc_buf'] = {
@@ -2463,12 +2463,12 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			self.__logger.debug('in do_artist_search DATA OK')
 		
 		if commandD['artists_maintain'] == "search_artist":
-		# эта функция очень медленная так как собирает фактически всю статистику АРТИСТ->АЛЬБОМ->Список трэков ID и Статистика трэков и альбомов 
+		# ГЅГІГ  ГґГіГ­ГЄГ¶ГЁГї Г®Г·ГҐГ­Гј Г¬ГҐГ¤Г«ГҐГ­Г­Г Гї ГІГ ГЄ ГЄГ ГЄ Г±Г®ГЎГЁГ°Г ГҐГІ ГґГ ГЄГІГЁГ·ГҐГ±ГЄГЁ ГўГ±Гѕ Г±ГІГ ГІГЁГ±ГІГЁГЄГі ГЂГђГ’Г€Г‘Г’->ГЂГ‹ГњГЃГЋГЊ->Г‘ГЇГЁГ±Г®ГЄ ГІГ°ГЅГЄГ®Гў ID ГЁ Г‘ГІГ ГІГЁГ±ГІГЁГЄГ  ГІГ°ГЅГЄГ®Гў ГЁ Г Г«ГјГЎГ®Г¬Г®Гў 
 			self.__model_instance.set_All_metaD(srch_folder_key)
 			self.__logger.debug('before get_All_metaD')
-			# Получаем текущие метаданные ARTIST --> ALBUMES на основе данных из трэков
+			# ГЏГ®Г«ГіГ·Г ГҐГ¬ ГІГҐГЄГіГ№ГЁГҐ Г¬ГҐГІГ Г¤Г Г­Г­Г»ГҐ ARTIST --> ALBUMES Г­Г  Г®Г±Г­Г®ГўГҐ Г¤Г Г­Г­Г»Гµ ГЁГ§ ГІГ°ГЅГЄГ®Гў
 			All_metaD = self.__model_instance.get_All_metaD()['resD']
-			# В буффере контроллера All_metaD находится только для отладочных целей, его надо удалить
+			# Г‚ ГЎГіГґГґГҐГ°ГҐ ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  All_metaD Г­Г ГµГ®Г¤ГЁГІГ±Гї ГІГ®Г«ГјГЄГ® Г¤Г«Гї Г®ГІГ«Г Г¤Г®Г·Г­Г»Гµ Г¶ГҐГ«ГҐГ©, ГҐГЈГ® Г­Г Г¤Г® ГіГ¤Г Г«ГЁГІГј
 			#print "Do not forger to delete this!!! "
 			#self.__modelDic['All_metaD'] = All_metaD
 			
@@ -2481,19 +2481,19 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			
 			self.__logger.debug('in do_artist_search OK')
 		elif commandD['artists_maintain'] == "search_artist_db":
-			# тут берем метаданных данные из таблицы Артистов, естественно без живой статистики альбомов и трэков
-			# фильтруем по поисковому слову 
-			# устанавливаем все буфферы
+			# ГІГіГІ ГЎГҐГ°ГҐГ¬ Г¬ГҐГІГ Г¤Г Г­Г­Г»Гµ Г¤Г Г­Г­Г»ГҐ ГЁГ§ ГІГ ГЎГ«ГЁГ¶Г» ГЂГ°ГІГЁГ±ГІГ®Гў, ГҐГ±ГІГҐГ±ГІГўГҐГ­Г­Г® ГЎГҐГ§ Г¦ГЁГўГ®Г© Г±ГІГ ГІГЁГ±ГІГЁГЄГЁ Г Г«ГјГЎГ®Г¬Г®Гў ГЁ ГІГ°ГЅГЄГ®Гў
+			# ГґГЁГ«ГјГІГ°ГіГҐГ¬ ГЇГ® ГЇГ®ГЁГ±ГЄГ®ГўГ®Г¬Гі Г±Г«Г®ГўГі 
+			# ГіГ±ГІГ Г­Г ГўГ«ГЁГўГ ГҐГ¬ ГўГ±ГҐ ГЎГіГґГґГҐГ°Г»
 			
 			pass
 	
 	def map_artist_album_categ_assignment_to_view_json(self,artist_album_categ_structD,process_phase):
-		# Назначение функции подготовить вью по аналогии с вью начальной загрузки или ДБ вью
-		# Данные об индексах артистов и альбомов получаются из чтения назначения категоризаций
+		# ГЌГ Г§Г­Г Г·ГҐГ­ГЁГҐ ГґГіГ­ГЄГ¶ГЁГЁ ГЇГ®Г¤ГЈГ®ГІГ®ГўГЁГІГј ГўГјГѕ ГЇГ® Г Г­Г Г«Г®ГЈГЁГЁ Г± ГўГјГѕ Г­Г Г·Г Г«ГјГ­Г®Г© Г§Г ГЈГ°ГіГ§ГЄГЁ ГЁГ«ГЁ Г„ГЃ ГўГјГѕ
+		# Г„Г Г­Г­Г»ГҐ Г®ГЎ ГЁГ­Г¤ГҐГЄГ±Г Гµ Г Г°ГІГЁГ±ГІГ®Гў ГЁ Г Г«ГјГЎГ®Г¬Г®Гў ГЇГ®Г«ГіГ·Г ГѕГІГ±Гї ГЁГ§ Г·ГІГҐГ­ГЁГї Г­Г Г§Г­Г Г·ГҐГ­ГЁГї ГЄГ ГІГҐГЈГ®Г°ГЁГ§Г Г¶ГЁГ©
 		# 
-		# Т.к альбомы информации о пересечении артистов и альбомов в сатегоризационном назначении нет 
-		# то его надо восстановить
-		# во View показываются только те объекты, которые явно присутствуют в категоризации
+		# Г’.ГЄ Г Г«ГјГЎГ®Г¬Г» ГЁГ­ГґГ®Г°Г¬Г Г¶ГЁГЁ Г® ГЇГҐГ°ГҐГ±ГҐГ·ГҐГ­ГЁГЁ Г Г°ГІГЁГ±ГІГ®Гў ГЁ Г Г«ГјГЎГ®Г¬Г®Гў Гў Г±Г ГІГҐГЈГ®Г°ГЁГ§Г Г¶ГЁГ®Г­Г­Г®Г¬ Г­Г Г§Г­Г Г·ГҐГ­ГЁГЁ Г­ГҐГІ 
+		# ГІГ® ГҐГЈГ® Г­Г Г¤Г® ГўГ®Г±Г±ГІГ Г­Г®ГўГЁГІГј
+		# ГўГ® View ГЇГ®ГЄГ Г§Г»ГўГ ГѕГІГ±Гї ГІГ®Г«ГјГЄГ® ГІГҐ Г®ГЎГєГҐГЄГІГ», ГЄГ®ГІГ®Г°Г»ГҐ ГїГўГ­Г® ГЇГ°ГЁГ±ГіГІГ±ГІГўГіГѕГІ Гў ГЄГ ГІГҐГЈГ®Г°ГЁГ§Г Г¶ГЁГЁ
 		
 		dbPath = self.__model_instance.getMediaLibPlayProcessContext()['dbPath'] 
 		not_single_artist_albumD_list = []
@@ -2518,7 +2518,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		artist_rel_albumD = artist_to_album_relD['artist_rel_albumD']
 		album_rel_artistD = artist_to_album_relD['album_rel_artistD']
 		
-		# Восстанавиваем пересечение артистов и альбомов
+		# Г‚Г®Г±Г±ГІГ Г­Г ГўГЁГўГ ГҐГ¬ ГЇГҐГ°ГҐГ±ГҐГ·ГҐГ­ГЁГҐ Г Г°ГІГЁГ±ГІГ®Гў ГЁ Г Г«ГјГЎГ®Г¬Г®Гў
 		if artist_to_album_relD['artistL_extend'] <> []:
 			artistD_extend = getArtist_Album_relationD_and_simpleMetaD_viaCRC32L(dbPath,None,artist_to_album_relD['artistL_extend'],[],'with_artist_metaD','with_relation')
 			for a in artistD_extend['artistD']:
@@ -2586,10 +2586,10 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		print 
 		print 'artist map OK'
 		
-		# Читаем метаданные по альбомам
+		# Г—ГЁГІГ ГҐГ¬ Г¬ГҐГІГ Г¤Г Г­Г­Г»ГҐ ГЇГ® Г Г«ГјГЎГ®Г¬Г Г¬
 		tb_removed_NSA_L = []
 		for albumcrc32 in albumL:
-			# Суть этой ветки получить метаданные альбома и восстановить артиста по альбому если он не назначен в категории, если аольбом NSA то засунуть его в НСА лист
+			# Г‘ГіГІГј ГЅГІГ®Г© ГўГҐГІГЄГЁ ГЇГ®Г«ГіГ·ГЁГІГј Г¬ГҐГІГ Г¤Г Г­Г­Г»ГҐ Г Г«ГјГЎГ®Г¬Г  ГЁ ГўГ®Г±Г±ГІГ Г­Г®ГўГЁГІГј Г Г°ГІГЁГ±ГІГ  ГЇГ® Г Г«ГјГЎГ®Г¬Гі ГҐГ±Г«ГЁ Г®Г­ Г­ГҐ Г­Г Г§Г­Г Г·ГҐГ­ Гў ГЄГ ГІГҐГЈГ®Г°ГЁГЁ, ГҐГ±Г«ГЁ Г Г®Г«ГјГЎГ®Г¬ NSA ГІГ® Г§Г Г±ГіГ­ГіГІГј ГҐГЈГ® Гў ГЌГ‘ГЂ Г«ГЁГ±ГІ
 			
 			print 'album>',albumcrc32
 				
@@ -2664,7 +2664,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					artistD_list.remove(item)
 					#item['visible'] = False
 		
-		# Ключи {'key':a[0],'value':a[1],'album_type':a[2]} 
+		# ГЉГ«ГѕГ·ГЁ {'key':a[0],'value':a[1],'album_type':a[2]} 
 		print ' mapping OK',artistD_list
 		
 		self.__logger.debug('In map_artist_album_categ_assignment_to_view_json -> Finished')
@@ -2686,7 +2686,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		
 		for a in artistD:
 			obj_type = 'artist'	
-			# если артист для NSA пропускаем его тут
+			# ГҐГ±Г«ГЁ Г Г°ГІГЁГ±ГІ Г¤Г«Гї NSA ГЇГ°Г®ГЇГіГ±ГЄГ ГҐГ¬ ГҐГЈГ® ГІГіГІ
 			
 			if artistD[a]['for_nsa_only']:
 				continue
@@ -2809,7 +2809,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return {'artistD_list':artistD_list,'not_single_artist_albumD_list':not_single_artist_albumD_list}
 		
 	def map_meta_album_tracks_struct_to_view_json(self,meta_tracks_structD,album_artistD):
-		# Формирование структурного представления для JSON упаковки и передачи на web клиент
+		# Г”Г®Г°Г¬ГЁГ°Г®ГўГ Г­ГЁГҐ Г±ГІГ°ГіГЄГІГіГ°Г­Г®ГЈГ® ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї Г¤Г«Гї JSON ГіГЇГ ГЄГ®ГўГЄГЁ ГЁ ГЇГҐГ°ГҐГ¤Г Г·ГЁ Г­Г  web ГЄГ«ГЁГҐГ­ГІ
 		self.__logger.debug('in map_meta_album_tracks_struct_to_view_json: [%s] - start'%(str(len(meta_tracks_structD))))
 		album_listD = {}
 		albumL =[]
@@ -2859,9 +2859,9 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return {'albumL':albumL,'not_single_artist_albumD_list':[]}
 		
 	def map_meta_artist_album_struct_to_view_json(self,meta_artist_album_structD,process_phase):
-		# формироует начальные буфера для двойного представления 'artistD_list':artistD_list,'not_single_artist_albumD_list':not_single_artist_albumD_list
-		# ВНИМАНИЕ album_song_num касается только представления альбома по артисту NSA в представлении артиста есть song_num т.е. количество песен по этому
-		# артисту в альбоме	
+		# ГґГ®Г°Г¬ГЁГ°Г®ГіГҐГІ Г­Г Г·Г Г«ГјГ­Г»ГҐ ГЎГіГґГҐГ°Г  Г¤Г«Гї Г¤ГўГ®Г©Г­Г®ГЈГ® ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї 'artistD_list':artistD_list,'not_single_artist_albumD_list':not_single_artist_albumD_list
+		# Г‚ГЌГ€ГЊГЂГЌГ€Г… album_song_num ГЄГ Г±Г ГҐГІГ±Гї ГІГ®Г«ГјГЄГ® ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї Г Г«ГјГЎГ®Г¬Г  ГЇГ® Г Г°ГІГЁГ±ГІГі NSA Гў ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГЁ Г Г°ГІГЁГ±ГІГ  ГҐГ±ГІГј song_num ГІ.ГҐ. ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ® ГЇГҐГ±ГҐГ­ ГЇГ® ГЅГІГ®Г¬Гі
+		# Г Г°ГІГЁГ±ГІГі Гў Г Г«ГјГЎГ®Г¬ГҐ	
 		ReportBufD = meta_artist_album_structD
 		artistD_list = []
 			
@@ -2886,7 +2886,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				#print b
 				if b in album_KeyL:
 					#if (new_only) and (b == 'is_in_db'):
-						# сделать первую проверку на наличие в дб и если только новые то далее допроверить и если опят в ДБ то пропуск.
+						# Г±Г¤ГҐГ«Г ГІГј ГЇГҐГ°ГўГіГѕ ГЇГ°Г®ГўГҐГ°ГЄГі Г­Г  Г­Г Г«ГЁГ·ГЁГҐ Гў Г¤ГЎ ГЁ ГҐГ±Г«ГЁ ГІГ®Г«ГјГЄГ® Г­Г®ГўГ»ГҐ ГІГ® Г¤Г Г«ГҐГҐ Г¤Г®ГЇГ°Г®ГўГҐГ°ГЁГІГј ГЁ ГҐГ±Г«ГЁ Г®ГЇГїГІ Гў Г„ГЃ ГІГ® ГЇГ°Г®ГЇГіГ±ГЄ.
 					if b == 'albumD':
 					
 						
@@ -2962,8 +2962,8 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				
 			
 			artistD_list.append(artistD)	
-		# Проверяем есть ли альбомы в которых задействован не только выявленыые выше артисты
-		# Для таких альбомов делаем специальную структуру для которой будет дополнительное представление		
+		# ГЏГ°Г®ГўГҐГ°ГїГҐГ¬ ГҐГ±ГІГј Г«ГЁ Г Г«ГјГЎГ®Г¬Г» Гў ГЄГ®ГІГ®Г°Г»Гµ Г§Г Г¤ГҐГ©Г±ГІГўГ®ГўГ Г­ Г­ГҐ ГІГ®Г«ГјГЄГ® ГўГ»ГїГўГ«ГҐГ­Г»Г»ГҐ ГўГ»ГёГҐ Г Г°ГІГЁГ±ГІГ»
+		# Г„Г«Гї ГІГ ГЄГЁГµ Г Г«ГјГЎГ®Г¬Г®Гў Г¤ГҐГ«Г ГҐГ¬ Г±ГЇГҐГ¶ГЁГ Г«ГјГ­ГіГѕ Г±ГІГ°ГіГЄГІГіГ°Гі Г¤Г«Гї ГЄГ®ГІГ®Г°Г®Г© ГЎГіГ¤ГҐГІ Г¤Г®ГЇГ®Г«Г­ГЁГІГҐГ«ГјГ­Г®ГҐ ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГҐ		
 		not_single_artist_albumD_list = []
 		
 		album_songD = meta_artist_album_structD['album_songD']
@@ -3047,15 +3047,15 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return {'artistD_list':artistD_list,'not_single_artist_albumD_list':not_single_artist_albumD_list}
 	
 	def client_struct_restore(self,client_struct,server_struct,list_node_key,new_process_type):
-		# функция проверяет логическую целостность артистов и их альбомов и сихронизирует клиентскую и серверную структуры в процессе массового сохранения,
-		# до самого сохранения.
-		# сохранено будет то, что выделено к сохранению в этой структуре. на клиенте активировать кнопку сохранения только после прихода этой структуры
-		# любое изменение в этой структура должно блокировать сохранение. если изменили то опять проверка.
+		# ГґГіГ­ГЄГ¶ГЁГї ГЇГ°Г®ГўГҐГ°ГїГҐГІ Г«Г®ГЈГЁГ·ГҐГ±ГЄГіГѕ Г¶ГҐГ«Г®Г±ГІГ­Г®Г±ГІГј Г Г°ГІГЁГ±ГІГ®Гў ГЁ ГЁГµ Г Г«ГјГЎГ®Г¬Г®Гў ГЁ Г±ГЁГµГ°Г®Г­ГЁГ§ГЁГ°ГіГҐГІ ГЄГ«ГЁГҐГ­ГІГ±ГЄГіГѕ ГЁ Г±ГҐГ°ГўГҐГ°Г­ГіГѕ Г±ГІГ°ГіГЄГІГіГ°Г» Гў ГЇГ°Г®Г¶ГҐГ±Г±ГҐ Г¬Г Г±Г±Г®ГўГ®ГЈГ® Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї,
+		# Г¤Г® Г±Г Г¬Г®ГЈГ® Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї.
+		# Г±Г®ГµГ°Г Г­ГҐГ­Г® ГЎГіГ¤ГҐГІ ГІГ®, Г·ГІГ® ГўГ»Г¤ГҐГ«ГҐГ­Г® ГЄ Г±Г®ГµГ°Г Г­ГҐГ­ГЁГѕ Гў ГЅГІГ®Г© Г±ГІГ°ГіГЄГІГіГ°ГҐ. Г­Г  ГЄГ«ГЁГҐГ­ГІГҐ Г ГЄГІГЁГўГЁГ°Г®ГўГ ГІГј ГЄГ­Г®ГЇГЄГі Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї ГІГ®Г«ГјГЄГ® ГЇГ®Г±Г«ГҐ ГЇГ°ГЁГµГ®Г¤Г  ГЅГІГ®Г© Г±ГІГ°ГіГЄГІГіГ°Г»
+		# Г«ГѕГЎГ®ГҐ ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГҐ Гў ГЅГІГ®Г© Г±ГІГ°ГіГЄГІГіГ°Г  Г¤Г®Г«Г¦Г­Г® ГЎГ«Г®ГЄГЁГ°Г®ГўГ ГІГј Г±Г®ГµГ°Г Г­ГҐГ­ГЁГҐ. ГҐГ±Г«ГЁ ГЁГ§Г¬ГҐГ­ГЁГ«ГЁ ГІГ® Г®ГЇГїГІГј ГЇГ°Г®ГўГҐГ°ГЄГ .
 		
-		# Если артист уже в базе, то он предлагается как невыбранный checked = False, проверка его альбомов происходит всегда
-		# проверочная иерархия всегда если есть альбомы на сохранение
+		# Г…Г±Г«ГЁ Г Г°ГІГЁГ±ГІ ГіГ¦ГҐ Гў ГЎГ Г§ГҐ, ГІГ® Г®Г­ ГЇГ°ГҐГ¤Г«Г ГЈГ ГҐГІГ±Гї ГЄГ ГЄ Г­ГҐГўГ»ГЎГ°Г Г­Г­Г»Г© checked = False, ГЇГ°Г®ГўГҐГ°ГЄГ  ГҐГЈГ® Г Г«ГјГЎГ®Г¬Г®Гў ГЇГ°Г®ГЁГ±ГµГ®Г¤ГЁГІ ГўГ±ГҐГЈГ¤Г 
+		# ГЇГ°Г®ГўГҐГ°Г®Г·Г­Г Гї ГЁГҐГ°Г Г°ГµГЁГї ГўГ±ГҐГЈГ¤Г  ГҐГ±Г«ГЁ ГҐГ±ГІГј Г Г«ГјГЎГ®Г¬Г» Г­Г  Г±Г®ГµГ°Г Г­ГҐГ­ГЁГҐ
 		
-		# Если артист не в БД и не выделен, то отменить выборку  его альбомом, даже если они выбраны
+		# Г…Г±Г«ГЁ Г Г°ГІГЁГ±ГІ Г­ГҐ Гў ГЃГ„ ГЁ Г­ГҐ ГўГ»Г¤ГҐГ«ГҐГ­, ГІГ® Г®ГІГ¬ГҐГ­ГЁГІГј ГўГ»ГЎГ®Г°ГЄГі  ГҐГЈГ® Г Г«ГјГЎГ®Г¬Г®Г¬, Г¤Г Г¦ГҐ ГҐГ±Г«ГЁ Г®Г­ГЁ ГўГ»ГЎГ°Г Г­Г»
 		self.__logger.debug('in function client_struct_restore: [%s] '%(str('')))
 
 		print 'in client_struct_restore' 
@@ -3084,15 +3084,15 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					
 		return	
 	def artist_album_struct_client_server_sinc_categ(self,categ_key,artist_album_struct_serv,artist_album_struct_client,list_node_key,new_process_type,mode):
-		# !!!Внимание функция  вызывается ТОЛЬКО для отдельного вью.!!! или АРТИСТ или АЛЬБОМ
+		# !!!Г‚Г­ГЁГ¬Г Г­ГЁГҐ ГґГіГ­ГЄГ¶ГЁГї  ГўГ»Г§Г»ГўГ ГҐГІГ±Гї Г’ГЋГ‹ГњГЉГЋ Г¤Г«Гї Г®ГІГ¤ГҐГ«ГјГ­Г®ГЈГ® ГўГјГѕ.!!! ГЁГ«ГЁ ГЂГђГ’Г€Г‘Г’ ГЁГ«ГЁ ГЂГ‹ГњГЃГЋГЊ
 		
-		# функция проверяет логическую целостность артистов и их альбомов и сихронизирует клиентскую и серверную структуры в процессе массового сохранения,
-		# до самого сохранения.
-		# сохранено будет то, что выделено к сохранению в этой структуре. на клиенте активировать кнопку сохранения только после прихода этой структуры
-		# любое изменение в этой структура должно блокировать сохранение. если изменили то опять проверка.
+		# ГґГіГ­ГЄГ¶ГЁГї ГЇГ°Г®ГўГҐГ°ГїГҐГІ Г«Г®ГЈГЁГ·ГҐГ±ГЄГіГѕ Г¶ГҐГ«Г®Г±ГІГ­Г®Г±ГІГј Г Г°ГІГЁГ±ГІГ®Гў ГЁ ГЁГµ Г Г«ГјГЎГ®Г¬Г®Гў ГЁ Г±ГЁГµГ°Г®Г­ГЁГ§ГЁГ°ГіГҐГІ ГЄГ«ГЁГҐГ­ГІГ±ГЄГіГѕ ГЁ Г±ГҐГ°ГўГҐГ°Г­ГіГѕ Г±ГІГ°ГіГЄГІГіГ°Г» Гў ГЇГ°Г®Г¶ГҐГ±Г±ГҐ Г¬Г Г±Г±Г®ГўГ®ГЈГ® Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї,
+		# Г¤Г® Г±Г Г¬Г®ГЈГ® Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї.
+		# Г±Г®ГµГ°Г Г­ГҐГ­Г® ГЎГіГ¤ГҐГІ ГІГ®, Г·ГІГ® ГўГ»Г¤ГҐГ«ГҐГ­Г® ГЄ Г±Г®ГµГ°Г Г­ГҐГ­ГЁГѕ Гў ГЅГІГ®Г© Г±ГІГ°ГіГЄГІГіГ°ГҐ. Г­Г  ГЄГ«ГЁГҐГ­ГІГҐ Г ГЄГІГЁГўГЁГ°Г®ГўГ ГІГј ГЄГ­Г®ГЇГЄГі Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї ГІГ®Г«ГјГЄГ® ГЇГ®Г±Г«ГҐ ГЇГ°ГЁГµГ®Г¤Г  ГЅГІГ®Г© Г±ГІГ°ГіГЄГІГіГ°Г»
+		# Г«ГѕГЎГ®ГҐ ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГҐ Гў ГЅГІГ®Г© Г±ГІГ°ГіГЄГІГіГ°Г  Г¤Г®Г«Г¦Г­Г® ГЎГ«Г®ГЄГЁГ°Г®ГўГ ГІГј Г±Г®ГµГ°Г Г­ГҐГ­ГЁГҐ. ГҐГ±Г«ГЁ ГЁГ§Г¬ГҐГ­ГЁГ«ГЁ ГІГ® Г®ГЇГїГІГј ГЇГ°Г®ГўГҐГ°ГЄГ .
 		
-		# Если артист уже в базе, то он предлагается как невыбранный checked = False, проверка его альбомов происходит всегда
-		# проверочная иерархия всегда если есть альбомы на сохранение
+		# Г…Г±Г«ГЁ Г Г°ГІГЁГ±ГІ ГіГ¦ГҐ Гў ГЎГ Г§ГҐ, ГІГ® Г®Г­ ГЇГ°ГҐГ¤Г«Г ГЈГ ГҐГІГ±Гї ГЄГ ГЄ Г­ГҐГўГ»ГЎГ°Г Г­Г­Г»Г© checked = False, ГЇГ°Г®ГўГҐГ°ГЄГ  ГҐГЈГ® Г Г«ГјГЎГ®Г¬Г®Гў ГЇГ°Г®ГЁГ±ГµГ®Г¤ГЁГІ ГўГ±ГҐГЈГ¤Г 
+		# ГЇГ°Г®ГўГҐГ°Г®Г·Г­Г Гї ГЁГҐГ°Г Г°ГµГЁГї ГўГ±ГҐГЈГ¤Г  ГҐГ±Г«ГЁ ГҐГ±ГІГј Г Г«ГјГЎГ®Г¬Г» Г­Г  Г±Г®ГµГ°Г Г­ГҐГ­ГЁГҐ
 		
 		
 		self.__logger.debug('in function artist_album_struct_client_server_sinc: [%s] '%(str('')))
@@ -3111,7 +3111,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			colorcl_parent = 'artist errisindb'
 			colorcl_child = 'album errisindb'
 		
-		# 1 Для режима add проверка, что элементы не существуют в базе.
+		# 1 Г„Г«Гї Г°ГҐГ¦ГЁГ¬Г  add ГЇГ°Г®ГўГҐГ°ГЄГ , Г·ГІГ® ГЅГ«ГҐГ¬ГҐГ­ГІГ» Г­ГҐ Г±ГіГ№ГҐГ±ГІГўГіГѕГІ Гў ГЎГ Г§ГҐ.
 		if mode == "add":
 			db = sqlite3.connect(self.__model_instance.getMediaLibPlayProcessContext()['dbPath'])
 			db.text_factory = str
@@ -3143,7 +3143,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				
 			db.close()
 		
-		# Для режима добавления, все что селектед + все что не выбрано - игнорируется. свертывается, невидимится.
+		# Г„Г«Гї Г°ГҐГ¦ГЁГ¬Г  Г¤Г®ГЎГ ГўГ«ГҐГ­ГЁГї, ГўГ±ГҐ Г·ГІГ® Г±ГҐГ«ГҐГЄГІГҐГ¤ + ГўГ±ГҐ Г·ГІГ® Г­ГҐ ГўГ»ГЎГ°Г Г­Г® - ГЁГЈГ­Г®Г°ГЁГ°ГіГҐГІГ±Гї. Г±ГўГҐГ°ГІГ»ГўГ ГҐГІГ±Гї, Г­ГҐГўГЁГ¤ГЁГ¬ГЁГІГ±Гї.
 		
 		for artist_item_serv in artist_album_struct_serv:
 			artist_index = artist_album_struct_serv.index(artist_item_serv)
@@ -3159,12 +3159,12 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					if mode == "add" and ( not artist_item_client['checked'] ):
 						pass
 					else:	
-						# Это поле служит индикатором, что его надо учесть при апдейте БД. либо удалить, либо добавить
+						# ГќГІГ® ГЇГ®Г«ГҐ Г±Г«ГіГ¦ГЁГІ ГЁГ­Г¤ГЁГЄГ ГІГ®Г°Г®Г¬, Г·ГІГ® ГҐГЈГ® Г­Г Г¤Г® ГіГ·ГҐГ±ГІГј ГЇГ°ГЁ Г ГЇГ¤ГҐГ©ГІГҐ ГЃГ„. Г«ГЁГЎГ® ГіГ¤Г Г«ГЁГІГј, Г«ГЁГЎГ® Г¤Г®ГЎГ ГўГЁГІГј
 						artist_item_client['process_type'] = new_process_type
 						if mode == "update":
 							if artist_item_client[a] <> artist_item_serv[a]:
 								
-								if not artist_item_client[a]:   # значить удалить
+								if not artist_item_client[a]:   # Г§Г­Г Г·ГЁГІГј ГіГ¤Г Г«ГЁГІГј
 									artist_item_client['process_type'] = 'tb_delete'
 									artist_item_client['colorcl'] = artist_item_serv['colorcl'].replace(artist_item_serv['process_type'],new_process_type+' remove')
 								else:
@@ -3210,7 +3210,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 									album_item_client['visible'] = True
 									artist_item_client['expanded'] = True
 							
-									if not album_item_client[b]:   # значить удалить
+									if not album_item_client[b]:   # Г§Г­Г Г·ГЁГІГј ГіГ¤Г Г«ГЁГІГј
 										album_item_client['process_type'] = 'tb_delete'
 										album_item_client['colorcl'] = album_item_serv['colorcl'].replace(album_item_serv['process_type'],new_process_type+' remove')
 									else:
@@ -3240,15 +3240,15 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					
 		return						
 	def artist_album_struct_client_server_sinc(self,artist_album_struct_serv,artist_album_struct_client,list_node_key,new_process_type):
-		# функция проверяет логическую целостность артистов и их альбомов и сихронизирует клиентскую и серверную структуры в процессе массового сохранения,
-		# до самого сохранения.
-		# сохранено будет то, что выделено к сохранению в этой структуре. на клиенте активировать кнопку сохранения только после прихода этой структуры
-		# любое изменение в этой структура должно блокировать сохранение. если изменили то опять проверка.
+		# ГґГіГ­ГЄГ¶ГЁГї ГЇГ°Г®ГўГҐГ°ГїГҐГІ Г«Г®ГЈГЁГ·ГҐГ±ГЄГіГѕ Г¶ГҐГ«Г®Г±ГІГ­Г®Г±ГІГј Г Г°ГІГЁГ±ГІГ®Гў ГЁ ГЁГµ Г Г«ГјГЎГ®Г¬Г®Гў ГЁ Г±ГЁГµГ°Г®Г­ГЁГ§ГЁГ°ГіГҐГІ ГЄГ«ГЁГҐГ­ГІГ±ГЄГіГѕ ГЁ Г±ГҐГ°ГўГҐГ°Г­ГіГѕ Г±ГІГ°ГіГЄГІГіГ°Г» Гў ГЇГ°Г®Г¶ГҐГ±Г±ГҐ Г¬Г Г±Г±Г®ГўГ®ГЈГ® Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї,
+		# Г¤Г® Г±Г Г¬Г®ГЈГ® Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї.
+		# Г±Г®ГµГ°Г Г­ГҐГ­Г® ГЎГіГ¤ГҐГІ ГІГ®, Г·ГІГ® ГўГ»Г¤ГҐГ«ГҐГ­Г® ГЄ Г±Г®ГµГ°Г Г­ГҐГ­ГЁГѕ Гў ГЅГІГ®Г© Г±ГІГ°ГіГЄГІГіГ°ГҐ. Г­Г  ГЄГ«ГЁГҐГ­ГІГҐ Г ГЄГІГЁГўГЁГ°Г®ГўГ ГІГј ГЄГ­Г®ГЇГЄГі Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї ГІГ®Г«ГјГЄГ® ГЇГ®Г±Г«ГҐ ГЇГ°ГЁГµГ®Г¤Г  ГЅГІГ®Г© Г±ГІГ°ГіГЄГІГіГ°Г»
+		# Г«ГѕГЎГ®ГҐ ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГҐ Гў ГЅГІГ®Г© Г±ГІГ°ГіГЄГІГіГ°Г  Г¤Г®Г«Г¦Г­Г® ГЎГ«Г®ГЄГЁГ°Г®ГўГ ГІГј Г±Г®ГµГ°Г Г­ГҐГ­ГЁГҐ. ГҐГ±Г«ГЁ ГЁГ§Г¬ГҐГ­ГЁГ«ГЁ ГІГ® Г®ГЇГїГІГј ГЇГ°Г®ГўГҐГ°ГЄГ .
 		
-		# Если артист уже в базе, то он предлагается как невыбранный checked = False, проверка его альбомов происходит всегда
-		# проверочная иерархия всегда если есть альбомы на сохранение
+		# Г…Г±Г«ГЁ Г Г°ГІГЁГ±ГІ ГіГ¦ГҐ Гў ГЎГ Г§ГҐ, ГІГ® Г®Г­ ГЇГ°ГҐГ¤Г«Г ГЈГ ГҐГІГ±Гї ГЄГ ГЄ Г­ГҐГўГ»ГЎГ°Г Г­Г­Г»Г© checked = False, ГЇГ°Г®ГўГҐГ°ГЄГ  ГҐГЈГ® Г Г«ГјГЎГ®Г¬Г®Гў ГЇГ°Г®ГЁГ±ГµГ®Г¤ГЁГІ ГўГ±ГҐГЈГ¤Г 
+		# ГЇГ°Г®ГўГҐГ°Г®Г·Г­Г Гї ГЁГҐГ°Г Г°ГµГЁГї ГўГ±ГҐГЈГ¤Г  ГҐГ±Г«ГЁ ГҐГ±ГІГј Г Г«ГјГЎГ®Г¬Г» Г­Г  Г±Г®ГµГ°Г Г­ГҐГ­ГЁГҐ
 		
-		# Если артист не в БД и не выделен, то отменить выборку  его альбомом, даже если они выбраны
+		# Г…Г±Г«ГЁ Г Г°ГІГЁГ±ГІ Г­ГҐ Гў ГЃГ„ ГЁ Г­ГҐ ГўГ»Г¤ГҐГ«ГҐГ­, ГІГ® Г®ГІГ¬ГҐГ­ГЁГІГј ГўГ»ГЎГ®Г°ГЄГі  ГҐГЈГ® Г Г«ГјГЎГ®Г¬Г®Г¬, Г¤Г Г¦ГҐ ГҐГ±Г«ГЁ Г®Г­ГЁ ГўГ»ГЎГ°Г Г­Г»
 		self.__logger.debug('in function artist_album_struct_client_server_sinc: [%s] '%(str('')))
 
 		print 'in sinc--->',list_node_key,new_process_type
@@ -3283,7 +3283,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					if b not in album_item_client:
 						album_item_client[b] = album_item_serv[b]
 				
-				# пропуск позиций уже наход. в бд или невыбранных
+				# ГЇГ°Г®ГЇГіГ±ГЄ ГЇГ®Г§ГЁГ¶ГЁГ© ГіГ¦ГҐ Г­Г ГµГ®Г¤. Гў ГЎГ¤ ГЁГ«ГЁ Г­ГҐГўГ»ГЎГ°Г Г­Г­Г»Гµ
 				if album_item_client['is_in_db']:
 					album_item_client['checked'] = False
 					album_item_client['visible'] = False
@@ -3292,7 +3292,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				if not album_item_client['checked']:
 					album_item_client['visible'] = False
 					continue
-				# Если артист не в базе 	
+				# Г…Г±Г«ГЁ Г Г°ГІГЁГ±ГІ Г­ГҐ Гў ГЎГ Г§ГҐ 	
 				if not artist_item_client['is_in_db'] and not artist_item_client['checked']:
 					album_item_client['checked'] = False
 					continue
@@ -3352,11 +3352,11 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return
 	
 	def artist_album_maintain_check(self,commandD):	
-		# фаза проверки должно прийти тип представления, тип состояния процесса, номер странцицы.
-		# обно
-		# Внимание!!! Эта функция не полностью универсальная, т.к. в зависимости от процесса обработки (начальное сохранение, или категоризация) вызываемая функция
-		# синхронизации artist_album_struct_client_server_sinc или ее аналог работает по разному, чтобы вызвать правильную функцию ее надо вызывать в контексте процесса
-		# этот контекст передается пока через значение параметра commandD['artists_maintain'] 
+		# ГґГ Г§Г  ГЇГ°Г®ГўГҐГ°ГЄГЁ Г¤Г®Г«Г¦Г­Г® ГЇГ°ГЁГ©ГІГЁ ГІГЁГЇ ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї, ГІГЁГЇ Г±Г®Г±ГІГ®ГїГ­ГЁГї ГЇГ°Г®Г¶ГҐГ±Г±Г , Г­Г®Г¬ГҐГ° Г±ГІГ°Г Г­Г¶ГЁГ¶Г».
+		# Г®ГЎГ­Г®
+		# Г‚Г­ГЁГ¬Г Г­ГЁГҐ!!! ГќГІГ  ГґГіГ­ГЄГ¶ГЁГї Г­ГҐ ГЇГ®Г«Г­Г®Г±ГІГјГѕ ГіГ­ГЁГўГҐГ°Г±Г Г«ГјГ­Г Гї, ГІ.ГЄ. Гў Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГЁ Г®ГІ ГЇГ°Г®Г¶ГҐГ±Г±Г  Г®ГЎГ°Г ГЎГ®ГІГЄГЁ (Г­Г Г·Г Г«ГјГ­Г®ГҐ Г±Г®ГµГ°Г Г­ГҐГ­ГЁГҐ, ГЁГ«ГЁ ГЄГ ГІГҐГЈГ®Г°ГЁГ§Г Г¶ГЁГї) ГўГ»Г§Г»ГўГ ГҐГ¬Г Гї ГґГіГ­ГЄГ¶ГЁГї
+		# Г±ГЁГ­ГµГ°Г®Г­ГЁГ§Г Г¶ГЁГЁ artist_album_struct_client_server_sinc ГЁГ«ГЁ ГҐГҐ Г Г­Г Г«Г®ГЈ Г°Г ГЎГ®ГІГ ГҐГІ ГЇГ® Г°Г Г§Г­Г®Г¬Гі, Г·ГІГ®ГЎГ» ГўГ»Г§ГўГ ГІГј ГЇГ°Г ГўГЁГ«ГјГ­ГіГѕ ГґГіГ­ГЄГ¶ГЁГѕ ГҐГҐ Г­Г Г¤Г® ГўГ»Г§Г»ГўГ ГІГј Гў ГЄГ®Г­ГІГҐГЄГ±ГІГҐ ГЇГ°Г®Г¶ГҐГ±Г±Г 
+		# ГЅГІГ®ГІ ГЄГ®Г­ГІГҐГЄГ±ГІ ГЇГҐГ°ГҐГ¤Г ГҐГІГ±Гї ГЇГ®ГЄГ  Г·ГҐГ°ГҐГ§ Г§Г­Г Г·ГҐГ­ГЁГҐ ГЇГ Г°Г Г¬ГҐГІГ°Г  commandD['artists_maintain'] 
 		
 		
 		self.__logger.info('in action artist_album_maintain_check: [%s] '%(str(commandD)[:100]))
@@ -3406,11 +3406,11 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			self.__modelDic['artist_album_maintain_proc_buf'][buf_key]['dataD']['initial_changed']=copy_client			
 			
 			
-			# Проверить логическую целостность альбомов и артистов и вернуть предложение на сохранение
-			# к данным структур надо добавить сессионный ключ уникальности буфера, который вернувшись назад должен быть сверен с серверным если ок. то можно сохранять
-			# на клиенте любые изменения сформированной ниже структуры отменяют сохранение пока сверка не пройдет.
+			# ГЏГ°Г®ГўГҐГ°ГЁГІГј Г«Г®ГЈГЁГ·ГҐГ±ГЄГіГѕ Г¶ГҐГ«Г®Г±ГІГ­Г®Г±ГІГј Г Г«ГјГЎГ®Г¬Г®Гў ГЁ Г Г°ГІГЁГ±ГІГ®Гў ГЁ ГўГҐГ°Г­ГіГІГј ГЇГ°ГҐГ¤Г«Г®Г¦ГҐГ­ГЁГҐ Г­Г  Г±Г®ГµГ°Г Г­ГҐГ­ГЁГҐ
+			# ГЄ Г¤Г Г­Г­Г»Г¬ Г±ГІГ°ГіГЄГІГіГ° Г­Г Г¤Г® Г¤Г®ГЎГ ГўГЁГІГј Г±ГҐГ±Г±ГЁГ®Г­Г­Г»Г© ГЄГ«ГѕГ· ГіГ­ГЁГЄГ Г«ГјГ­Г®Г±ГІГЁ ГЎГіГґГҐГ°Г , ГЄГ®ГІГ®Г°Г»Г© ГўГҐГ°Г­ГіГўГёГЁГ±Гј Г­Г Г§Г Г¤ Г¤Г®Г«Г¦ГҐГ­ ГЎГ»ГІГј Г±ГўГҐГ°ГҐГ­ Г± Г±ГҐГ°ГўГҐГ°Г­Г»Г¬ ГҐГ±Г«ГЁ Г®ГЄ. ГІГ® Г¬Г®Г¦Г­Г® Г±Г®ГµГ°Г Г­ГїГІГј
+			# Г­Г  ГЄГ«ГЁГҐГ­ГІГҐ Г«ГѕГЎГ»ГҐ ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї Г±ГґГ®Г°Г¬ГЁГ°Г®ГўГ Г­Г­Г®Г© Г­ГЁГ¦ГҐ Г±ГІГ°ГіГЄГІГіГ°Г» Г®ГІГ¬ГҐГ­ГїГѕГІ Г±Г®ГµГ°Г Г­ГҐГ­ГЁГҐ ГЇГ®ГЄГ  Г±ГўГҐГ°ГЄГ  Г­ГҐ ГЇГ°Г®Г©Г¤ГҐГІ.
 			
-			# Ниже идет выбор соответствующей процессу функции синхронизации
+			# ГЌГЁГ¦ГҐ ГЁГ¤ГҐГІ ГўГ»ГЎГ®Г° Г±Г®Г®ГІГўГҐГІГ±ГІГўГіГѕГ№ГҐГ© ГЇГ°Г®Г¶ГҐГ±Г±Гі ГґГіГ­ГЄГ¶ГЁГЁ Г±ГЁГ­ГµГ°Г®Г­ГЁГ§Г Г¶ГЁГЁ
 			if commandD['artists_maintain'] == 'artist_album_maintain_check':
 				self.artist_album_struct_client_server_sinc(self.__modelDic['artist_album_maintain_proc_buf'][buf_key]['dataD']['initial'],commandD[client_data_key],sublist_key,'tb_save')
 			elif commandD['artists_maintain'] == 'artist_album_maintain_categ_check':
@@ -3427,7 +3427,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				self.artist_album_struct_client_server_sinc_categ(categ_key,self.__modelDic['artist_album_maintain_proc_buf'][buf_key]['dataD']['initial'],
 				commandD[client_data_key],sublist_key,'tb_save',mode)
 			
-			# формируем буфер процесса массовой обработки, сохранив в нем пришедшую с клиента реплику по ключу artist_dataD_list_client_copy_init_edited
+			# ГґГ®Г°Г¬ГЁГ°ГіГҐГ¬ ГЎГіГґГҐГ° ГЇГ°Г®Г¶ГҐГ±Г±Г  Г¬Г Г±Г±Г®ГўГ®Г© Г®ГЎГ°Г ГЎГ®ГІГЄГЁ, Г±Г®ГµГ°Г Г­ГЁГў Гў Г­ГҐГ¬ ГЇГ°ГЁГёГҐГ¤ГёГіГѕ Г± ГЄГ«ГЁГҐГ­ГІГ  Г°ГҐГЇГ«ГЁГЄГі ГЇГ® ГЄГ«ГѕГ·Гі artist_dataD_list_client_copy_init_edited
 			self.__modelDic['artist_album_maintain_proc_buf'][buf_key]['dataD']['tb_save']=commandD[client_data_key]
 																
 			#self.__modelDic['artist_album_maintain_proc_buf']['artist_dataD_list_client_copy_init_edited']=[a for a in commandD[sublist_key]]
@@ -3454,7 +3454,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			if album_item_serv['process_type'] <> 'tb_save':
 				continue
 			
-			# Связи сохраняются в любом случае по любым артистам. главное чтобы существовал альбом
+			# Г‘ГўГїГ§ГЁ Г±Г®ГµГ°Г Г­ГїГѕГІГ±Гї Гў Г«ГѕГЎГ®Г¬ Г±Г«ГіГ·Г ГҐ ГЇГ® Г«ГѕГЎГ»Г¬ Г Г°ГІГЁГ±ГІГ Г¬. ГЈГ«Г ГўГ­Г®ГҐ Г·ГІГ®ГЎГ» Г±ГіГ№ГҐГ±ГІГўГ®ГўГ Г« Г Г«ГјГЎГ®Г¬
 			print album_item_serv.keys()
 				
 			album_db_id = None
@@ -3474,8 +3474,8 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				artist_key = int(artist_item_serv['key'])
 				
 				
-				# Логика сохранения следующая, тк. альбом логически не может быть без артиста артистов, то вначале надо создать артиста
-				# Затем один раз создается альбом если его надо создавать
+				# Г‹Г®ГЈГЁГЄГ  Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї Г±Г«ГҐГ¤ГіГѕГ№Г Гї, ГІГЄ. Г Г«ГјГЎГ®Г¬ Г«Г®ГЈГЁГ·ГҐГ±ГЄГЁ Г­ГҐ Г¬Г®Г¦ГҐГІ ГЎГ»ГІГј ГЎГҐГ§ Г Г°ГІГЁГ±ГІГ  Г Г°ГІГЁГ±ГІГ®Гў, ГІГ® ГўГ­Г Г·Г Г«ГҐ Г­Г Г¤Г® Г±Г®Г§Г¤Г ГІГј Г Г°ГІГЁГ±ГІГ 
+				# Г‡Г ГІГҐГ¬ Г®Г¤ГЁГ­ Г°Г Г§ Г±Г®Г§Г¤Г ГҐГІГ±Гї Г Г«ГјГЎГ®Г¬ ГҐГ±Г«ГЁ ГҐГЈГ® Г­Г Г¤Г® Г±Г®Г§Г¤Г ГўГ ГІГј
 					
 				artistName = artist_item_serv['artist']
 				retD = {}
@@ -3488,7 +3488,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					print 'in save artist part',artist_item_serv['artist']
 					retD = saveArtistD_intoDB(None,artistName.lower().strip(),'',None,None,[],None,db)
 					print 'in save artist part OK'
-					# Если ошибка сохранения то сменить цвет на ошибочный как для списка
+					# Г…Г±Г«ГЁ Г®ГёГЁГЎГЄГ  Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї ГІГ® Г±Г¬ГҐГ­ГЁГІГј Г¶ГўГҐГІ Г­Г  Г®ГёГЁГЎГ®Г·Г­Г»Г© ГЄГ ГЄ Г¤Г«Гї Г±ГЇГЁГ±ГЄГ 
 				
 					if retD['result'] <> None and retD['result']<> -1:
 						artist_db_id = retD['id_artist']
@@ -3512,10 +3512,10 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				if not album_saved and not album_item_serv['is_in_db'] and create_album:
 						
 					print 'Creating album:',albumD[album_key]['album'],album_saved
-					# albumD тут из 'album_songD'
+					# albumD ГІГіГІ ГЁГ§ 'album_songD'
 					res = saveAlbum_intoDB_via_artistD(None,albumD[album_key],artist_key,album_key,db,'without_artist_relation','album_NSA_view')
 					print 'Ok',res,album_key
-					# Если ошибка сохранения то сменить цвет на ошибочный как для списка
+					# Г…Г±Г«ГЁ Г®ГёГЁГЎГЄГ  Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї ГІГ® Г±Г¬ГҐГ­ГЁГІГј Г¶ГўГҐГІ Г­Г  Г®ГёГЁГЎГ®Г·Г­Г»Г© ГЄГ ГЄ Г¤Г«Гї Г±ГЇГЁГ±ГЄГ 
 					if res == -1:
 						artist_item_serv['colorcl'] = album_item_serv['colorcl'].replace(album_item_serv['process_type'],'error')
 						artist_item_serv['process_type'] = 'error'
@@ -3536,12 +3536,12 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					print 4
 				
 				if album_saved:
-					# тут сохранить артиста
+					# ГІГіГІ Г±Г®ГµГ°Г Г­ГЁГІГј Г Г°ГІГЁГ±ГІГ 
 					#print 'saving artist:',album_item_serv['key'],album_item_serv['artist']
 					print 'Creating album relation:',albumD[album_key]['album']
 					res = saveAlbum_intoDB_via_artistD(None,albumD[album_key],artist_key,album_key,db,'only_artist_relation_creation','album_NSA_view')
 					print 'OK',res
-					# Если ошибка сохранения то сменить цвет на ошибочный как для списка
+					# Г…Г±Г«ГЁ Г®ГёГЁГЎГЄГ  Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї ГІГ® Г±Г¬ГҐГ­ГЁГІГј Г¶ГўГҐГІ Г­Г  Г®ГёГЁГЎГ®Г·Г­Г»Г© ГЄГ ГЄ Г¤Г«Гї Г±ГЇГЁГ±ГЄГ 
 					if res == -1:
 						artist_item_serv['colorcl'] = album_item_serv['colorcl'].replace(album_item_serv['process_type'],'error')
 						artist_item_serv['process_type'] = 'error'
@@ -3560,12 +3560,12 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			#print 	artist_item_serv['artist']
 			artist_db_id = None
 			if artist_item_serv['process_type'] == 'tb_save':
-				# тут сохранить артиста
+				# ГІГіГІ Г±Г®ГµГ°Г Г­ГЁГІГј Г Г°ГІГЁГ±ГІГ 
 				#print 'saving artist:',artist_item_serv['key'],artist_item_serv['artist']
 				artistName = artist_item_serv['artist']
 				retD = saveArtistD_intoDB(None,artistName.lower().strip(),'',None,None,[],None,db)
 				
-				# Если ошибка сохранения то сменить цвет на ошибочный как для списка
+				# Г…Г±Г«ГЁ Г®ГёГЁГЎГЄГ  Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї ГІГ® Г±Г¬ГҐГ­ГЁГІГј Г¶ГўГҐГІ Г­Г  Г®ГёГЁГЎГ®Г·Г­Г»Г© ГЄГ ГЄ Г¤Г«Гї Г±ГЇГЁГ±ГЄГ 
 				
 				if retD['result'] <> None and retD['result']<> -1:
 					artist_db_id = retD['id_artist']
@@ -3584,15 +3584,15 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			no_albumes = True
 			for album_item_serv in albumL_serv:
 				
-				# пропуск позиций уже наход. в бд или невыбранных
+				# ГЇГ°Г®ГЇГіГ±ГЄ ГЇГ®Г§ГЁГ¶ГЁГ© ГіГ¦ГҐ Г­Г ГµГ®Г¤. Гў ГЎГ¤ ГЁГ«ГЁ Г­ГҐГўГ»ГЎГ°Г Г­Г­Г»Гµ
 				if album_item_serv['is_in_db']:
 					continue	
 							
 				if not album_item_serv['checked']:
 					continue
-				# Если артист не в базе м чекнут	
+				# Г…Г±Г«ГЁ Г Г°ГІГЁГ±ГІ Г­ГҐ Гў ГЎГ Г§ГҐ Г¬ Г·ГҐГЄГ­ГіГІ	
 				if album_item_serv['process_type'] == 'tb_save':
-					# тут сохранить аЛьбом
+					# ГІГіГІ Г±Г®ГµГ°Г Г­ГЁГІГј Г Г‹ГјГЎГ®Г¬
 					#print 'saving album:',album_item_serv['key'],album_item_serv['album']
 					#print 'saving reference:',artist_item_serv['key'],album_item_serv['key']
 					artist_key = int(album_item_serv['artist_key'])
@@ -3613,7 +3613,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		print 'Ok'
 						
 	def artist_album_maintain_mass(self,commandD):	
-		# Функция обертка для сохранения данных в БД (artist_view_save)
+		# Г”ГіГ­ГЄГ¶ГЁГї Г®ГЎГҐГ°ГІГЄГ  Г¤Г«Гї Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї Г¤Г Г­Г­Г»Гµ Гў ГЃГ„ (artist_view_save)
 		self.__logger.info('in action artist_album_maintain_mass: [%s] '%(str(commandD)))
 		artistDataDL = []
 		
@@ -3624,9 +3624,9 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		
 					
 		if ('artistDataD' in commandD or 'album_NSA_DataD' in commandD) and 'save' in commandD['action_mode']:
-			# Тут нужна серьезная проверка, что посланные шаг назад данные не изменились
-			# если проверка прошла то сохранять
-			# данные от клиента передавать не надо
+			# Г’ГіГІ Г­ГіГ¦Г­Г  Г±ГҐГ°ГјГҐГ§Г­Г Гї ГЇГ°Г®ГўГҐГ°ГЄГ , Г·ГІГ® ГЇГ®Г±Г«Г Г­Г­Г»ГҐ ГёГ ГЈ Г­Г Г§Г Г¤ Г¤Г Г­Г­Г»ГҐ Г­ГҐ ГЁГ§Г¬ГҐГ­ГЁГ«ГЁГ±Гј
+			# ГҐГ±Г«ГЁ ГЇГ°Г®ГўГҐГ°ГЄГ  ГЇГ°Г®ГёГ«Г  ГІГ® Г±Г®ГµГ°Г Г­ГїГІГј
+			# Г¤Г Г­Г­Г»ГҐ Г®ГІ ГЄГ«ГЁГҐГ­ГІГ  ГЇГҐГ°ГҐГ¤Г ГўГ ГІГј Г­ГҐ Г­Г Г¤Г®
 			
 			
 			artist_album_struct_serv = self.__modelDic['artist_album_maintain_proc_buf'][buf_key]['dataD']['tb_save']
@@ -3651,7 +3651,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			db.commit()
 			db.close()	
 			print "saved!!!"
-			# тут надо править
+			# ГІГіГІ Г­Г Г¤Г® ГЇГ°Г ГўГЁГІГј
 			#self.__modelDic['artist_album_maintain_proc_buf']['artist_dataD_list_sync']:artist_album_struct_serv,'action_type':'saved'}		
 			return 1
 				
@@ -3660,7 +3660,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return None			
 		
 	def artist_album_categ_maintain_mass(self,commandD):	
-		# Функция обертка для сохранения данных в БД (artist_view_save)
+		# Г”ГіГ­ГЄГ¶ГЁГї Г®ГЎГҐГ°ГІГЄГ  Г¤Г«Гї Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї Г¤Г Г­Г­Г»Гµ Гў ГЃГ„ (artist_view_save)
 		self.__logger.info('in action artist_album_categ_maintain_mass: [%s] '%(str(commandD)))
 		artistDataDL = []
 		
@@ -3679,13 +3679,13 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			categ_id = None
 					
 		if ('artistDataD' in commandD or 'album_NSA_DataD' in commandD) and 'save' in commandD['action_mode']:
-			# Тут нужна серьезная проверка, что посланные шаг назад данные не изменились
-			# если проверка прошла то сохранять
-			# данные от клиента передавать не надо
+			# Г’ГіГІ Г­ГіГ¦Г­Г  Г±ГҐГ°ГјГҐГ§Г­Г Гї ГЇГ°Г®ГўГҐГ°ГЄГ , Г·ГІГ® ГЇГ®Г±Г«Г Г­Г­Г»ГҐ ГёГ ГЈ Г­Г Г§Г Г¤ Г¤Г Г­Г­Г»ГҐ Г­ГҐ ГЁГ§Г¬ГҐГ­ГЁГ«ГЁГ±Гј
+			# ГҐГ±Г«ГЁ ГЇГ°Г®ГўГҐГ°ГЄГ  ГЇГ°Г®ГёГ«Г  ГІГ® Г±Г®ГµГ°Г Г­ГїГІГј
+			# Г¤Г Г­Г­Г»ГҐ Г®ГІ ГЄГ«ГЁГҐГ­ГІГ  ГЇГҐГ°ГҐГ¤Г ГўГ ГІГј Г­ГҐ Г­Г Г¤Г®
 			
 			artist_album_struct_serv = self.__modelDic['artist_album_maintain_proc_buf'][buf_key]['dataD']['tb_save']
 			
-			artistD = {} # взять метаданные тут из буферов
+			artistD = {} # ГўГ§ГїГІГј Г¬ГҐГІГ Г¤Г Г­Г­Г»ГҐ ГІГіГІ ГЁГ§ ГЎГіГґГҐГ°Г®Гў
 			
 			artist_dbDD={}	
 			album_dbDD={}	
@@ -3817,7 +3817,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			#db.commit()
 			db.close()	
 			print "saved!!!"
-			# тут надо править
+			# ГІГіГІ Г­Г Г¤Г® ГЇГ°Г ГўГЁГІГј
 			#self.__modelDic['artist_album_maintain_proc_buf']['artist_dataD_list_sync']:artist_album_struct_serv,'action_type':'saved'}		
 			return 1
 				
@@ -3873,7 +3873,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		imageLD = {'album_crc32':cur_album_crc32,'imageL':imageL,'imageD':imageD}	
 		
 		self.__logger.debug('3665 get_images_4_cur_album_fromPL: len[%s] '%(str(len(imageL))))
-		# Найти срц32 текущего альбома album_crc32 = metaD_of_cur_pL[1989996026]['album_crc32']
+		# ГЌГ Г©ГІГЁ Г±Г°Г¶32 ГІГҐГЄГіГ№ГҐГЈГ® Г Г«ГјГЎГ®Г¬Г  album_crc32 = metaD_of_cur_pL[1989996026]['album_crc32']
 		
 		paramD = {'action':'get_album_images_from_cur_plist'}
 		if 'srch_rep_mode' in commandD:
@@ -3900,7 +3900,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		imageLD = {'album_crc32':album_crc32,'imageL':imageL,'imageD':imageD}	
 		
 		self.__logger.debug('3723 get_images_4_cur_album_fromPL: len[%s] '%(str(len(imageL))))
-		# Найти срц32 текущего альбома album_crc32 = metaD_of_cur_pL[1989996026]['album_crc32']
+		# ГЌГ Г©ГІГЁ Г±Г°Г¶32 ГІГҐГЄГіГ№ГҐГЈГ® Г Г«ГјГЎГ®Г¬Г  album_crc32 = metaD_of_cur_pL[1989996026]['album_crc32']
 		
 		paramD = {'action':'get_album_images_from_cur_plist'}
 		if 'srch_rep_mode' in commandD:
@@ -3913,7 +3913,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return 1
 		
 	def get_tracks_4_selected_folder(self,commandD):	
-		# Сбор метаданных для закладки Tracks и упаковка в JSON структуру
+		# Г‘ГЎГ®Г° Г¬ГҐГІГ Г¤Г Г­Г­Г»Гµ Г¤Г«Гї Г§Г ГЄГ«Г Г¤ГЄГЁ Tracks ГЁ ГіГЇГ ГЄГ®ГўГЄГ  Гў JSON Г±ГІГ°ГіГЄГІГіГ°Гі
 		self.__logger.debug('3740 get_tracks_4_selected_folder: [%s] '%(str(commandD)))
 		cfgD = readConfigData(mymedialib_cfg)
 		music_folder =''
@@ -3997,7 +3997,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				album_artistD = resDBS['album_artistD']
 				albumDL = self.map_meta_album_tracks_struct_to_view_json(new_allmFD,album_artistD)	
 				
-						# ВНИМАНИЕ! proc_state - является ключем для bufferD													
+						# Г‚ГЌГ€ГЊГЂГЌГ€Г…! proc_state - ГїГўГ«ГїГҐГІГ±Гї ГЄГ«ГѕГ·ГҐГ¬ Г¤Г«Гї bufferD													
 				vldt_art_key = zlib.crc32('art_db_buf'+str(time.time()))
 				vldt_albNSA_key = zlib.crc32('alb_NSA_db_buf'+str(time.time()))
 				print 'CRC32'	
@@ -4034,7 +4034,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				
 		print 'modeldic ok'	
 		
-		# Найти срц32 текущего альбома album_crc32 = metaD_of_cur_pL[1989996026]['album_crc32']
+		# ГЌГ Г©ГІГЁ Г±Г°Г¶32 ГІГҐГЄГіГ№ГҐГЈГ® Г Г«ГјГЎГ®Г¬Г  album_crc32 = metaD_of_cur_pL[1989996026]['album_crc32']
 		
 		paramD = {'action':'get_album_tracks_from_cur_plist'}
 		if 'srch_rep_mode' in commandD:
@@ -4122,7 +4122,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		album_artistD = resDBS['album_artistD']
 		albumDL = self.map_meta_album_tracks_struct_to_view_json(new_allmFD,album_artistD)	
 				
-			# ВНИМАНИЕ! proc_state - является ключем для bufferD													
+			# Г‚ГЌГ€ГЊГЂГЌГ€Г…! proc_state - ГїГўГ«ГїГҐГІГ±Гї ГЄГ«ГѕГ·ГҐГ¬ Г¤Г«Гї bufferD													
 		vldt_art_key = zlib.crc32('art_db_buf'+str(time.time()))
 		vldt_albNSA_key = zlib.crc32('alb_NSA_db_buf'+str(time.time()))
 		print 'CRC32'	
@@ -4144,7 +4144,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		#resDBS = myMediaLib_adm.mediaLib_intoDb_Load_withUpdateCheck(dbPath,[sel_dir],'save_db')
 		
 		#self.__logger.debug('3752 get_tracks_4_cur_album_fromPL: len[%s] '%(str(len(imageL))))
-		# Найти срц32 текущего альбома album_crc32 = metaD_of_cur_pL[1989996026]['album_crc32']
+		# ГЌГ Г©ГІГЁ Г±Г°Г¶32 ГІГҐГЄГіГ№ГҐГЈГ® Г Г«ГјГЎГ®Г¬Г  album_crc32 = metaD_of_cur_pL[1989996026]['album_crc32']
 		
 		paramD = {'action':'get_album_tracks_from_cur_plist'}
 		if 'srch_rep_mode' in commandD:
@@ -4238,7 +4238,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					self.__logger.critical('in remove_tracks_from_db - Validate 2 artist ERROR [%s]'%(str(resD)))
 				
 				if resD['del_alb_L'] != []:
-					r = delete_album_via_DbIdL(dbPath,resD['del_alb_L'],'remove')
+					r = delete_album_via_DbIdL(dbPath,resD['del_alb_L'],'remove','with_artist_albub_ref_check')
 					if r == 1:
 						self.__logger.info('in remove_tracks_from_db - Deleted album OK [%s]'%(str(resD['del_alb_L'])))
 					else:
@@ -4281,7 +4281,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		
 		#print "resDBS.keys------>",resDBS.keys(),'album',album_crc32
 		
-		# получить метаданные из сохраненного get_tracks_4_selected_folder по album_id
+		# ГЇГ®Г«ГіГ·ГЁГІГј Г¬ГҐГІГ Г¤Г Г­Г­Г»ГҐ ГЁГ§ Г±Г®ГµГ°Г Г­ГҐГ­Г­Г®ГЈГ® get_tracks_4_selected_folder ГЇГ® album_id
 		
 		self.__logger.debug('at play_album_from_folder: track res buf found ')
 		print resDBS.keys()
@@ -4309,7 +4309,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		resDBS = self.__model_instance.getTracksPreloadRes_BufD()['new_allmFD']
 		#print "resDBS.keys------>",resDBS.keys(),'album',album_crc32
 		
-		# получить метаданные из сохраненного get_tracks_4_selected_folder по album_id
+		# ГЇГ®Г«ГіГ·ГЁГІГј Г¬ГҐГІГ Г¤Г Г­Г­Г»ГҐ ГЁГ§ Г±Г®ГµГ°Г Г­ГҐГ­Г­Г®ГЈГ® get_tracks_4_selected_folder ГЇГ® album_id
 		track_num = 0
 		#print resDBS.keys()
 		if track_crc32 in resDBS:
@@ -4552,7 +4552,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 	def get_artist_live_search_variants(self,commandD):	
 		print 'get_artist_live_search_variants!!!!:',commandD	
 		
-		# Если метаданные еще не получены то нижестоящая фукция их соберет, если уже были собраны,то из нее быстрый выход
+		# Г…Г±Г«ГЁ Г¬ГҐГІГ Г¤Г Г­Г­Г»ГҐ ГҐГ№ГҐ Г­ГҐ ГЇГ®Г«ГіГ·ГҐГ­Г» ГІГ® Г­ГЁГ¦ГҐГ±ГІГ®ГїГ№Г Гї ГґГіГЄГ¶ГЁГї ГЁГµ Г±Г®ГЎГҐГ°ГҐГІ, ГҐГ±Г«ГЁ ГіГ¦ГҐ ГЎГ»Г«ГЁ Г±Г®ГЎГ°Г Г­Г»,ГІГ® ГЁГ§ Г­ГҐГҐ ГЎГ»Г±ГІГ°Г»Г© ГўГ»ГµГ®Г¤
 		
 		#ArtistL=self.__model_instance.MediaLibPlayProcessDic_viaKey('Artist_metaBufL','local')
 		ArtistL=self.__model_instance.MediaLibPlayProcessDic_viaKey('ArtistL','local')
@@ -4579,7 +4579,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		
 		self.__logger.info('get_artist_meta_buf_live_search_variants: [%s] '%(str(commandD)))
 		
-		# Если метаданные еще не получены то нижестоящая фукция их соберет, если уже были собраны,то из нее быстрый выход
+		# Г…Г±Г«ГЁ Г¬ГҐГІГ Г¤Г Г­Г­Г»ГҐ ГҐГ№ГҐ Г­ГҐ ГЇГ®Г«ГіГ·ГҐГ­Г» ГІГ® Г­ГЁГ¦ГҐГ±ГІГ®ГїГ№Г Гї ГґГіГЄГ¶ГЁГї ГЁГµ Г±Г®ГЎГҐГ°ГҐГІ, ГҐГ±Г«ГЁ ГіГ¦ГҐ ГЎГ»Г«ГЁ Г±Г®ГЎГ°Г Г­Г»,ГІГ® ГЁГ§ Г­ГҐГҐ ГЎГ»Г±ГІГ°Г»Г© ГўГ»ГµГ®Г¤
 		
 		ArtistL=self.__model_instance.MediaLibPlayProcessDic_viaKey('Artist_metaBufL','local')
 		#ArtistL=self.__model_instance.MediaLibPlayProcessDic_viaKey('ArtistL','local')
@@ -4643,12 +4643,12 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return 1
 		
 	def get_picture(self,commandD):	
-		# Загрузка картинки по URL из админ закладки
+		# Г‡Г ГЈГ°ГіГ§ГЄГ  ГЄГ Г°ГІГЁГ­ГЄГЁ ГЇГ® URL ГЁГ§ Г Г¤Г¬ГЁГ­ Г§Г ГЄГ«Г Г¤ГЄГЁ
 		self.__logger.info('action get_picture!!!!:%s'%(str(commandD)))
 		url = commandD['text_line']
 		self.__logger.debug('before dest_dir = self.__model_instance.getCurAlbumDir()')
 		
-		# Проверить что картинка для РАДИО, проверить есть ли папка для нее по узлу из шаблона. если нет создать е???
+		# ГЏГ°Г®ГўГҐГ°ГЁГІГј Г·ГІГ® ГЄГ Г°ГІГЁГ­ГЄГ  Г¤Г«Гї ГђГЂГ„Г€ГЋ, ГЇГ°Г®ГўГҐГ°ГЁГІГј ГҐГ±ГІГј Г«ГЁ ГЇГ ГЇГЄГ  Г¤Г«Гї Г­ГҐГҐ ГЇГ® ГіГ§Г«Гі ГЁГ§ ГёГ ГЎГ«Г®Г­Г . ГҐГ±Г«ГЁ Г­ГҐГІ Г±Г®Г§Г¤Г ГІГј ГҐ???
 		dest_dir = self.__model_instance.getCurAlbumDir()
 		print 'dest_dir=',dest_dir
 		
@@ -4720,16 +4720,16 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		
 		if object_type == 'artist':
 		
-			# Референтные списки через фунцию getAll_Related_to_main_Artist_fromDB:
-			#1. Список со ссылкой или ссылками на главных (для playtogether их несколько)
-			#2. Список со ссылкам от главного (для главного)
-			#3. Список всего кластера для неглавног
+			# ГђГҐГґГҐГ°ГҐГ­ГІГ­Г»ГҐ Г±ГЇГЁГ±ГЄГЁ Г·ГҐГ°ГҐГ§ ГґГіГ­Г¶ГЁГѕ getAll_Related_to_main_Artist_fromDB:
+			#1. Г‘ГЇГЁГ±Г®ГЄ Г±Г® Г±Г±Г»Г«ГЄГ®Г© ГЁГ«ГЁ Г±Г±Г»Г«ГЄГ Г¬ГЁ Г­Г  ГЈГ«Г ГўГ­Г»Гµ (Г¤Г«Гї playtogether ГЁГµ Г­ГҐГ±ГЄГ®Г«ГјГЄГ®)
+			#2. Г‘ГЇГЁГ±Г®ГЄ Г±Г® Г±Г±Г»Г«ГЄГ Г¬ Г®ГІ ГЈГ«Г ГўГ­Г®ГЈГ® (Г¤Г«Гї ГЈГ«Г ГўГ­Г®ГЈГ®)
+			#3. Г‘ГЇГЁГ±Г®ГЄ ГўГ±ГҐГЈГ® ГЄГ«Г Г±ГІГҐГ°Г  Г¤Г«Гї Г­ГҐГЈГ«Г ГўГ­Г®ГЈ
 			artists_from_main_relL = [] 
 			artists_main_to_relL = [] 
 			artists_all_relL = [] 
-			artists_from_main_relLD = [] # для главного список подчиненных
-			artists_main_to_relLD = [] # список главных артистов для неглавного или виртуальных для неглавного
-			artists_all_relLD = [] # список всего кластера для неглавного
+			artists_from_main_relLD = [] # Г¤Г«Гї ГЈГ«Г ГўГ­Г®ГЈГ® Г±ГЇГЁГ±Г®ГЄ ГЇГ®Г¤Г·ГЁГ­ГҐГ­Г­Г»Гµ
+			artists_main_to_relLD = [] # Г±ГЇГЁГ±Г®ГЄ ГЈГ«Г ГўГ­Г»Гµ Г Г°ГІГЁГ±ГІГ®Гў Г¤Г«Гї Г­ГҐГЈГ«Г ГўГ­Г®ГЈГ® ГЁГ«ГЁ ГўГЁГ°ГІГіГ Г«ГјГ­Г»Гµ Г¤Г«Гї Г­ГҐГЈГ«Г ГўГ­Г®ГЈГ®
+			artists_all_relLD = [] # Г±ГЇГЁГ±Г®ГЄ ГўГ±ГҐГЈГ® ГЄГ«Г Г±ГІГҐГ°Г  Г¤Г«Гї Г­ГҐГЈГ«Г ГўГ­Г®ГЈГ®
 			object_crc32 = int(commandD['key'])
 			
 			object_dbD=getArtistD_fromDB(dbPath,object_crc32,[])[object_crc32]
@@ -4768,10 +4768,10 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			
 			#rel_artL = getAll_Related_to_main_Artist_fromDB(artist_crc32)
 			
-			# Получаем данные по всем артистам они нужны чтобы востановить исходные данные в референтных списках
+			# ГЏГ®Г«ГіГ·Г ГҐГ¬ Г¤Г Г­Г­Г»ГҐ ГЇГ® ГўГ±ГҐГ¬ Г Г°ГІГЁГ±ГІГ Г¬ Г®Г­ГЁ Г­ГіГ¦Г­Г» Г·ГІГ®ГЎГ» ГўГ®Г±ГІГ Г­Г®ГўГЁГІГј ГЁГ±ГµГ®Г¤Г­Г»ГҐ Г¤Г Г­Г­Г»ГҐ Гў Г°ГҐГґГҐГ°ГҐГ­ГІГ­Г»Гµ Г±ГЇГЁГ±ГЄГ Гµ
 			artist_dbD_all=getArtistD_fromDB(dbPath,None,[],'wo_reflist')
 			
-			# Получаем референтные списки фром для главного и ту для обычных
+			# ГЏГ®Г«ГіГ·Г ГҐГ¬ Г°ГҐГґГҐГ°ГҐГ­ГІГ­Г»ГҐ Г±ГЇГЁГ±ГЄГЁ ГґГ°Г®Г¬ Г¤Г«Гї ГЈГ«Г ГўГ­Г®ГЈГ® ГЁ ГІГі Г¤Г«Гї Г®ГЎГ»Г·Г­Г»Гµ
 			if (object_dbD['main'] == 'X' or object_dbD['main'] == True):	
 				print 'this is main!!!!'
 				artists_from_main_relLD = getArtist_relation_metaD(dbPath,object_crc32,'main')['artists_from_main_relLD']
@@ -4845,7 +4845,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				new_Item['key']	= rel_item['album_key']
 				new_Item['checked']	= 'X'
 				
-				# Это надо менять, забирать артистов надо проверяя их связь в ARTIST_ALBUM_REF
+				# ГќГІГ® Г­Г Г¤Г® Г¬ГҐГ­ГїГІГј, Г§Г ГЎГЁГ°Г ГІГј Г Г°ГІГЁГ±ГІГ®Гў Г­Г Г¤Г® ГЇГ°Г®ГўГҐГ°ГїГї ГЁГµ Г±ГўГїГ§Гј Гў ARTIST_ALBUM_REF
 				#if rel_item['rel_type'] <> None:
 					#continue
 				#else:
@@ -4989,7 +4989,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				new_Item['key']	= rel_item['artist_key']
 				new_Item['checked']	= 'X'
 				
-				# Это надо менять, забирать артистов надо проверяя их связь в ARTIST_ALBUM_REF
+				# ГќГІГ® Г­Г Г¤Г® Г¬ГҐГ­ГїГІГј, Г§Г ГЎГЁГ°Г ГІГј Г Г°ГІГЁГ±ГІГ®Гў Г­Г Г¤Г® ГЇГ°Г®ГўГҐГ°ГїГї ГЁГµ Г±ГўГїГ§Гј Гў ARTIST_ALBUM_REF
 				if rel_item['rel_type'] <> None:
 					#print '1',new_Item['object_type'],new_Item['artist']
 					new_Item['rel_type'] = 	rel_item['rel_type']
@@ -5039,7 +5039,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return 1
 		
 	def maintain_single_artist_rel(self,commandD):
-		# точечная функция обрабработки процесса изменения Альбома или Артиста и всех их связей
+		# ГІГ®Г·ГҐГ·Г­Г Гї ГґГіГ­ГЄГ¶ГЁГї Г®ГЎГ°Г ГЎГ°Г ГЎГ®ГІГЄГЁ ГЇГ°Г®Г¶ГҐГ±Г±Г  ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї ГЂГ«ГјГЎГ®Г¬Г  ГЁГ«ГЁ ГЂГ°ГІГЁГ±ГІГ  ГЁ ГўГ±ГҐГµ ГЁГµ Г±ГўГїГ§ГҐГ©
 		
 		dbPath = self.__model_instance.getMediaLibPlayProcessContext()['dbPath']
 		self.__logger.info('in action maintain_single_artist_rel: [%s] '%(str(commandD)))
@@ -5136,7 +5136,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				self.__modelDic['check_album2artist_rel_res'] = 'error'		
 	
 	def maintain_single_album_rel(self,commandD):
-		# точечная функция обрабработки процесса изменения Альбома или Артиста и всех их связей
+		# ГІГ®Г·ГҐГ·Г­Г Гї ГґГіГ­ГЄГ¶ГЁГї Г®ГЎГ°Г ГЎГ°Г ГЎГ®ГІГЄГЁ ГЇГ°Г®Г¶ГҐГ±Г±Г  ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї ГЂГ«ГјГЎГ®Г¬Г  ГЁГ«ГЁ ГЂГ°ГІГЁГ±ГІГ  ГЁ ГўГ±ГҐГµ ГЁГµ Г±ГўГїГ§ГҐГ©
 		dbPath = self.__model_instance.getMediaLibPlayProcessContext()['dbPath']
 		self.__logger.info('in action maintain_single_album_rel: [%s] '%(str(commandD)))
 		if 'alb_art_relation_struct' in commandD:
@@ -5194,7 +5194,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			print res
 			self.__modelDic['maintain_object_attrs_res'] = 'error'		
 	def maintain_single_artist_album(self,commandD):
-		# точечная функция обрабработки процесса изменения связи Альбома или Артиста
+		# ГІГ®Г·ГҐГ·Г­Г Гї ГґГіГ­ГЄГ¶ГЁГї Г®ГЎГ°Г ГЎГ°Г ГЎГ®ГІГЄГЁ ГЇГ°Г®Г¶ГҐГ±Г±Г  ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї Г±ГўГїГ§ГЁ ГЂГ«ГјГЎГ®Г¬Г  ГЁГ«ГЁ ГЂГ°ГІГЁГ±ГІГ 
 		dbPath = self.__model_instance.getMediaLibPlayProcessContext()['dbPath']
 		self.__logger.info('in action maintain_single_artist_album: [%s] '%(str(commandD)))
 		if 'alb_art_relation_struct' in commandD:
@@ -5256,7 +5256,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				artistD = {}
 			
 			##################
-			# Написать функцию берущую тип связи для текущего артиста и его связанных соседей ее использовать при показе страницы в дроп дауне.
+			# ГЌГ ГЇГЁГ±Г ГІГј ГґГіГ­ГЄГ¶ГЁГѕ ГЎГҐГ°ГіГ№ГіГѕ ГІГЁГЇ Г±ГўГїГ§ГЁ Г¤Г«Гї ГІГҐГЄГіГ№ГҐГЈГ® Г Г°ГІГЁГ±ГІГ  ГЁ ГҐГЈГ® Г±ГўГїГ§Г Г­Г­Г»Гµ Г±Г®Г±ГҐГ¤ГҐГ© ГҐГҐ ГЁГ±ГЇГ®Г«ГјГ§Г®ГўГ ГІГј ГЇГ°ГЁ ГЇГ®ГЄГ Г§ГҐ Г±ГІГ°Г Г­ГЁГ¶Г» Гў Г¤Г°Г®ГЇ Г¤Г ГіГ­ГҐ.
 
 			#####################	
 			
@@ -5342,7 +5342,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			
 			self.__logger.debug('3')
 			ref_art_newL = []
-			# Если новый артист на ввод то у него нет референсивных списков пока. значит пропуск
+			# Г…Г±Г«ГЁ Г­Г®ГўГ»Г© Г Г°ГІГЁГ±ГІ Г­Г  ГўГўГ®Г¤ ГІГ® Гі Г­ГҐГЈГ® Г­ГҐГІ Г°ГҐГґГҐГ°ГҐГ­Г±ГЁГўГ­Г»Гµ Г±ГЇГЁГ±ГЄГ®Гў ГЇГ®ГЄГ . Г§Г­Г Г·ГЁГІ ГЇГ°Г®ГЇГіГ±ГЄ
 			if len(artist_dbD) == 1:
 				artist_dbD=getArtistD_fromDB(dbPath,None,[])
 				self.__modelDic['edit_artist_struc']['artist_dbD'] = artist_dbD
@@ -5448,7 +5448,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return 1	
 		
 	def get_track_search_list_for_tag_id(self,commandD):	
-		# возвращает список "поискового" типа для выбранного tag_id
+		# ГўГ®Г§ГўГ°Г Г№Г ГҐГІ Г±ГЇГЁГ±Г®ГЄ "ГЇГ®ГЁГ±ГЄГ®ГўГ®ГЈГ®" ГІГЁГЇГ  Г¤Г«Гї ГўГ»ГЎГ°Г Г­Г­Г®ГЈГ® tag_id
 		
 		self.__logger.debug('in get_track_search_list_for_tag_id: [%s] '%(str(commandD)))
 		
@@ -5469,7 +5469,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return -1	
 		
 	def get_artist_search_list_for_object_id(self,commandD):	
-		# возвращает список "поискового" типа для выбранного tag_id
+		# ГўГ®Г§ГўГ°Г Г№Г ГҐГІ Г±ГЇГЁГ±Г®ГЄ "ГЇГ®ГЁГ±ГЄГ®ГўГ®ГЈГ®" ГІГЁГЇГ  Г¤Г«Гї ГўГ»ГЎГ°Г Г­Г­Г®ГЈГ® tag_id
 		
 		self.__logger.info('in get_track_search_list_for_tag_id: [%s] '%(str(commandD)))
 		
@@ -5490,19 +5490,19 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return -1		
 		
 	def check_and_add_missd_song(self,commandD):
-		# Недоделанная пока функция автоаматическйо проверк тэга на наличие новой версии песни
+		# ГЌГҐГ¤Г®Г¤ГҐГ«Г Г­Г­Г Гї ГЇГ®ГЄГ  ГґГіГ­ГЄГ¶ГЁГї Г ГўГІГ®Г Г¬Г ГІГЁГ·ГҐГ±ГЄГ©Г® ГЇГ°Г®ГўГҐГ°ГЄ ГІГЅГЈГ  Г­Г  Г­Г Г«ГЁГ·ГЁГҐ Г­Г®ГўГ®Г© ГўГҐГ°Г±ГЁГЁ ГЇГҐГ±Г­ГЁ
 		self.__logger.info('check_and_add_missd_song: [%s] '%(str(commandD)))
 		paramD['action'] = 'tag_maintain'
 		commandD['action_mode'] = 'add'
 		tag_id = int(commandD['tag_id'])
 		search_term = ''
 		dbPath = self.__model_instance.getMediaLibPlayProcessContext()['dbPath'] 
-		# Получить все трэки этого названия, невзирая на то, что они уже существуют в назначении
+		# ГЏГ®Г«ГіГ·ГЁГІГј ГўГ±ГҐ ГІГ°ГЅГЄГЁ ГЅГІГ®ГЈГ® Г­Г Г§ГўГ Г­ГЁГї, Г­ГҐГўГ§ГЁГ°Г Гї Г­Г  ГІГ®, Г·ГІГ® Г®Г­ГЁ ГіГ¦ГҐ Г±ГіГ№ГҐГ±ГІГўГіГѕГІ Гў Г­Г Г§Г­Г Г·ГҐГ­ГЁГЁ
 		sD =  searchMediaLib_MetaData(dbPath,search_term,['title'],[])
 		self.__model_instance.setSearchBufD(search_term,sD,tag_id,tag_form_mode,paramD)
 
 		sD =  searchMediaLib_MetaData(dbPath,search_term,['title'],[])
-		# Получить текущие трэки тэга	
+		# ГЏГ®Г«ГіГ·ГЁГІГј ГІГҐГЄГіГ№ГЁГҐ ГІГ°ГЅГЄГЁ ГІГЅГЈГ 	
 		self.__model_instance.setSearch_editable_BufD(sD,tag_id,tag_form_mode,'add')
 
 		if sD_editable <> {}:	
@@ -5511,16 +5511,16 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			
 			
 	def get_artist_search_list_for_tag_id(self,commandD):	
-		# возвращает список "поискового" типа для выбранного tag_id
+		# ГўГ®Г§ГўГ°Г Г№Г ГҐГІ Г±ГЇГЁГ±Г®ГЄ "ГЇГ®ГЁГ±ГЄГ®ГўГ®ГЈГ®" ГІГЁГЇГ  Г¤Г«Гї ГўГ»ГЎГ°Г Г­Г­Г®ГЈГ® tag_id
 		
 		self.__logger.info('in get_artist_search_list_for_tag_id: [%s] '%(str(commandD)))
 		
 		tagId = commandD['tag_id']
 		db = sqlite3.connect(self.__model_instance.getMediaLibPlayProcessContext()['dbPath'])		
-		#заменить эту функцию на новую для артиста
+		#Г§Г Г¬ГҐГ­ГЁГІГј ГЅГІГі ГґГіГ­ГЄГ¶ГЁГѕ Г­Г  Г­Г®ГўГіГѕ Г¤Г«Гї Г Г°ГІГЁГ±ГІГ 
 		dbIdL = getDbIdL_viaTagId(tagId,db)
 		#print 'get_tag_tracks dbl_d:',dbIdL
-		# тут брать из RepBuffer
+		# ГІГіГІ ГЎГ°Г ГІГј ГЁГ§ RepBuffer
 		sD = getCurrentMetaData_fromDB_via_DbIdL(dbIdL,db)
 			#print sD
 			#print sD[sD.keys()[0]].keys()
@@ -5534,15 +5534,15 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return -1		
 
 	def artist_tag_assign_update_check(self,commandD):	
-		# проверяет список "поискового" типа для выбранного tag_id на предмет изменения тэгоназначения
+		# ГЇГ°Г®ГўГҐГ°ГїГҐГІ Г±ГЇГЁГ±Г®ГЄ "ГЇГ®ГЁГ±ГЄГ®ГўГ®ГЈГ®" ГІГЁГЇГ  Г¤Г«Гї ГўГ»ГЎГ°Г Г­Г­Г®ГЈГ® tag_id Г­Г  ГЇГ°ГҐГ¤Г¬ГҐГІ ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї ГІГЅГЈГ®Г­Г Г§Г­Г Г·ГҐГ­ГЁГї
 		
-		# Для представления надо подготовить следующие параметры 'change_list':'','change_action':''
-		# 'change_list':'' - список измененных позиций. 'change_action' - удалить или добавить
-		# вью должен возвратить новый лист с подкрашееными позициями. промежуточно должнен быть сохранет список, по нему после нажатия save будет сделан реальный
-		# апдейт
+		# Г„Г«Гї ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї Г­Г Г¤Г® ГЇГ®Г¤ГЈГ®ГІГ®ГўГЁГІГј Г±Г«ГҐГ¤ГіГѕГ№ГЁГҐ ГЇГ Г°Г Г¬ГҐГІГ°Г» 'change_list':'','change_action':''
+		# 'change_list':'' - Г±ГЇГЁГ±Г®ГЄ ГЁГ§Г¬ГҐГ­ГҐГ­Г­Г»Гµ ГЇГ®Г§ГЁГ¶ГЁГ©. 'change_action' - ГіГ¤Г Г«ГЁГІГј ГЁГ«ГЁ Г¤Г®ГЎГ ГўГЁГІГј
+		# ГўГјГѕ Г¤Г®Г«Г¦ГҐГ­ ГўГ®Г§ГўГ°Г ГІГЁГІГј Г­Г®ГўГ»Г© Г«ГЁГ±ГІ Г± ГЇГ®Г¤ГЄГ°Г ГёГҐГҐГ­Г»Г¬ГЁ ГЇГ®Г§ГЁГ¶ГЁГїГ¬ГЁ. ГЇГ°Г®Г¬ГҐГ¦ГіГІГ®Г·Г­Г® Г¤Г®Г«Г¦Г­ГҐГ­ ГЎГ»ГІГј Г±Г®ГµГ°Г Г­ГҐГІ Г±ГЇГЁГ±Г®ГЄ, ГЇГ® Г­ГҐГ¬Гі ГЇГ®Г±Г«ГҐ Г­Г Г¦Г ГІГЁГї save ГЎГіГ¤ГҐГІ Г±Г¤ГҐГ«Г Г­ Г°ГҐГ Г«ГјГ­Г»Г©
+		# Г ГЇГ¤ГҐГ©ГІ
 		
-		# тут же делать проверку целостности. если действие добавить то список не должен пересекаться с существующим. если удалить, то элементы должны быть в 
-		# тэгоназначении
+		# ГІГіГІ Г¦ГҐ Г¤ГҐГ«Г ГІГј ГЇГ°Г®ГўГҐГ°ГЄГі Г¶ГҐГ«Г®Г±ГІГ­Г®Г±ГІГЁ. ГҐГ±Г«ГЁ Г¤ГҐГ©Г±ГІГўГЁГҐ Г¤Г®ГЎГ ГўГЁГІГј ГІГ® Г±ГЇГЁГ±Г®ГЄ Г­ГҐ Г¤Г®Г«Г¦ГҐГ­ ГЇГҐГ°ГҐГ±ГҐГЄГ ГІГјГ±Гї Г± Г±ГіГ№ГҐГ±ГІГўГіГѕГ№ГЁГ¬. ГҐГ±Г«ГЁ ГіГ¤Г Г«ГЁГІГј, ГІГ® ГЅГ«ГҐГ¬ГҐГ­ГІГ» Г¤Г®Г«Г¦Г­Г» ГЎГ»ГІГј Гў 
+		# ГІГЅГЈГ®Г­Г Г§Г­Г Г·ГҐГ­ГЁГЁ
 			
 		self.__logger.info('in artist_tag_assign_update_check: [%s] '%(str(commandD)))
 		#self.__logger.debug('selL = %s '%(str(commandD['selL'])))
@@ -5590,7 +5590,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		sD_cur_tag = {}
 		tagKey = commandD['tag_id']
 		
-		# временная проверка сохранения в БД
+		# ГўГ°ГҐГ¬ГҐГ­Г­Г Гї ГЇГ°Г®ГўГҐГ°ГЄГ  Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї Гў ГЃГ„
 		#if 'ReportBufD' not in self.__modelDic:
 		#	self.__modelDic['ReportBufD'] = self.__model_instance.getReportBuf_forArtist()
 			
@@ -5629,8 +5629,8 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		self.__model_instance.setSearch_editable_BufD({},None,'')
 		
 		
-		# если 'action_mode' == "delete" то достаточно просто сохранить дельта список ключей, если "add" то надо дополнить поисковый буфер метаданными трэков тэга,
-		# на который будут назначаться трэки
+		# ГҐГ±Г«ГЁ 'action_mode' == "delete" ГІГ® Г¤Г®Г±ГІГ ГІГ®Г·Г­Г® ГЇГ°Г®Г±ГІГ® Г±Г®ГµГ°Г Г­ГЁГІГј Г¤ГҐГ«ГјГІГ  Г±ГЇГЁГ±Г®ГЄ ГЄГ«ГѕГ·ГҐГ©, ГҐГ±Г«ГЁ "add" ГІГ® Г­Г Г¤Г® Г¤Г®ГЇГ®Г«Г­ГЁГІГј ГЇГ®ГЁГ±ГЄГ®ГўГ»Г© ГЎГіГґГҐГ° Г¬ГҐГІГ Г¤Г Г­Г­Г»Г¬ГЁ ГІГ°ГЅГЄГ®Гў ГІГЅГЈГ ,
+		# Г­Г  ГЄГ®ГІГ®Г°Г»Г© ГЎГіГ¤ГіГІ Г­Г Г§Г­Г Г·Г ГІГјГ±Гї ГІГ°ГЅГЄГЁ
 		
 		if 'action_mode' in commandD and 'selL'  in commandD:
 			
@@ -5642,7 +5642,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			if commandD['action_mode'] == 'add' and len(commandD['selL']) > 0:
 				
 					
-					# список ключей из поискового списка которые выбраны на назначение
+					# Г±ГЇГЁГ±Г®ГЄ ГЄГ«ГѕГ·ГҐГ© ГЁГ§ ГЇГ®ГЁГ±ГЄГ®ГўГ®ГЈГ® Г±ГЇГЁГ±ГЄГ  ГЄГ®ГІГ®Г°Г»ГҐ ГўГ»ГЎГ°Г Г­Г» Г­Г  Г­Г Г§Г­Г Г·ГҐГ­ГЁГҐ
 				curSelectedKeyL = [a for a in self.__model_instance.getSearchBufD()['sD'] if a in commandD['selL']]
 				for a in curSelectedKeyL:
 					if a not in sD_cur_tag:
@@ -5665,11 +5665,11 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				self.__model_instance.setSearch_editable_BufD(sD_editable,tagId,commandD['action_mode'])
 				
 		
-			# Сохраняем дельта список по которому будет в последствии возможно произведен апдейт
+			# Г‘Г®ГµГ°Г Г­ГїГҐГ¬ Г¤ГҐГ«ГјГІГ  Г±ГЇГЁГ±Г®ГЄ ГЇГ® ГЄГ®ГІГ®Г°Г®Г¬Гі ГЎГіГ¤ГҐГІ Гў ГЇГ®Г±Г«ГҐГ¤Г±ГІГўГЁГЁ ГўГ®Г§Г¬Г®Г¦Г­Г® ГЇГ°Г®ГЁГ§ГўГҐГ¤ГҐГ­ Г ГЇГ¤ГҐГ©ГІ
 			if sD_editable <> {}:
-				# тут потом еще сделать проверку на соответствие списка изменений и текущего поискового буфера sD
-				# такжедля дельта списка можно хранить таймстемп создания и если на время сохранения прошло допустим больше минуты, то 
-				# то отклонять такую транзакцию
+				# ГІГіГІ ГЇГ®ГІГ®Г¬ ГҐГ№ГҐ Г±Г¤ГҐГ«Г ГІГј ГЇГ°Г®ГўГҐГ°ГЄГі Г­Г  Г±Г®Г®ГІГўГҐГІГ±ГІГўГЁГҐ Г±ГЇГЁГ±ГЄГ  ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГ© ГЁ ГІГҐГЄГіГ№ГҐГЈГ® ГЇГ®ГЁГ±ГЄГ®ГўГ®ГЈГ® ГЎГіГґГҐГ°Г  sD
+				# ГІГ ГЄГ¦ГҐГ¤Г«Гї Г¤ГҐГ«ГјГІГ  Г±ГЇГЁГ±ГЄГ  Г¬Г®Г¦Г­Г® ГµГ°Г Г­ГЁГІГј ГІГ Г©Г¬Г±ГІГҐГ¬ГЇ Г±Г®Г§Г¤Г Г­ГЁГї ГЁ ГҐГ±Г«ГЁ Г­Г  ГўГ°ГҐГ¬Гї Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї ГЇГ°Г®ГёГ«Г® Г¤Г®ГЇГіГ±ГІГЁГ¬ ГЎГ®Г«ГјГёГҐ Г¬ГЁГ­ГіГІГ», ГІГ® 
+				# ГІГ® Г®ГІГЄГ«Г®Г­ГїГІГј ГІГ ГЄГіГѕ ГІГ°Г Г­Г§Г ГЄГ¶ГЁГѕ
 				
 				cfgD = {'list_type':'edit_hard_tag','action_mode':commandD['action_mode'],'tagId':tagId}
 				res = self.__model_instance.set_genKeyL(sD_editable.keys(),cfgD)
@@ -5678,15 +5678,15 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		return 0	
 			
 	def tag_assign_update_check(self,commandD):	
-		# проверяет список "поискового" типа для выбранного tag_id на предмет изменения тэгоназначения
+		# ГЇГ°Г®ГўГҐГ°ГїГҐГІ Г±ГЇГЁГ±Г®ГЄ "ГЇГ®ГЁГ±ГЄГ®ГўГ®ГЈГ®" ГІГЁГЇГ  Г¤Г«Гї ГўГ»ГЎГ°Г Г­Г­Г®ГЈГ® tag_id Г­Г  ГЇГ°ГҐГ¤Г¬ГҐГІ ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГї ГІГЅГЈГ®Г­Г Г§Г­Г Г·ГҐГ­ГЁГї
 		
-		# Для представления надо подготовить следующие параметры 'change_list':'','change_action':''
-		# 'change_list':'' - список измененных позиций. 'change_action' - удалить или добавить
-		# вью должен возвратить новый лист с подкрашееными позициями. промежуточно должнен быть сохранет список, по нему после нажатия save будет сделан реальный
-		# апдейт
+		# Г„Г«Гї ГЇГ°ГҐГ¤Г±ГІГ ГўГ«ГҐГ­ГЁГї Г­Г Г¤Г® ГЇГ®Г¤ГЈГ®ГІГ®ГўГЁГІГј Г±Г«ГҐГ¤ГіГѕГ№ГЁГҐ ГЇГ Г°Г Г¬ГҐГІГ°Г» 'change_list':'','change_action':''
+		# 'change_list':'' - Г±ГЇГЁГ±Г®ГЄ ГЁГ§Г¬ГҐГ­ГҐГ­Г­Г»Гµ ГЇГ®Г§ГЁГ¶ГЁГ©. 'change_action' - ГіГ¤Г Г«ГЁГІГј ГЁГ«ГЁ Г¤Г®ГЎГ ГўГЁГІГј
+		# ГўГјГѕ Г¤Г®Г«Г¦ГҐГ­ ГўГ®Г§ГўГ°Г ГІГЁГІГј Г­Г®ГўГ»Г© Г«ГЁГ±ГІ Г± ГЇГ®Г¤ГЄГ°Г ГёГҐГҐГ­Г»Г¬ГЁ ГЇГ®Г§ГЁГ¶ГЁГїГ¬ГЁ. ГЇГ°Г®Г¬ГҐГ¦ГіГІГ®Г·Г­Г® Г¤Г®Г«Г¦Г­ГҐГ­ ГЎГ»ГІГј Г±Г®ГµГ°Г Г­ГҐГІ Г±ГЇГЁГ±Г®ГЄ, ГЇГ® Г­ГҐГ¬Гі ГЇГ®Г±Г«ГҐ Г­Г Г¦Г ГІГЁГї save ГЎГіГ¤ГҐГІ Г±Г¤ГҐГ«Г Г­ Г°ГҐГ Г«ГјГ­Г»Г©
+		# Г ГЇГ¤ГҐГ©ГІ
 		
-		# тут же делать проверку целостности. если действие добавить то список не должен пересекаться с существующим. если удалить, то элементы должны быть в 
-		# тэгоназначении
+		# ГІГіГІ Г¦ГҐ Г¤ГҐГ«Г ГІГј ГЇГ°Г®ГўГҐГ°ГЄГі Г¶ГҐГ«Г®Г±ГІГ­Г®Г±ГІГЁ. ГҐГ±Г«ГЁ Г¤ГҐГ©Г±ГІГўГЁГҐ Г¤Г®ГЎГ ГўГЁГІГј ГІГ® Г±ГЇГЁГ±Г®ГЄ Г­ГҐ Г¤Г®Г«Г¦ГҐГ­ ГЇГҐГ°ГҐГ±ГҐГЄГ ГІГјГ±Гї Г± Г±ГіГ№ГҐГ±ГІГўГіГѕГ№ГЁГ¬. ГҐГ±Г«ГЁ ГіГ¤Г Г«ГЁГІГј, ГІГ® ГЅГ«ГҐГ¬ГҐГ­ГІГ» Г¤Г®Г«Г¦Г­Г» ГЎГ»ГІГј Гў 
+		# ГІГЅГЈГ®Г­Г Г§Г­Г Г·ГҐГ­ГЁГЁ
 			
 		self.__logger.info('in tag_assign_update_check: [%s] '%(str(commandD)))
 		sD_editable = {}
@@ -5696,8 +5696,8 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		self.__model_instance.setSearch_editable_BufD({},None,'')
 		
 		
-		# если 'action_mode' == "delete" то достаточно просто сохранить дельта список ключей, если "add" то надо дополнить поисковый буфер метаданными трэков тэга,
-		# на который будут назначаться трэки
+		# ГҐГ±Г«ГЁ 'action_mode' == "delete" ГІГ® Г¤Г®Г±ГІГ ГІГ®Г·Г­Г® ГЇГ°Г®Г±ГІГ® Г±Г®ГµГ°Г Г­ГЁГІГј Г¤ГҐГ«ГјГІГ  Г±ГЇГЁГ±Г®ГЄ ГЄГ«ГѕГ·ГҐГ©, ГҐГ±Г«ГЁ "add" ГІГ® Г­Г Г¤Г® Г¤Г®ГЇГ®Г«Г­ГЁГІГј ГЇГ®ГЁГ±ГЄГ®ГўГ»Г© ГЎГіГґГҐГ° Г¬ГҐГІГ Г¤Г Г­Г­Г»Г¬ГЁ ГІГ°ГЅГЄГ®Гў ГІГЅГЈГ ,
+		# Г­Г  ГЄГ®ГІГ®Г°Г»Г© ГЎГіГ¤ГіГІ Г­Г Г§Г­Г Г·Г ГІГјГ±Гї ГІГ°ГЅГЄГЁ
 		
 		if 'action_mode' in commandD and 'selL'  in commandD:
 			
@@ -5709,7 +5709,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			if commandD['action_mode'] == 'add' and len(commandD['selL']) > 0:
 				
 					
-					# список ключей из поискового списка которые выбраны на назначение
+					# Г±ГЇГЁГ±Г®ГЄ ГЄГ«ГѕГ·ГҐГ© ГЁГ§ ГЇГ®ГЁГ±ГЄГ®ГўГ®ГЈГ® Г±ГЇГЁГ±ГЄГ  ГЄГ®ГІГ®Г°Г»ГҐ ГўГ»ГЎГ°Г Г­Г» Г­Г  Г­Г Г§Г­Г Г·ГҐГ­ГЁГҐ
 				curSelectedKeyL = [a for a in self.__model_instance.getSearchBufD()['sD'] if a in commandD['selL']]
 				for a in curSelectedKeyL:
 					if a not in sD_cur_tag:
@@ -5732,11 +5732,11 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				self.__model_instance.setSearch_editable_BufD(sD_editable,tagId,commandD['action_mode'])
 				
 		
-			# Сохраняем дельта список по которому будет в последствии возможно произведен апдейт
+			# Г‘Г®ГµГ°Г Г­ГїГҐГ¬ Г¤ГҐГ«ГјГІГ  Г±ГЇГЁГ±Г®ГЄ ГЇГ® ГЄГ®ГІГ®Г°Г®Г¬Гі ГЎГіГ¤ГҐГІ Гў ГЇГ®Г±Г«ГҐГ¤Г±ГІГўГЁГЁ ГўГ®Г§Г¬Г®Г¦Г­Г® ГЇГ°Г®ГЁГ§ГўГҐГ¤ГҐГ­ Г ГЇГ¤ГҐГ©ГІ
 			if sD_editable <> {}:
-				# тут потом еще сделать проверку на соответствие списка изменений и текущего поискового буфера sD
-				# такжедля дельта списка можно хранить таймстемп создания и если на время сохранения прошло допустим больше минуты, то 
-				# то отклонять такую транзакцию
+				# ГІГіГІ ГЇГ®ГІГ®Г¬ ГҐГ№ГҐ Г±Г¤ГҐГ«Г ГІГј ГЇГ°Г®ГўГҐГ°ГЄГі Г­Г  Г±Г®Г®ГІГўГҐГІГ±ГІГўГЁГҐ Г±ГЇГЁГ±ГЄГ  ГЁГ§Г¬ГҐГ­ГҐГ­ГЁГ© ГЁ ГІГҐГЄГіГ№ГҐГЈГ® ГЇГ®ГЁГ±ГЄГ®ГўГ®ГЈГ® ГЎГіГґГҐГ°Г  sD
+				# ГІГ ГЄГ¦ГҐГ¤Г«Гї Г¤ГҐГ«ГјГІГ  Г±ГЇГЁГ±ГЄГ  Г¬Г®Г¦Г­Г® ГµГ°Г Г­ГЁГІГј ГІГ Г©Г¬Г±ГІГҐГ¬ГЇ Г±Г®Г§Г¤Г Г­ГЁГї ГЁ ГҐГ±Г«ГЁ Г­Г  ГўГ°ГҐГ¬Гї Г±Г®ГµГ°Г Г­ГҐГ­ГЁГї ГЇГ°Г®ГёГ«Г® Г¤Г®ГЇГіГ±ГІГЁГ¬ ГЎГ®Г«ГјГёГҐ Г¬ГЁГ­ГіГІГ», ГІГ® 
+				# ГІГ® Г®ГІГЄГ«Г®Г­ГїГІГј ГІГ ГЄГіГѕ ГІГ°Г Г­Г§Г ГЄГ¶ГЁГѕ
 				
 				cfgD = {'list_type':'edit_hard_tag','action_mode':commandD['action_mode'],'tagId':tagId}
 				res = self.__model_instance.set_genKeyL(sD_editable.keys(),cfgD)
@@ -5799,12 +5799,12 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				
 				categ_id = int(commandD['cat_id'])
 				
-				# в данном случае cat_id это артист	
+				# Гў Г¤Г Г­Г­Г®Г¬ Г±Г«ГіГ·Г ГҐ cat_id ГЅГІГ® Г Г°ГІГЁГ±ГІ	
 				print 'get albums for artist:',categ_id
 				
 				self.__logger.debug('in 1. getNavi_Album_Artist_DataSet  cat_id artist [%s] '%(str(categ_id)))
 				
-				# Получаем всех артистов связанных с этим главным. по идее должны быть только главные
+				# ГЏГ®Г«ГіГ·Г ГҐГ¬ ГўГ±ГҐГµ Г Г°ГІГЁГ±ГІГ®Гў Г±ГўГїГ§Г Г­Г­Г»Гµ Г± ГЅГІГЁГ¬ ГЈГ«Г ГўГ­Г»Г¬. ГЇГ® ГЁГ¤ГҐГҐ Г¤Г®Г«Г¦Г­Г» ГЎГ»ГІГј ГІГ®Г«ГјГЄГ® ГЈГ«Г ГўГ­Г»ГҐ
 				artistCRC32L = getAll_Related_to_main_Artist_fromDB(dbPath,None,categ_id,'with_parent')
 				extendedL = [a[0] for a in artistCRC32L]
 				print 'extendedL:',artistCRC32L,categ_id
@@ -6047,7 +6047,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 						continue
 					try:
 						
-						# проверяем на регистрацию в базе артистов
+						# ГЇГ°Г®ГўГҐГ°ГїГҐГ¬ Г­Г  Г°ГҐГЈГЁГ±ГІГ°Г Г¶ГЁГѕ Гў ГЎГ Г§ГҐ Г Г°ГІГЁГ±ГІГ®Гў
 						if artist_key not in self.__modelDic['artistD']:
 							if artist_key not in tag2artistD[a]:
 								tag2artistD[a].append(artist_key)
@@ -6055,14 +6055,14 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 								
 								continue 
 						#print 'check',b	,artist_key
-						# Далее идет обработка только для зарегистрированных артистов		
+						# Г„Г Г«ГҐГҐ ГЁГ¤ГҐГІ Г®ГЎГ°Г ГЎГ®ГІГЄГ  ГІГ®Г«ГјГЄГ® Г¤Г«Гї Г§Г Г°ГҐГЈГЁГ±ГІГ°ГЁГ°Г®ГўГ Г­Г­Г»Гµ Г Г°ГІГЁГ±ГІГ®Гў		
 						if artist_key in artist_mainL:
 							#print 'main found!!!!!---------',artist_key
 							if artist_key not in tag2artistD[a]:
 								tag2artistD[a].append(artist_key)
 						elif artist_key in artist_not_mainL:
 							#print 'not main found!!!!!---------',artist_key
-							# получить референтный главный индекс артиста
+							# ГЇГ®Г«ГіГ·ГЁГІГј Г°ГҐГґГҐГ°ГҐГ­ГІГ­Г»Г© ГЈГ«Г ГўГ­Г»Г© ГЁГ­Г¤ГҐГЄГ± Г Г°ГІГЁГ±ГІГ 
 							if self.__modelDic['artistD'][artist_key]['ref_artist_crc32L'] <> []:
 								try:
 									main_ref_key = self.__modelDic['artistD'][artist_key]['ref_artist_crc32L'][0]	
@@ -6157,8 +6157,8 @@ class MediaLib_Application_RPC_server():
 	def __init__(self):
 		self.__MediaLib_Controller_instance = MediaLib_Controller()
 		#print dir(self.__MediaLib_Controller_instance)
-		# тут также напрямюу вызываем родительский конструктор, чтобы иметь возможность доступа к функциям старой и новой реализации.
-		# затем сервер стартовать в отдельном модуле используя инстанцию контроллера как внешний объект
+		# ГІГіГІ ГІГ ГЄГ¦ГҐ Г­Г ГЇГ°ГїГ¬ГѕГі ГўГ»Г§Г»ГўГ ГҐГ¬ Г°Г®Г¤ГЁГІГҐГ«ГјГ±ГЄГЁГ© ГЄГ®Г­Г±ГІГ°ГіГЄГІГ®Г°, Г·ГІГ®ГЎГ» ГЁГ¬ГҐГІГј ГўГ®Г§Г¬Г®Г¦Г­Г®Г±ГІГј Г¤Г®Г±ГІГіГЇГ  ГЄ ГґГіГ­ГЄГ¶ГЁГїГ¬ Г±ГІГ Г°Г®Г© ГЁ Г­Г®ГўГ®Г© Г°ГҐГ Г«ГЁГ§Г Г¶ГЁГЁ.
+		# Г§Г ГІГҐГ¬ Г±ГҐГ°ГўГҐГ° Г±ГІГ Г°ГІГ®ГўГ ГІГј Гў Г®ГІГ¤ГҐГ«ГјГ­Г®Г¬ Г¬Г®Г¤ГіГ«ГҐ ГЁГ±ГЇГ®Г«ГјГ§ГіГї ГЁГ­Г±ГІГ Г­Г¶ГЁГѕ ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  ГЄГ ГЄ ГўГ­ГҐГёГ­ГЁГ© Г®ГЎГєГҐГЄГІ
 		
 	def get_controller_instance(self):
 		return self.__MediaLib_Controller_instance
@@ -6178,7 +6178,7 @@ class MediaLib_Application_RPC_server():
 		
 		
 		server.register_introspection_functions()
-		# фукнции старого контроллера в модели (для совместимости) от них надо избавиться и все перенести в новый контроллер
+		# ГґГіГЄГ­Г¶ГЁГЁ Г±ГІГ Г°Г®ГЈГ® ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г  Гў Г¬Г®Г¤ГҐГ«ГЁ (Г¤Г«Гї Г±Г®ГўГ¬ГҐГ±ГІГЁГ¬Г®Г±ГІГЁ) Г®ГІ Г­ГЁГµ Г­Г Г¤Г® ГЁГ§ГЎГ ГўГЁГІГјГ±Гї ГЁ ГўГ±ГҐ ГЇГҐГ°ГҐГ­ГҐГ±ГІГЁ Гў Г­Г®ГўГ»Г© ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°
 		server.register_function(self.__MediaLib_Controller_instance.get_instance().getMediaLibPlayProcessContext, "appl_status")
 		server.register_function(self.__MediaLib_Controller_instance.get_instance().MediaLibPlayProcessDic_viaKey,"processDic_viaKey")
 		
@@ -6192,7 +6192,7 @@ class MediaLib_Application_RPC_server():
 		server.register_function(self.__MediaLib_Controller_instance.get_instance().get_All_metaD,'get_All_metaD')
 		
 		
-		# фукнция нового контроллера
+		# ГґГіГЄГ­Г¶ГЁГї Г­Г®ГўГ®ГЈГ® ГЄГ®Г­ГІГ°Г®Г«Г«ГҐГ°Г 
 		server.register_function(self.__MediaLib_Controller_instance.command_dispatcher,'command_dispatcher')
 		server.register_function(self.__MediaLib_Controller_instance.get_audio,'get_audio')
 		
