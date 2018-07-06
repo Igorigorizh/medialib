@@ -5060,7 +5060,9 @@ def delete_album_via_DbIdL(dbPath,albums_dbIdL,*args):
 		logger.critical('Exception at delete_album_via_DbIdL - 2 [%s]'%(str(req)))
 	
 	if 'with_artist_album_ref_check':
-		
+		req = "select id_album from  artist_album_ref where id_album in (%s)"%(str(albums_dbIdL)[1:-1])
+		c.execute(req)
+		relL =c.fetchone()	
 	if relL !=[]:
 		for album in relL:
 			req = """delete from  artist_album_ref where id_album = %s"""%(str(album[0]))
@@ -5100,17 +5102,17 @@ def delete_Album_Artist(dbPath,id_artist,id_album,artist_crc32,album_crc32,*args
 		logger.critical('Exception at delete from artist [%s] in delete_Album_Artist'%(str(e)))
 		return 
 		
-	if id_artist and id_album:
-		req = """delete from  artist_album_ref where id_album = %s"""%(str(id_album))	
+	#if id_artist and id_album:
+	#	req = """delete from  artist_album_ref where id_album = %s"""%(str(id_album))	
 	
-	try:	
-		c.execute(req)
-		l =c.fetchone()	
-		print 'del art_album_rel:',l,id_artist,id_album
-		logger.info('at delete from artist_album_ref id_album=[%s] in delete_Album_Artist'%(str(alb_key)))
-	except Exception, e:
-		logger.critical('Exception at delete from artist_album_ref [%s] in delete_Album_Artist'%(str(e)))
-		return
+	#try:	
+	#	c.execute(req)
+	#	l =c.fetchone()	
+	#	print 'del art_album_rel:',l,id_artist,id_album
+	#	logger.info('at delete from artist_album_ref id_album=[%s] in delete_Album_Artist'%(str(alb_key)))
+	#except Exception, e:
+	#	logger.critical('Exception at delete from artist_album_ref [%s] in delete_Album_Artist'%(str(e)))
+	#	return
 		
 	c.close()
 	if 'remove' in args:
