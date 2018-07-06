@@ -5059,7 +5059,7 @@ def delete_album_via_DbIdL(dbPath,albums_dbIdL,*args):
 		logger.critical('Exception at delete_album_via_DbIdL [%s]'%(str(e)))
 		logger.critical('Exception at delete_album_via_DbIdL - 2 [%s]'%(str(req)))
 	
-	if 'with_artist_album_ref_check':
+	if 'with_artist_album_ref_check' in args:
 		req = "select id_album from  artist_album_ref where id_album in (%s)"%(str(albums_dbIdL)[1:-1])
 		c.execute(req)
 		relL =c.fetchone()	
@@ -5080,7 +5080,8 @@ def delete_album_via_DbIdL(dbPath,albums_dbIdL,*args):
 	db.close()
 	return 1	
 
-def delete_Album_Artist(dbPath,id_artist,id_album,artist_crc32,album_crc32,*args):	
+def delete_Album_Artist(dbPath,id_artist,id_album,artist_crc32,album_crc32,*args):
+	#	
 	logger.debug('at delete_Album_Artist [%s / %s] - Start'%(str(id_artist),str(id_album)))
 	db = sqlite3.connect(dbPath)	
 	c = db.cursor()
