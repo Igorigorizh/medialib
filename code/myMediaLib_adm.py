@@ -5045,6 +5045,8 @@ def delete_tracks_via_DbIdL(dbPath,tracks_dbIdL,*args):
 	return 1
 	
 def delete_album_via_DbIdL(dbPath,albums_dbIdL,*args):
+	# Удаление Альбома и связи артист-альбом
+	relL = []
 	logger.debug('at delete_album_via_DbIdL [%s]'%(str(albums_dbIdL)))
 	db = sqlite3.connect(dbPath)	
 	c = db.cursor()	
@@ -5057,6 +5059,19 @@ def delete_album_via_DbIdL(dbPath,albums_dbIdL,*args):
 		logger.critical('Exception at delete_album_via_DbIdL [%s]'%(str(e)))
 		logger.critical('Exception at delete_album_via_DbIdL - 2 [%s]'%(str(req)))
 	
+	if 'with_artist_album_ref_check':
+		
+	if relL !=[]:
+		for album in relL:
+			req = """delete from  artist_album_ref where id_album = %s"""%(str(album[0]))
+			try:	
+				c.execute(req)
+				l =c.fetchone()	
+				print 'del art_album_rel:',album
+				logger.info('at delete from artist_album_ref id_album=[%s] in delete_Album_Artist'%(str(album[0])))
+			except Exception, e:
+				logger.critical('Exception at delete from artist_album_ref [%s] in delete_Album_Artist'%(str(e)))
+				return
 	if 'remove' in args:
 		db.commit()
 	c.close()
