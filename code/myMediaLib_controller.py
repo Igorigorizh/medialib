@@ -4238,7 +4238,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					self.__logger.critical('in remove_tracks_from_db - Validate 2 artist ERROR [%s]'%(str(resD)))
 				
 				if resD['del_alb_L'] != []:
-					r = delete_album_via_DbIdL(dbPath,resD['del_alb_L'],'remove','with_artist_albub_ref_check')
+					r = delete_album_via_DbIdL(dbPath,resD['del_alb_L'],'remove','with_artist_album_ref_check')
 					if r == 1:
 						self.__logger.info('in remove_tracks_from_db - Deleted album OK [%s]'%(str(resD['del_alb_L'])))
 					else:
