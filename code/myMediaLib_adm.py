@@ -1120,7 +1120,10 @@ def validate_ArtistAlbumLibClast_from_DB(dbPath,album_artistD,*args):
 	
 	album_remove = False
 	album_remove = False
+	remove_check = True
 	track_album_ref_ok = False
+	action = True
+	action_info = ''
 	
 	album_modify = False
 	artist_modify = False
@@ -1143,11 +1146,18 @@ def validate_ArtistAlbumLibClast_from_DB(dbPath,album_artistD,*args):
 	reqD['artist_list'] = {'req':'select id_artist, add_date from artist where artist_crc32 in (%s)', 'action':''}
 	reqD['artist'] = {'req':'select id_artist, add_date from artist where artist_crc32 = %s', 'action':''}
 	reqD['track'] = {'req':'select id_track, add_date from track where album_crc32 = %s', 'action':''}
+	reqD['track_tag'] = {'req':'select id_track  from track_tag where id_track = %s', 'action':''}
+	reqD['album_cat_rel'] = {'req':'select id_album from album_cat_rel where album_crc32 = %s', 'action':''}
+	reqD['album_reference'] = {'req':'select id_album from album_reference where album_crc32 = %s or album_crc32_ref = %s', 'action':''}
+	reqD['artist_cat_rel'] = {'req':'select id_artist from artist_cat_rel where artist_crc32 = %s', 'action':''}
+	reqD['artist_reference'] = {'req':'select id_artist from artist_reference where artist_crc32 = %s or artist_crc32_ref = %s', 'action':''}
+	
 	
 	for alb_key in album_artistD:
 		# Track checking DB only makes sence when remooving all: tracks-album-artist-alb_art_rel
 		track_add_dateL = []
 		track_add_date = album_add_date = artist_add_date = None
+		
 		#if 'remove_check' in args:
 		req = reqD['track']['req']%(str(alb_key))
 		resL = db_request_wrapper(None,req)
@@ -1156,6 +1166,14 @@ def validate_ArtistAlbumLibClast_from_DB(dbPath,album_artistD,*args):
 			logger.warning('in validate_ArtistAlbumLibClast_from_DB track ref empty - request: [%s]'%(req))
 		else:
 			track_album_ref_ok = True
+			
+			for track in resL:
+				req = reqD['track_tag']['req']%(str(track[0]))
+				res_trackL = db_request_wrapper(None,req)
+				if res_trackL !=[]:
+					action = False
+					
+					return {'updL':updL,'insL':insL,'ins_alb_L':ins_alb_L,'upd_alb_L':upd_alb_L,'ins_art_L':ins_art_L,'cr_upd_art_L':cr_upd_art_L,'del_alb_L':del_alb_L,'del_art_L':del_art_L,'ref_track_L':ref_track_L,'action':action,'action_info':'track_tag_exists: entry for TAG and Track'}
 				
 			for track_item in resL:
 				ref_track_L.append(track_item[0])
@@ -1194,15 +1212,38 @@ def validate_ArtistAlbumLibClast_from_DB(dbPath,album_artistD,*args):
 			print album_item,album_artistD[alb_key]['db_id']
 		
 		if 'remove_check' in args:
+			remove_check = True
 			if album_add_date == track_add_date:
-				
-				if album_artistD[alb_key]['isDB']:
+				req = reqD['album_cat_rel']['req']%(str(alb_key))
+				#INSERT INTO "ALBUM_CAT_REL" ("id_album", "id_object", "album_name", "object_name", "album_crc32", "rel_type") VALUES (3503, 7, 'Antonio Vivaldi: Concerti per Fagotto e Oboe (Sonatori de la Giosiosa Marca)', 'CLASSICL', 2017292393, 'general_categ')
+				print '----->','*'*50
+				print req
+				resL = db_request_wrapper(None,req)
+				print "album_refer validation album_cat_rel:",resL
+				if resL != []:
+					remove_check = False
+				logger.debug('in validate_ArtistAlbumLibClast_from_DB album_cat_rel check %s'%(str(resL)))		
+				logger.debug('in validate_ArtistAlbumLibClast_from_DB album_cat_rel check %s'%(req))		
+				print '----->','^'*50
+				req = reqD['album_reference']['req']%(str(alb_key),str(alb_key))
+				print req
+				resL = db_request_wrapper(None,req)
+				print "album_refer validation album_reference:",resL
+				logger.debug('in validate_ArtistAlbumLibClast_from_DB album_reference check %s'%(str(resL)))		
+				logger.debug('in validate_ArtistAlbumLibClast_from_DB album_reference check %s'%(req))		
+				if album_artistD[alb_key]['isDB'] and remove_check:
 					album_remove = True
 					del_alb_L.append(album_artistD[alb_key]['db_id'])
+					
 				
-				print 'add_date tr,alb',track_add_date,track_album_ref_ok,album_remove		
+				print 'add_date tr,alb',track_add_date,track_album_ref_ok,album_remove	
+				action = remove_check	
 				
-				
+		if not action:
+		# Если action на этом этапа уже False, дальнейшая логика не имеет смысла => выход
+			return {'updL':updL,'insL':insL,'ins_alb_L':ins_alb_L,'upd_alb_L':upd_alb_L,'ins_art_L':ins_art_L,'cr_upd_art_L':cr_upd_art_L,
+			'del_alb_L':del_alb_L,'del_art_L':del_art_L,'ref_track_L':ref_track_L,'action':action}
+		
 		# Артистов собрать в список и запускать 1-ну проверку запрос по списку
 		#artL = [art_key for art_key in album_artistD[alb_key]['artistDataD']]
 		print 'artist_db_check'
@@ -1238,7 +1279,7 @@ def validate_ArtistAlbumLibClast_from_DB(dbPath,album_artistD,*args):
 	logger.info('in validate_ArtistAlbumLibClast_from_DB - Finish')	
 
 	return {'updL':updL,'insL':insL,'ins_alb_L':ins_alb_L,'upd_alb_L':upd_alb_L,'ins_art_L':ins_art_L,'cr_upd_art_L':cr_upd_art_L,
-			'del_alb_L':del_alb_L,'del_art_L':del_art_L,'ref_track_L':ref_track_L}	
+			'del_alb_L':del_alb_L,'del_art_L':del_art_L,'ref_track_L':ref_track_L,'action':action}	
 		
 def saveLibClast_to_DB_unicode(dbPath,allmFD,album_artistD,add_date,*args):
 	logger.info('in saveLibClast_to_DB_unicode dir - Start')
@@ -5062,15 +5103,16 @@ def delete_album_via_DbIdL(dbPath,albums_dbIdL,*args):
 	if 'with_artist_album_ref_check' in args:
 		req = "select id_album from  artist_album_ref where id_album in (%s)"%(str(albums_dbIdL)[1:-1])
 		c.execute(req)
-		relL =c.fetchone()	
+		relL =list(c.fetchone())
+		
 	if relL !=[]:
-		for album in relL:
-			req = """delete from  artist_album_ref where id_album = %s"""%(str(album[0]))
+		for id_album in relL:
+			req = """delete from  artist_album_ref where id_album = %s"""%(str(id_album))
 			try:	
 				c.execute(req)
 				l =c.fetchone()	
-				print 'del art_album_rel:',album
-				logger.info('at delete from artist_album_ref id_album=[%s] in delete_Album_Artist'%(str(album[0])))
+				print 'del art_album_rel:',id_album
+				logger.info('at delete from artist_album_ref id_album=[%s] in delete_Album_Artist'%(str(id_album)))
 			except Exception, e:
 				logger.critical('Exception at delete from artist_album_ref [%s] in delete_Album_Artist'%(str(e)))
 				return
@@ -5080,40 +5122,28 @@ def delete_album_via_DbIdL(dbPath,albums_dbIdL,*args):
 	db.close()
 	return 1	
 
-def delete_Album_Artist(dbPath,id_artist,id_album,artist_crc32,album_crc32,*args):
+def delete_Artist(dbPath,id_artist,artist_crc32,*args):
 	#	
-	logger.debug('at delete_Album_Artist [%s / %s] - Start'%(str(id_artist),str(id_album)))
+	logger.debug('at delete_Album_Artist [%s] - Start'%(str(id_artist)))
 	db = sqlite3.connect(dbPath)	
 	c = db.cursor()
 	art_key = ''
 	if id_artist:
 		req = """delete from  artist where id_artist = %s"""%(str(id_artist))
 		art_key = id_artist
-		alb_key = id_album
+
 	elif artist_crc32:
 		req = """delete from  artist where artist_crc32 = %s"""%(str(artist_crc32))
 		art_key = artist_crc32
-		alb_key = album_crc32
+
 	try:	
 		c.execute(req)
 		l =c.fetchone()	
-		print 'del Artist:',l
+		#print 'del Artist:',l
 		logger.info('at delete from artist id=[%s] in delete_Album_Artist'%(str(art_key)))
 	except Exception, e:
 		logger.critical('Exception at delete from artist [%s] in delete_Album_Artist'%(str(e)))
 		return 
-		
-	#if id_artist and id_album:
-	#	req = """delete from  artist_album_ref where id_album = %s"""%(str(id_album))	
-	
-	#try:	
-	#	c.execute(req)
-	#	l =c.fetchone()	
-	#	print 'del art_album_rel:',l,id_artist,id_album
-	#	logger.info('at delete from artist_album_ref id_album=[%s] in delete_Album_Artist'%(str(alb_key)))
-	#except Exception, e:
-	#	logger.critical('Exception at delete from artist_album_ref [%s] in delete_Album_Artist'%(str(e)))
-	#	return
 		
 	c.close()
 	if 'remove' in args:
