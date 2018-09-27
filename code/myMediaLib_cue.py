@@ -89,7 +89,7 @@ def parseCue(fName,*args):
 	# define most possible coding schema	
 	cue_termsL = ['file ','title ','performer ']
 	codec_freqL = []
-	tobe_suppressed_codecL = ['MacCyrillic','ascii']
+	tobe_suppressed_codecL = ['MacCyrillic','ascii','TIS-620']
 	for a in l:
 		for term in cue_termsL:
 			if a.lower().strip().find(term) == 0:
@@ -97,7 +97,7 @@ def parseCue(fName,*args):
 	counter=collections.Counter(codec_freqL)
 	most_codec = str(counter.most_common(1)[0][0])
 	
-	# belew is heuristik aproach for codec change when 'ascii' is a major but also local specifik is met so ignor ascii! 
+	# below is heuristik aproach for codec change when 'ascii' is a major but also local specifik is met so ignor ascii! 
 	# better aproach 1. Предотвратить появление копии потрэковой альбома если это CUE
 	# 2. выбирать кодек файла на втором проходе, если при первомо происходит неправильный выбор кодировки файла CUE
 	# 3. надо делать несколько проходный прелоад сценарий
@@ -132,8 +132,10 @@ def parseCue(fName,*args):
 				
 			except UnicodeDecodeError, e:
 				print 'decoding catch at cueParse:',orig_file
+				logger.warning('in parseCue - Exception 1 [%s]'%(str(e)))
 				orig_file = lst[2].decode('raw_unicode_escape')
 			except Exception, e:	
+				logger.warning('in parseCue - Exception 2 [%s]'%(str(e)))	
 				orig_file = 'decode_utf8_Error'.decode('utf8')
 			
 			orig_file_path = fName[:fName.rfind('\\')+1]+orig_file
@@ -478,10 +480,11 @@ def checkCue_inLibConsistenc_folder(init_dirL,*args):
 					ftype = ''
 					
 					try:
-						cue_name = (root+'\\'+a).decode('utf-8').encode('cp1251')
-				
-					except:
 						cue_name = (root+'\\'+a)
+				
+					except Exception, e:
+						logger.critical('in checkCue_inLibConsistenc_folder - Exception  [%s]'%(str(e)))
+
 
 					try:	
 						origfD = simple_parseCue(cue_name)	
@@ -493,7 +496,7 @@ def checkCue_inLibConsistenc_folder(init_dirL,*args):
 					try:
 						if os.path.exists(origfD['orig_file_path']):
 							cue_dirname = os.path.dirname(origfD['orig_file_path'])
-							check_dircrc32 =  zlib.crc32(cue_dirname.decode('cp1251').encode('utf-8').lower())
+							check_dircrc32 =  zlib.crc32(cue_dirname.lower())
 							if check_dircrc32 in cueDupl :
 								cueDupl[check_dircrc32]['dupL'].append((origfD['orig_file_path'],a)) 
 							else:
@@ -508,7 +511,7 @@ def checkCue_inLibConsistenc_folder(init_dirL,*args):
 								print origfD['fType']
 							origf = origfD['orig_file_path']
 							ftype = origfD['fType']
-							crc32 = zlib.crc32(origf.decode('cp1251').encode('utf-8').lower())
+							crc32 = zlib.crc32(origf.lower())
 							last_modify_date = 0
 							try:
 								last_modify_date = os.stat(cue_name).st_mtime
@@ -541,7 +544,7 @@ def checkCue_inLibConsistenc_folder(init_dirL,*args):
 					ftype = 'mp3'
 				
 				if	ftype <> None:
-					fname = (root.decode('cp1251').encode('utf-8')+'\\'+a.decode('cp1251').encode('utf-8')).lower() 
+					fname = (root+'\\'+a).lower() 
 					orig_fname = root+'\\'+a 
 					
 					crc32 = zlib.crc32(fname)
@@ -560,11 +563,11 @@ def checkCue_inLibConsistenc_folder(init_dirL,*args):
 					#print root
 					if crc32 in cueD:
 						for b in cueD[crc32]['songL']:
-							crc32_i = zlib.crc32((b.decode('cp1251').encode('utf-8')).lower())
+							crc32_i = zlib.crc32((b).lower())
 							pos = b.rfind(',')
-							allmFD[crc32_i] = {'orig_fname':cueD[crc32]['file'],'last_modify_date':cueD[crc32]['last_modify_date'],'album':album,'album_crc32':zlib.crc32((root.decode('cp1251').encode('utf-8')).lower()),'file':b.lower(),'cueNameIndx':b[:pos],'ftype':ftype,'cue':'X'}
+							allmFD[crc32_i] = {'orig_fname':cueD[crc32]['file'],'last_modify_date':cueD[crc32]['last_modify_date'],'album':album,'album_crc32':zlib.crc32((root).lower()),'file':b.lower(),'cueNameIndx':b[:pos],'ftype':ftype,'cue':'X'}
 					else:
-						allmFD[crc32] = {'orig_fname':orig_fname,'last_modify_date':last_modify_date,'album':album,'album_crc32':zlib.crc32((root.decode('cp1251').encode('utf-8')).lower()),'file':fname,'ftype':ftype,'cueNameIndx':None}
+						allmFD[crc32] = {'orig_fname':orig_fname,'last_modify_date':last_modify_date,'album':album,'album_crc32':zlib.crc32((root).lower()),'file':fname,'ftype':ftype,'cueNameIndx':None}
 			
 			if 'stat' not in args:
 				continue
@@ -685,6 +688,8 @@ def cue_check_and_error_correct(fName,separator,seqL,*args):
 	
 def GetTrackInfoVia_ext(filename,ftype):
 	logger.debug('in GetTrackInfoVia_ext - start')
+	#logger.debug('in GetTrackInfoVia_ext, file= %s'%(str([filename])))
+	#print 'filename:',[filename],type(filename)
 	#'pL_info':pL_info
 	audio = None
 	bitrate = 0
@@ -703,22 +708,19 @@ def GetTrackInfoVia_ext(filename,ftype):
 				time = full_time
 			
 		except Exception, e:	
-			logger.critical('Exception in GetTrackInfoVia_ext: %s'%(str(e)))	
+			logger.critical(' 711 Exception in GetTrackInfoVia_ext: %s'%(str(e)))	
 		except IOError, e:
-			logger.critical('Exception in GetTrackInfoVia_ext: %s'%(str(e)))	
+			logger.critical(' 713 Exception in GetTrackInfoVia_ext: %s'%(str(e)))	
 			return {"title":filename[filename.rfind('\\')+1:-(len(ftype)+1)],"artist":'No Artist',"album":'No Album',"bitrate":0,'time':'00:00','ftype':ftype}
 		except :	
-			logger.critical('Exception in GetTrackInfoVia_ext: %s'%(str('unknown mutagen error')))	
-			
-		
-		
+			logger.critical(' 716 Exception in GetTrackInfoVia_ext: %s'%(str('unknown mutagen error')))	
 			
 			
 	elif ftype.lower() == 'mp3':		
 		try:
 			audio = MP3(filename, ID3=EasyID3)
 		except IOError, e:
-			logger.critical('Exception in GetTrackInfoVia_ext: %s'%(str(e)))	
+			logger.critical('723 Exception in GetTrackInfoVia_ext: %s'%(str(e)))	
 			return {"title":filename[filename.rfind('\\')+1:-(len(ftype)+1)],"artist":'No Artist',"album":'No Album',"bitrate":0,'time':'00:00','ftype':ftype}
 		except:
 			logger.critical('Strange mp3 error at 639 myMediaLib_cue:')	
@@ -781,37 +783,12 @@ def GetTrackInfoVia_ext(filename,ftype):
 			time_sec = 0
 	#return audio	
 	for c in ['title','artist','album','tracknumber','date','genre']:
-		try:
-			c in audio
-		except:
-			print audio
+		if not audio.has_key(c):
 			continue
 		if c in audio:
 			#print audio[c]
-			try:
-				if ftype == 'mp3':
-					item = audio[c].value.strip().decode('cp1251').encode('utf8')
-				else:
-					item = audio[c].value.strip()
-			except AttributeError:
-				try:
-					item = audio[c][0]
-				except:
-					print audio[c],c
-					
-				#if ftype == 'mp3':
-					#item = ''.join([chr(ord(b)) for b in item]).decode('cp1251').encode('utf8')	
-				infoD[c] = item
-					
-				continue
-			except ValueError:
-				pass
-			
-			try:
-				audio[c].__unicode__()
-			except:
-				item = audio[c].value.strip().decode('cp1251').encode('utf8')
-			infoD[c] = item	
+							
+			infoD[c] = audio[c][0].strip()	
 		else:
 			if c == 'title':
 				infoD[c] = filename[filename.rfind('\\')+1:-(len(ftype)+1)]

@@ -5,13 +5,17 @@ import json
 import pickle
 
 def application(environ, start_response):
+	output = ['<pre>']
+	output.append('If you see this - it is strange')
+	output.append(['/<pre>'])
+	output_len = sum(len(line) for line in output)
+	response_headers = [('Content-type', 'text/plain'),
+                    ('Content-Length', str(output_len))]
 	s_appl = xmlrpclib.ServerProxy('http://127.0.0.1:9001')	
 #	output = ['<pre>']
 #	output.append(pformat(environ))
 #	output.append('</pre>')
-#	output_len = sum(len(line) for line in output)
-#	response_headers = [('Content-type', 'text/plain'),
-#                    ('Content-Length', str(output_len))]
+	
 #	return output
 	path = ''
 	data = ''
@@ -20,7 +24,7 @@ def application(environ, start_response):
 		id= environ['REQUEST_URI'][pos:-4]
 		#data = s_appl.get_image(id).data
 		d = s_appl.get_image(id).data
-		path = pickle.loads(d)
+		path = pickle.loads(os.path.normpath(d))
 		
 	elif '/album_images' in environ['REQUEST_URI']:
 		pos = environ['REQUEST_URI'].find('/album_images')+14	
@@ -31,7 +35,7 @@ def application(environ, start_response):
 		#data = s_appl.get_image("album_images",{'album_crc32':album_crc32,'image_crc32':image_crc32}).data
 		d = s_appl.get_image("album_images",{'album_crc32':album_crc32,'image_crc32':image_crc32}).data
 		
-		path = pickle.loads(d)
+		path = pickle.loads(os.path.normpath(d))
 
 	elif '/100_cover' in environ['REQUEST_URI'] or 'no-image-availabl' in environ['REQUEST_URI']:
 		if '/100_cover' in environ['REQUEST_URI']:
@@ -40,7 +44,11 @@ def application(environ, start_response):
 
 		#data = s_appl.get_image('search_icon',id).data
 		d = s_appl.get_image('search_icon',id).data
-		path = pickle.loads(d)
+		
+		path = pickle.loads(os.path.normpath(d))
+		#path = u'Y:\\MUSIC\\Mozart - Last concertos - Staier, Coppola\\cover_320.jpg'
+		#path = u'G:\\MUSIC\\'	
+		#print 'path check:',os.path.exists(os.path.normpath(path)),os.path.normpath(path)
 	# Conditions above are true	
 	if path != '':
 				
@@ -58,6 +66,20 @@ def application(environ, start_response):
 			
 			start_response('200 OK', response_headers)
 			return [image]
+		else:
+			print 'Error in image.wsgi with image path:',[path]
+			res = 'Wrong path returned in image.wsgi:'+str([path])
+			#output.append(res)
+			
+			#output_len = sum(len(line) for line in output)
+			output_len = len(res)
+			
+			response_headers = [('Content-type', 'text/plain'),
+                    ('Content-Length', str(output_len))]
+			
+			start_response('400 Bad data', response_headers)
+			
+			return res
 	
 	controlL = ['play','stop','next','prev','pause']
 	

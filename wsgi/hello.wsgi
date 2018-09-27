@@ -10,10 +10,8 @@ import json
 import os, sys
 from subprocess import Popen
 
-
-
 import winamp
-sys.path.append('C:\\My_projects\\MyMediaLib')
+sys.path.append(u'C:\\My_projects\\MyMediaLib')
 
 #import myMediaLib_controller
 from myMediaLib_adm import checkANDkillMLPids
@@ -21,7 +19,7 @@ from myMediaLib_adm import RebootServer
 from myMediaLib_adm import loadTemplates_viaCFG
 from myMediaLib_adm import readConfigData
 
-mymedialib_cfg = 'C:\\My_projects\\MyMediaLib\\mymedialib.cfg'
+mymedialib_cfg = u'C:\\My_projects\\MyMediaLib\\mymedialib.cfg'
 #from myMediaLib_adm import getHardWareInfo
 
 def getHardWareInfo():
@@ -373,7 +371,7 @@ def application(environ, start_response):
 			try:		
 				res = res + str(s_appl.appl_status())
 			except:
-				res = res + 'player application failed!!! <BR>'
+				res = res + 'medialib application failed!!! <BR>'
 				
 				
 			try:
@@ -444,9 +442,9 @@ def application(environ, start_response):
 				output.append("A fault occurred new main params parsing--->\n %s")
 				return output	
 				
-			# Обработать без запросов к серверам задачу на перезагрузку или физицескую остановку сервера	
+			# Обработать без запросов к серверам задачу на перезагрузку или физическую остановку сервера	
 			if 'do_admin' in json_params:
-				if json_params['do_admin'] == 'restart_srv' or json_params['do_admin'] == 'shutdown_srv':
+				if json_params['do_admin'] == 'restart_srv' or json_params['do_admin'] == 'shutdown_srv' or json_params['do_admin'] == 'remove_srv':
 					if json_params['restart_pswrd'] == 'brumbul':
 						
 						if json_params['do_admin'] == 'restart_srv':
@@ -457,6 +455,11 @@ def application(environ, start_response):
 							reply = {"action_name": "do_admin", "action_result": 1,"message":'Shutdowning... Take AC plug off and reloacate server'}
 							output.append(json.dumps(reply))
 							RebootServer(message='Shutdown', bReboot=0) 
+						if json_params['do_admin'] == 'remove_srv':	
+							reply = {"action_name": "do_admin", "action_result": 1,"message":'Removing ml services and Winamp... Restart services again'}
+							output.append(json.dumps(reply))
+							res = res + str(checkANDkillMLPids('kill')) 	
+							output.append(res)
 					else:
 						reply = {"action_name": "do_admin", "action_result": 0,"message":'wrong password'}
 						output.append(json.dumps(reply))

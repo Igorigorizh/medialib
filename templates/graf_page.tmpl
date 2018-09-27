@@ -38,10 +38,6 @@
 
 <script type="text/javascript" src="../../js/jquery-1.7.1.min.js"></script>
 
-
-<script src="../../js/arbor.js"></script>  
-<script src="../../js/arbor-graphics.js"></script>
-<script src="../../js/arbor-tween.js"></script>
 <script src="../../js/main.js"></script>
 
 <script src="../../js/jquery.mousewheel.js"></script>
@@ -227,7 +223,10 @@ var proc_mode = 0;
 			var elem = {'cat_name':'','cat_id':'','cat_key':''};
 			
 				if (self.modelDisplay()){
-				if (self.cat_prof_selectedDL().length > 0){
+				//alert(self.cat_prof_selectedDL())
+				if (m_vM.catProfileDL_current().length == 0){return elem}
+				
+				if  (self.cat_prof_selectedDL().length > 0){
 						elem = self.cat_prof_selectedDL()[self.player_adhoc_cat_selected()];
 						//alert(this.player_adhoc_category().cat_key)
 						if (this.player_adhoc_category().cat_key){
@@ -497,8 +496,13 @@ var proc_mode = 0;
 		 
 		 seconds=((seconds < 10) ? "0" : "") + seconds;
 		 var clock = minutes + ":" + seconds
-		 document.getElementById("refresh_time").innerHTML = clock;	
-		 document.getElementById("refresh_time_2").innerHTML = clock;	
+		 //console.log(clock)
+		 //alert('stop')
+		 
+		 if (m_vM.catProfileDL_current().length > 0) {
+			document.getElementById("refresh_time").innerHTML = clock.toString();	
+			document.getElementById("refresh_time_2").innerHTML = clock.toString();	
+		 }
 		 
 		 $( "#slider" ).slider( "option", "value", (sw_PLAYER_M.player_State().duration_sec - (( old_timestamp/1000 ) - 1)) );
 		 		 
@@ -649,6 +653,7 @@ var proc_mode = 0;
 			var max = $( "#slider" ).slider( "option", "max" );
 			
 			$( "#slider" ).slider( "option", "max", sw_PLAYER_M.player_State().duration_sec );
+			//console.log(sw_PLAYER_M.player_State().duration_sec)
 			self.setTiming((sw_PLAYER_M.player_State().rest_sec+1)*1000)
 			
 		}
@@ -706,10 +711,11 @@ var proc_mode = 0;
 		d_title = "test "
 		respond = do_send_ajax_json_req(url_key,ko.toJSON({'player_process_info':'get_player_process_info','get_player_process_info':'initial'}))
 		//temp = respond
+		//console.log(respond)
 		self.new_pl_list(true)
 		
 		
-		if ( !('player_process_info' in respond)){
+		if (!('player_process_info' in respond)){
 			
 			alert('Error at player_process_info server side')
 		} else {
@@ -1313,7 +1319,7 @@ $(document).ready(function(){
 	alert('dfg')	
 	$("#table_block").hide();	
 	//document.getElementById('table_block').style.visibility="hidden";
-	document.getElementById('loading').style.visibility="hidden";
+	//document.getElementById('loading').style.visibility="hidden";
 } 
  
  function processReqChange()
@@ -1467,7 +1473,7 @@ $(document).ready(function(){
 						}
 						else if (my_JSON_object['action_result'] == 1){
 							document.getElementById('play_butn').type = "button";
-							document.getElementById('play_butn').style.background='BurlyWood'
+							//document.getElementById('play_butn').style.background='BurlyWood'
 							 
 							document.getElementById('action_result').innerHTML = "Play result succesfuly!";
 							do_cancell_action()
@@ -1523,7 +1529,7 @@ function do_cancell_action() {
 function at_initial_page_load(){
 	$("#graf_block").hide();	
 	$("#search_block").toggle();	
-	document.getElementById('loading').style.visibility="hidden";
+	//document.getElementById('loading').style.visibility="hidden";
 	action_name = ''
 
 	json_req = "{" +"\"" + proc_name +"\"" + ':' +"\"" + action_name + "\"" +','+"\"" + "graf_load_update" +"\"" + ':'+"\""+"navi_musiclib_graf_load"+"\""+ "}";
@@ -1614,7 +1620,7 @@ function processGetPL(myForm){
 function set_form_layout() {
 	
 	document.getElementById('play_butn').type = "hidden";
-	document.getElementById('loading').style.visibility="hidden";
+	//document.getElementById('loading').style.visibility="hidden";
 	return null;
 	
 	
@@ -1637,7 +1643,9 @@ function do_send_json_req(json_req){
 	req.onreadystatechange = processReqChange;
 	//alert('do_send_json_req:'+json_req)
 	req.send(json_req)
-	startProgressBar()
+	if (m_vM.catProfileDL_current().length > 0) {
+		startProgressBar()
+	}	
 	
 	return false;
 
@@ -2492,7 +2500,7 @@ Select category type:
 
 </td>
 		
-		<td align="center">	
+		<td align="center"  >	
 				 
 		<input height="27" width="36" type="button" id="prev_trc_" title="Prev" name="prev" value="<<"  onclick ="player_control_command(this.id)" ">
 		<input height="27" width="36" type="button" id="stop_" title="Stop" name="stop" value="&#9632;"  onclick ="player_control_command(this.id)" ">
@@ -2685,8 +2693,8 @@ Select category type:
 	<tr style=" background-color: lightGrey">
 	 <td>
 	  <B> Albumes in: </B>
-		<a data-bind="click:function() { navi_play_control_send('genre',catProfileDL_current()[cur_cat_selected_index].cat_id)}"  href="#">
-		<span style="color:Green;" data-bind="visible: artistL().length > 0 , text: catProfileDL_current()[cur_cat_selected_index].cat_id"></span></a>
+		<a data-bind="click:function() { navi_play_control_send('genre',catProfileDL_current()[category_type_index_selected()]['relCatL'][cur_cat_selected_index].cat_id)}"  href="#">
+		<span style="color:Green;" data-bind="visible: artistL().length > 0 , text: catProfileDL_current()[category_type_index_selected()]['relCatL'][cur_cat_selected_index].cat_key"></span></a>
 	 
 	</td>
 	<td style="width:230px;" align="central">
@@ -2773,7 +2781,7 @@ Select category type:
 	<tr style=" background-color: lightGrey">
 	 <td>
 	  <B> Song in: </B>
-		<a data-bind="click:function() { navi_play_control_send('genre',catProfileDL_current()[cur_cat_selected_index].cat_id)}"  href="#">
+		<a data-bind="click:function() { navi_play_control_send('genre',catProfileDL_current()[category_type_index_selected()]['relCatL'][cur_cat_selected_index].cat_id)}"  href="#">
 		
 	 
 	</td>

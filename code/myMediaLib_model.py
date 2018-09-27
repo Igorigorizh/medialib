@@ -170,7 +170,7 @@ class MediaLibPlayProcess_singletone(object):
 		
 		# Строим список главных артистов
 		db = sqlite3.connect(self.__dbPath)
-		db.text_factory = str
+		#db.text_factory = str
 		
 		main_artL = getAll_Main_Artist_fromDB(db)
 		self.__ArtistL = [(a[1],a[0]) for a in main_artL]
@@ -194,7 +194,7 @@ class MediaLibPlayProcess_singletone(object):
 		
 		# Загрузка тэгов созданных вручную
 		c = db.cursor()
-		db.text_factory = str
+		#db.text_factory = str
 		c.execute("select * from tag")
 		l =  c.fetchall()
 		for a in l:
@@ -803,34 +803,45 @@ class MediaLibPlayProcess_singletone(object):
 			return xmlrpclib.Binary(self.__controlPicD[picName])
 		
 	def getCoverPageObj(self,*args):
+		logger.debug( "in *PIC* getCoverPageObj - START: %s"%(str(args)))
 		
-		filename = self.__PlayListL[self.__songNum]
-		path = filename[:filename.rfind('\\')+1]
+		filename = ''
+		#filename = self.__PlayListL[self.__songNum]
+		#path = filename[:filename.rfind('\\')+1]
 		id = 0
 		#if path == '':
 		#	print "path is empty:", args
 
 		logger.debug( "in ****PIC***** getCoverPageObj: %s *** %s"%(str(filename),str(args)))
 		
-		cover_path_320 = path+'cover_320.jpg'
-		cover_path_100 = path+'cover_100.jpg'
-		cover_path = path+'cover.jpg'
+		#cover_path_320 = path+'cover_320.jpg'
+		#cover_path_100 = path+'cover_100.jpg'
+		#cover_path = path+'cover.jpg'
+		
 		#print 'Cur image path:1.%s  2.%s  3.%s'%(cover_path,filename,str(self.__songNum))
 		image = ''
 		
 		if 'search_icon' in args:
+			logger.debug( "in **PIC** getCoverPageObj at 'search icon': %s *** "%(str(args)))
 			id = int(args[1])
 			
+			
 			#print self.__DB_metaIndxD_album.keys()
-			#print 'koko1'
+			
 			if id in self.__DB_metaIndxD_album:
-				path = str(self.__DB_metaIndxD_album[id])
+				#print 'id in self.__DB_metaIndxD_album'
+				logger.debug( "in  getCoverPageObj at id: %s"%(str(id)))
+				path = self.__DB_metaIndxD_album[id]
+				logger.debug( "in  getCoverPageObj at path: %s"%(path))
+				#print 'path:',path
 				if path[-1] <> '\\':
 					path+='\\'
 
 				cover_path = path+'cover.jpg'	
 				cover_path_100 = path+'cover_100.jpg'
-				#print 'path =',path
+				
+				logger.debug( "in  getCoverPageObj at cover_path_100: %s"%(cover_path_100))
+				#print 'cover_path_100 =',cover_path_100
 			else:
 				# тут резолвер путей виртуальных альбомов
 				# 1. поиск в корневой дирректории одного из связанных альбомов
@@ -864,7 +875,10 @@ class MediaLibPlayProcess_singletone(object):
 			
 			if os.path.exists(cover_path_100):
 				#print 'cover_path_100=',cover_path_100
-				return xmlrpclib.Binary(pickle.dumps(cover_path_100))
+				logger.debug( "in **PIC** getCoverPageObj at 'search icon' - OK Finished 875")
+				dmp = pickle.dumps(cover_path_100)
+				#print 'dmp - OK',type(cover_path_100)
+				return xmlrpclib.Binary(dmp)
 				fileObj = open(cover_path_100,'rb')
 				image = fileObj.read()
 				fileObj.close()
@@ -877,6 +891,7 @@ class MediaLibPlayProcess_singletone(object):
 					im.thumbnail((128,128))
 					im.save(cover_path_100,"JPEG")
 					del(im)
+					logger.debug( "in **PIC** getCoverPageObj at 'search icon' - OK Finished 889")
 					return xmlrpclib.Binary(pickle.dumps(cover_path_100))
 					fileObj_100 = open(cover_path_100,'rb')
 					image = fileObj_100.read()
@@ -885,6 +900,7 @@ class MediaLibPlayProcess_singletone(object):
 					#print 'new Icon created!',cover_path_100
 				else:		
 				#print 'cover_path=',cover_path
+					logger.debug( "in **PIC** getCoverPageObj at 'search icon' - OK Finished 898")
 					return xmlrpclib.Binary(pickle.dumps(cover_path))
 					image = fileObj.read()
 				#image = im.tostring()
@@ -893,6 +909,7 @@ class MediaLibPlayProcess_singletone(object):
 			else:	
 				#fileObj = open(getcwd()+"\\images\\no-image-available_110x110.jpg","rb") 
 				print 'No File &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&???????????',self.__no_cover_page_obj_path
+				logger.debug( "in **PIC** getCoverPageObj at 'search icon' - OK Finished (No cover path)")
 				return xmlrpclib.Binary(pickle.dumps(self.__no_cover_page_obj_path))
 				image = self.__no_cover_page_obj	
 				
@@ -900,7 +917,8 @@ class MediaLibPlayProcess_singletone(object):
 			logger.debug("in getCoverPageObj ->album_images :%s %s"%(str(args[0]),str(args[1])))
 			imageD = args[1]
 			if '.pdf' in imageD["image_crc32"]:
-				print 'pdf',imageD["image_crc32"][:-4]
+				#print 'pdf',imageD["image_crc32"][:-4]
+				logger.debug( "in  getCoverPageObj at pdf: ")
 				image_crc32=int(imageD["image_crc32"][:-4])
 			else:
 				image_crc32=int(imageD["image_crc32"])
@@ -912,31 +930,49 @@ class MediaLibPlayProcess_singletone(object):
 				#print imagesDL["album_crc32"],imageD["album_crc32"]
 				if int(imagesDL["album_crc32"]) == album_crc32:
 					#print "ckeck 2"
+					logger.debug("in getCoverPageObj ->album_images->get_images_from_cur_album")
 					if image_crc32 in imagesDL['imageD']:
 						#print "ckeck 3"
 						path= imagesDL['imageD'][image_crc32]
+						logger.debug("in getCoverPageObj ->album_images->get_images_from_cur_album: Path %s"%(str([path])))
 						if os.path.exists(path):
-							logger.debug("in getCoverPageObj ->album_images - Path OK :%s %s"%(str(image_crc32),str(path)))	
+							logger.debug("in getCoverPageObj ->album_images - Path OK :%s %s"%(str(image_crc32),str([path])))	
 							return xmlrpclib.Binary(pickle.dumps(path))
+						else:
+							logger.critical("in getCoverPageObj -> Path not exists: %s"%(str([path])))
 							
 							
-							fileObj = open(path,'rb')
-							image = fileObj.read()
-							fileObj.close()
+							#fileObj = open(path,'rb')
+							#image = fileObj.read()
+							#fileObj.close()
 						
 					
 			print "Album Images processing",args
 			pass
 		else:	
 			# Ветка для большой картинки обычноых дисков
-			print 'if search_icon NOT!!!!!!!!!!!!!!!!!!!!! in args',len(args)
-			
+			#print 'if search_icon NOT!!!!!!!!!!!!!!!!!!!!! in args',len(args)
+			logger.debug( "in *PIC* getCoverPageObj - other cases: %s"%(str(args)))
 			if len(args)>0:
 				id =  int(args[0])
 				#print 'id=',id
+				logger.debug( "in  getCoverPageObj at other cases id:%s: "%(str(id)))
+				
+			if id in self.__DB_metaIndxD_album:
+				logger.debug( "in  getCoverPageObj at other cases [id in self.__DB_metaIndxD_album]: ")
+				path = self.__DB_metaIndxD_album[id]
+				logger.debug( "in  getCoverPageObj at other cases path=%s "%(path))
+				#print 'path:',path
+				if path[-1] <> '\\':
+					path+='\\'
+
+				cover_path_320 = path+'cover_320.jpg'
+				cover_path_100 = path+'cover_100.jpg'
+				cover_path = path+'cover.jpg'
 				
 			if os.path.exists(cover_path_320):
 				#print 'path 320 ok:',cover_path
+				logger.debug( "in **PIC** getCoverPageObj at 'search icon' - OK Finished (cover 320) 967")	
 				return xmlrpclib.Binary(pickle.dumps(cover_path_320))
 				fileObj = open(cover_path_320,'rb')
 				image = fileObj.read()
@@ -973,7 +1009,8 @@ class MediaLibPlayProcess_singletone(object):
 				if cover_path[-1] <> '\\':
 					cover_path+='\\'
 				
-				print 'Radio cover path=',cover_path				
+				#print 'Radio cover path=',cover_path				
+				logger.debug( "in  getCoverPageObj at Radio cover path==%s "%(cover_path))
 				if os.path.exists(cover_path):
 					cover_path = cover_path+'cover.jpg'	
 					cover_path_100 = cover_path+'cover_100.jpg'
@@ -982,13 +1019,15 @@ class MediaLibPlayProcess_singletone(object):
 					image = fileObj.read()
 					fileObj.close()
 				else:
-					print "-------------->>>>>>>>>>>>>>>>>>>>No RADIO BIG IMAGE <<<<<<<<<<<< =-------------------------------"
+					#print "-------------->>>>>>>>>>>>>>>>>>>>No RADIO BIG IMAGE <<<<<<<<<<<< =-------------------------------"
+					logger.error( "Error: 1023 in  getCoverPageObj -->No RADIO BIG IMAGE ")
 					return xmlrpclib.Binary(pickle.dumps(self.__no_cover_page_obj_path))
 					
 					image = self.__no_cover_page_obj
 			else:	
 				#fileObj = open(getcwd()+"\\images\\no-image-available_110x110.jpg","rb") 
-				print "-------------->>>>>>>>>>>>>>>>>>>>No IMAGE <<<<<<<<<<<< =-------------------------------"
+				#print "-------------->>>>>>>>>>>>>>>>>>>>No IMAGE <<<<<<<<<<<< =-------------------------------"
+				logger.error( "Error: 1030 in  getCoverPageObj -->No RADIO BIG IMAGE ")
 				return xmlrpclib.Binary(pickle.dumps(self.__no_cover_page_obj_path))
 				image = self.__no_cover_page_obj
 		return xmlrpclib.Binary(pickle.dumps(self.__no_cover_page_obj_path))
@@ -1592,7 +1631,7 @@ def str2_RusLine(in_line,res_size):
 	except UnicodeEncodeError:	
 		try:
 			s = ''.join([chr(ord(b)) for b in in_line])
-			r_line = s.decode('cp1251').encode('utf8')
+			r_line = s #.decode('cp1251').encode('utf8')
 							#print '2-ok','-->',mp3L.index(a)
 		except ValueError:
 			try:
@@ -1623,8 +1662,6 @@ def getMyMediaLib_ListsData(pD,mlPath):
 		for b in l[1:]:
 			
 			try:
-				#crc32 = zlib.crc32(b.decode('utf-8').encode('cp1251').lower())
-			
 				crc32 = zlib.crc32(b.encode('raw_unicode_escape'))
 			except Exception, e:
 				logger.critical('at getMyMediaLib_ListsData Error %s %s'%(str(a),str(e)))

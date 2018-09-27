@@ -382,8 +382,9 @@ var sw_OBJEDIT_M = new function(){
 		json_data = json_data.replace('123',proc_name)
 					
 		this_self = this
-		// Get Data						
-		$.ajax({	url:  'http= //' + host + '/medialib/report/',type:  'POST', dataType:  "json", data:  json_data,async:  false,
+		// Get Data				
+		//alert('http://' + host + '/medialib/report/')	
+		$.ajax({	url:  'http://' + host + '/medialib/report/',type:  'POST', dataType:  'json', data:  json_data,async:  false,
 					error:  function( data ) { 
 							
 							alert('Error at data received= '+data.responseText)

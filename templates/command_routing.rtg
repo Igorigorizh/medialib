@@ -238,7 +238,12 @@
 								'view_elem_id_Dic':{'cover':0,'refresh_time':0,'play_status':0,'curState':''}}				
 								},				
 		
-	'tag_maintain':{'get_tag_tracks':{'model_update_method':'get_track_search_list_for_tag_id',
+	'tag_maintain':{
+				'tag_page_init_data': {'model_update_method':'do_nothing',
+										'view_method':'ajax_tag_admin_page_update',
+								'view_elem_id_Dic':{'tag_init_data':'','tagAdmin_page_elements':''}},
+	
+				'get_tag_tracks':{'model_update_method':'get_track_search_list_for_tag_id',
 							'view_method':'ajax_search_like_page_update',
 							'view_elem_id_Dic':{'tag_adm_search_res_buf':'','tagAdmin_page_elements':''}},
 							

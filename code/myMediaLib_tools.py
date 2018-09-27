@@ -22,6 +22,7 @@ from myMediaLib_adm import readConfigData
 from myMediaLib_adm import mymedialib_cfg
 from myMediaLib_adm import getFolderAlbumD_fromDB
 from myMediaLib_adm import db_request_wrapper
+import warnings
 
 cfgD = readConfigData(mymedialib_cfg)
 
@@ -806,122 +807,715 @@ def find_new_music_folder(init_dirL, prev_folderL,*args):
 	
 	logger.info('in find_new_music_folder - finished')
 	return {'folder_list':f_l,'NewFolderL':new_folderL,'music_folderL':music_folderL}
-	
 
-def check_medialib_utf8_issue(fs_folderL,erL, ):
-	# Сценарий миграции БД на unicode.
+def quick_check_medialib_utf8_issue(*args):
+	# быстрая проверка таблиц на соответствие unicode
+	mlDL = [{'table':'album','filedL':['path','album','search_term']},
+			{'table':'track','filedL':['path','artist','album','title','cue_fname']},
+			{'table':'artist','filedL':['artist','search_term','description']},
+			{'table':'artist_cat_rel','filedL':['artist_name']},
+			{'table':'category','filedL':['category_short_name','category_descr']},
+			{'table':'category_type','filedL':['categ_type_name','categ_type_descr']},
+			{'table':'GROUPS_PL','filedL':['descr','ref_folder','short_name']},
+			{'table':'tag','filedL':['tag_name','tag_descr']},
+			{'table':'track_tag','filedL':['tag_name']}
+			]
 	dbPath = cfgD['dbPath']
-	req = "select path_crc32 from ALBUM"
-	db_ALBUM_pathL = db_request_wrapper(None,req)
+	db = sqlite3.connect(dbPath)	
+	c = db.cursor()		
+	#print 'db.text_factory:',db.text_factory
+	exec_err_L = []
+	fetch_err_L = []
+	for table_item in mlDL:
+		for fld_name in table_item['filedL']:
+			req_data = (fld_name,table_item['table'])
+			req = 'select %s from %s'%req_data
+			#print [req]
+			msg_str = 'Table [%20s] field (%25s):'%(req_data[1].upper(),req_data[0])
+			print msg_str,
+			msg_exec = msg_fetch ='Failed'
+			try:
+				c.execute(req)
+				msg_exec = 'OK'
+			except Exception,e:
+				print e
+				exec_err_L.append((req_data,msg_str,e))
+			
+			if msg_exec == 'OK':
+				try:	
+					r = c.fetchall()	
+					msg_fetch = 'OK'
+				except Exception,e:
+					#print e	
+					fetch_err_L.append((req_data,msg_str,e))	
+				
+			print '[exec: %s, fetch:%s]'%(msg_exec,msg_fetch)	
+		
+		print "*"*50	
+		
+	fld_erL = []	
+	if 'with_fetch_detailes' in args:
+		tabl_set = set([a[0][1] for a in fetch_err_L])
+		print [tabl_set]
+		for table in tabl_set:
+			if 'track' == table:
+				req = 'select id_track from %s'%(table)
+			elif 'artist' == table:
+				req = 'select id_artist from %s'%(table)
+			elif 'album' == table:
+				req = 'select id_album from %s'%(table)	
+			else:
+				continue
+			
+			c.execute(req)
+			try:
+				r = c.fetchall()	
+			except Exception,e:
+				print e
+				
+			
+			print 'Table:',table
+			idL = [a[0] for a in r]	
+			filedL = [itm['filedL'] for itm in mlDL if itm['table'] == table][0]
+			err_cnt = utf_8_err_cnt = 0
+			#print filedL
+			for a in filedL:
+				print 'Processing field:',a,' of ',table.upper()
+				i = 0
+				err_cnt = utf_8_err_cnt = 0
+				for id in idL:
+					
+					req = 'select %s from %s where id_%s = %s'%(a,table,table,str(id))
+					exec_ok = True
+					try:
+						c.execute(req)
+					except Exception,e:
+						if 'utf-8' in e.message.lower():
+							utf_8_err_cnt+=1
+						fld_erL.append({'table':table,'field':a,'id':id,'error':e,'request':req})
+						exec_ok = False
+						err_cnt+=1
+						
+					if exec_ok:	
+						try:
+							r = c.fetchone()	
+						except Exception,e:
+							fld_erL.append({'table':table,'field':a,'id':id,'error':e})		
+							if 'utf-8' in e.message.lower():
+								utf_8_err_cnt+=1
+							err_cnt+=1
+						
+					if i%1000 == 0:
+						print '%i[%i]'%(i,err_cnt),
+					i+=1
+				if utf_8_err_cnt == err_cnt and err_cnt > 0:
+					print
+					print 'All issues %s %s are UTF-8'%(table,a)
+				elif utf_8_err_cnt == err_cnt and err_cnt == 0:
+					print
+					print 'No issues in %s %s --> OK'%(table,a)
+				print	
+				len_fld_erL = len(fld_erL)
+				print 'fld_erL:%i, utf_8_err_cnt:%i'%(len_fld_erL,utf_8_err_cnt)
+				
+			
+	c.close()
+	db.close()
+	return {'exec_err_L':exec_err_L,'fetch_err_L':fetch_err_L,'fld_erL':fld_erL}
+	
+def check_medialib_TRACK_utf8_issue(fs_folderL,erL,*args):
+	# аналог функции check_medialib_TRACK_utf8_issue, но входящие параметры другие, т.к. сравнение на шаге 3 с полным именем файла
+	# т.е использовать один и тотже список нельзя!
+	t_start = time.time()
+	# Сценарий миграции БД на unicode: формирования списка пересчета CRC32 на основе пересчета CRC32 для путей в unicode
+	# все преобразования .decode('cp1251') сделаны из-за первичного сохранения объектов в БД НЕ в UNICODE!
+	dbPath = cfgD['dbPath']
+	# таблица TRACK (пока только эта таблица) - собираем все CRC32 для путей из БД
+	req = "select path_crc32, id_track  from track"
+	db_TRACK_pathL = db_request_wrapper(None,req)
 	
 	convL = []
+	dublicatL = []
 	er_tb_deleteL = []
+	er_cueL = []
+	er_titleL = []
+	er_artistL = []
 	i = 0
 	if erL == []:
 		print "1. MediaLib db scanning..."
-		for a in db_ALBUM_pathL:
-			if i%100 == 0:
+		db = sqlite3.connect(dbPath)	
+		c = db.cursor()		
+		for a in db_TRACK_pathL:
+			if i%10000 == 0:
 				print i,
 			i+=1
 			# Get single ALBUM entry via path_crc32
-			r = getFolderAlbumD_fromDB(dbPath,None,a[0],[],'folder_tree_nodes')
-			if 'error_message' in r:
-				print '*',
-				erL.append(a[0])
+			req = "select path from track where id_track = %s"%(str(a[1]))
+			
+			try:
+				c.execute(req)
+			except Exception,e:
+				if 'UTF-8' in e.message: 
+				# отбираем записи где появилась ошибка преобразования unicode связанная path
+				#print '*',
+					if a[0] not in erL:
+						erL.append(a[0])
+					else:
+						# в процессе добавления альбомов появились дубликаты. Из-за некорректного алгоритма добавления
+						# Дубликаты надо собрать и исправить отдельно в БД 
+						dublicatL.append((a[0],a[1]))	
+						print '=',
+					
+					
+			req = "select cue_fname from track where id_track = %s"%(str(a[1]))
+			try:
+				c.execute(req)
+			except Exception,e:
+			# отбираем записи где появилась ошибка преобразования unicode связанная path
+				#print '*',
+				if 'UTF-8' in e.message: 
+					if a[0] not in er_cueL:
+						er_cueL.append(a[0])
+						
+						
+			req = "select title from track where id_track = %s"%(str(a[1]))
+			try:
+				c.execute(req)
+			except Exception,e:
+			# отбираем записи где появилась ошибка преобразования unicode связанная title
+				#print '*',
+				if 'UTF-8' in e.message: 
+					if a[0] not in er_titleL:
+						er_titleL.append(a[0])			
+						
+			
+			req = "select artist from track where id_track = %s"%(str(a[1]))
+			try:
+				c.execute(req)
+			except Exception,e:
+			# отбираем записи где появилась ошибка преобразования unicode связанная artist
+				#print '*',
+				if 'UTF-8' in e.message: 
+					if a[0] not in er_titleL:
+						er_artistL.append(a[0])				
+				
+		c.close()			
+		db.close()
+		
+		check_cue = False
+		time_stop_diff = int(time.time()-t_start)	
+		print
+		if set(er_cueL).issubset(set(erL)):
+			check_cue = True
+			print 'Cue error list is subset of Path error list'
+		else:
+			print 'Warning! Cue errors are is NOT subset of Path error list, check it separately!'
+			
+			
+		check_title = False
+		print
+		if set(er_titleL).issubset(set(erL)):
+			check_title = True
+			print 'Title error list is subset of Path error list'
+		else:
+			print 'Warning! Title errors are is NOT subset of Path error list, check it separately!'	
+			
+			
+		check_artist = False
+		print
+		if set(er_artistL).issubset(set(erL)):
+			check_artist = True
+			print 'Artist error list is subset of Path error list'
+		else:
+			print 'Warning! Artist errors are is NOT subset of Path error list, check it separately!'		
+			print 'er_artistL dif len:',len(set(erL).intersection(set(er_artistL)))
+		
 		print		
 		print "		MediaLib containes UTF8 decoding issues:",len(erL)	
+		print "		MediaLib Album containes dublicates (dublicatL):",len(dublicatL)	
+		print 'Finished in %i sec.'%(time_stop_diff)
 
 	# check path existence for failed path_crc32
 	print
 	print "2. Checking path existence for failed path_crc32 from erL:",len(erL)
 	i = 0
-	for a in erL:
-		req = "select id_album, path from ALBUM where path_crc32 = %s"%(str(a))
-		r = db_request_wrapper(None,req)
+	
+	t_2 = time.time()	
+	db = sqlite3.connect(dbPath)	
+	c = db.cursor()	
+	# !! Первый проход с подключением к бд с db.text_factory = str
+	if 'no_utf8' in args:
+		db.text_factory = str	
+	req = "select id_track, path_crc32, path, cue_fname,title,artist,cue_num from TRACK where path_crc32 in (%s)"%(str(erL)[1:-1])
+	try:
+		c.execute(req)
+	except Exception,e:
+		print e	
 		
-		if not os.path.exists(r[0][1]):
-			er_tb_deleteL.append((a,r[0][1],r[0][0]))
+	try:	
+		r = c.fetchall()	
+	except Exception,e:
+		print e	
+		
+	print 'Pathes for erL retrieved in %i sec'%(int(time.time()-t_2))  	
+		
+	track_path = ''
+		
+	for req_res_item in r:
+			#print 'dublicat',req_res_item
+			
+		try:
+			track_path = req_res_item[2]
+		except	Exception, e:
+			print e
+			print 'Error: request res: %s, req: %s'%(str(r),str(req))
+			return {"erL":erL,"er_tb_deleteL":er_tb_deleteL,'convL':convL,'matchL':[]} 
+		if not os.path.exists(track_path):
+			er_tb_deleteL.append((req_res_item[1],req_res_item[0]))
 		else:
-			convL.append((a,r[0][1],r[0][0]))
+			#id_track, path, cue_fname
+			convL.append((req_res_item[0],req_res_item[1],req_res_item[2],req_res_item[3],req_res_item[4],req_res_item[5],req_res_item[6]))
+		if i%1000 == 0:
+			print i,
+		i+=1	
+			
+	c.close()			
+	db.close()					
+	
+	print		
+	print "		Media lib album not exists and to be deleted issues:",len(er_tb_deleteL)	
+	print "		Media lib album to be matched and ajusted (convL):",len(convL)	
+	time_stop_diff = int(time.time()-t_2)
+	print 'Finished in %i sec.'%(time_stop_diff)
+	
+	if set(erL) == set([a[0] for a in er_tb_deleteL]):
+		print '2.1 Success: erL  is in sync with er_tb_deleteL'
+	else:
+		print '2.1 Issue: erL  is NOT in sync with er_tb_deleteL'
+	
+	dirL = []
+	if 'collect_dirs_for_preproc' in args:
+		
+		for a in convL:
+			dir_name = os.path.dirname(a[1])
+			if dir_name not in dirL:
+				dirL.append(dir_name)
+		print 'convL with dirL substituted dirL:',len(dirL)		
+	
+	
+	t_2 = time.time()	
+	matchL = []
+	real_fs_folder_path = ''
+	pathD = {}
+	
+	if 'fast_convL_processing' in args:
+		print 'fast_convL_processing is on' 
+		print "3. DB and FS track names matching only at convL:%i..."%(len(convL))
+		i = 0
+		t_2 = time.time()
+		for b in convL:
+			
+			db_fs_dir_name = os.path.dirname(b[2].decode('cp1251'))
+			crc32_db_fs_dir_name = zlib.crc32(db_fs_dir_name.encode('raw_unicode_escape'))
+			
+			fileL = []			
+			if crc32_db_fs_dir_name not in pathD:
+				pathD[crc32_db_fs_dir_name] = []
+				if os.path.exists(db_fs_dir_name):
+					fileL = scandir.listdir(db_fs_dir_name)
+					
+					for file_name in fileL:
+						for frm in ['.mp3','.ape','.flac']:
+							if frm in file_name.lower():
+								pathD[crc32_db_fs_dir_name].append(join(db_fs_dir_name,file_name))			
+						
+						
+					# Not CUE scenario
+			for real_fs_file_path in pathD[crc32_db_fs_dir_name]:
+				db_fs_folder_file_path = b[2].decode('cp1251')
+				if not os.path.exists(db_fs_folder_file_path):
+					print 'Error with decoded path file name:[%s]'%(db_fs_folder_file_path)
+			
+				if real_fs_file_path == db_fs_folder_file_path:
+					crc32_1 = zlib.crc32(db_fs_folder_file_path.encode('raw_unicode_escape'))
+				
+						#print "*",
+					if b[1] in er_cueL:
+						
+						db_fs_cue_file_path = b[3].decode('cp1251')
+						crc32_1 = zlib.crc32((db_fs_cue_file_path + ',' + str(b[6])).encode('raw_unicode_escape'))
+						# проверить доступность нового поти
+						if not os.path.exists(db_fs_cue_file_path):
+							print 'Error with decoded cue file name:[%s]'%(db_fs_cue_file_path)
+					else:
+						db_fs_cue_file_path = None
+					
+					new_title = None	
+					if b[1] in er_titleL:
+						new_title = b[4].decode('cp1251')
+						
+					new_artist = None	
+					if b[1] in er_artistL:
+						new_artist = b[4].decode('cp1251')	
+						
+						
+					matchL_item = {'new_crc32':crc32_1,'old_crc32':b[1],'new_path':db_fs_folder_file_path,'id_track': b[0],'new_cue_fname':db_fs_cue_file_path,'new_title':new_title,'new_artist':new_artist}
+					
+					if matchL_item not in matchL:
+						matchL.append(matchL_item)
+								# Еще могут быть дубликаты с темже crc32 и разными 'id_album' поэтому надо дополнить matchL значиниями из списка дубликатов
+					else:
+						print b[2]
+			if i%1000 == 0:
+				print '%i[%i]'%(i,len(matchL)),	
+			i+=1		
+			
+		print				
+		print "Converded and Decoded:",len(matchL)
+		print "Media dirs found:",len(pathD)
+		time_stop_diff = int(time.time()-t_2)	
+		print
+		print 'Finished in %i sec.'%(time_stop_diff)
+		
+		
+		return {"erL":erL,"er_tb_deleteL":er_tb_deleteL,'convL':convL,'matchL':matchL,'dublicatL':dublicatL,'pathD':pathD,'check_cue':check_cue,'er_artistL':er_artistL}	
+	
+	if fs_folderL <> []:
+		print "3. DB and FS track names matching at %i folders..."%(len(fs_folderL))
+		i = 0
+		fileL = []
+		for a in fs_folderL:
+			t_3 = time.time()
+			
+			real_fs_file_path = ''
+			real_fs_file_pathL = []
+			is_media = False
+			
+			
+			real_fs_folder_path = join(a[0],a[1])
+			crc32_real_fs_path = zlib.crc32(real_fs_folder_path.encode('raw_unicode_escape'))
+			if crc32_real_fs_path not in pathD:
+				pathD[crc32_real_fs_path] = []
+				if os.path.exists(real_fs_folder_path):
+					fileL = scandir.listdir(real_fs_folder_path)
+					is_media = False
+					for file_name in fileL:
+						for frm in ['.mp3','.ape','.flac']:
+							if frm in file_name.lower():
+								is_media = True
+								pathD[crc32_real_fs_path].append(join(real_fs_folder_path,file_name))
+					
+					if not is_media:
+						i+=1
+						continue
+					
+				else:
+					i+=1
+					continue
+					
+			
+			#print real_fs_folder_path
+			for b in convL:
+			
+				dir_name = os.path.dirname(b[2].decode('cp1251'))
+				
+				if dir_name != real_fs_folder_path:
+					continue
+						
+					# Not CUE scenario
+				for real_fs_file_path in pathD[crc32_real_fs_path]:
+					db_fs_folder_file_path = b[2].decode('cp1251')
+				
+					if real_fs_file_path == db_fs_folder_file_path:
+						crc32_1 = zlib.crc32(db_fs_folder_file_path.encode('raw_unicode_escape'))
+				
+						#print "*",
+						matchL_item = {'new_crc32':crc32_1,'old_crc32':b[1],'new_path':db_fs_folder_file_path,'id_track': b[0]}
+						if matchL_item not in matchL:
+							matchL.append({'new_crc32':crc32_1,'old_crc32':b[1],'new_path':db_fs_folder_file_path,'id_track': b[0]})
+								# Еще могут быть дубликаты с темже crc32 и разными 'id_album' поэтому надо дополнить matchL значиниями из списка дубликатов
+						else:
+							print b[2]
+		
+			if i%100 == 0:
+				print '%i[%i]'%(i,len(matchL)),
+				if i%1000 == 0:
+					time_stop_diff = int(time.time()-t_3)
+					print 'Passed %i sec. len matchL: %i, pathD:%i'%(time_stop_diff,len(matchL),len(pathD))	
+				
+				#print [real_fs_folder_path], type(real_fs_folder_path)
+				#print [db_fs_folder_path], type(db_fs_folder_path)
+			i+=1
+		time_stop_diff = int(time.time()-t_2)	
+		print
+		print 'Finished in %i sec.'%(time_stop_diff)
+		
+	print "Matching found:",len(matchL)
+	print "Matching media dirs found:",len(pathD)
+		
+	return {"erL":erL,"er_tb_deleteL":er_tb_deleteL,'convL':convL,'matchL':matchL,'dublicatL':dublicatL,'pathD':pathD,'check_cue':check_cue}	
+		
+
+def check_medialib_ALBUM_utf8_issue(fs_folderL,erL,*args):
+	# Сценарий миграции БД таблицы ALBUM на unicode: формирования списка пересчета CRC32 на основе пересчета CRC32 для путей в unicode
+	dbPath = cfgD['dbPath']
+	t_start = time.time()
+	# таблица ALBUM (пока только эта таблица) - собираем все CRC32 для путей из БД
+	req = "select path_crc32, id_album  from ALBUM"
+	db_ALBUM_pathL = db_request_wrapper(None,req)
+	
+	convL = []
+	dublicatL = []
+	er_tb_deleteL = []
+	i = 0
+	if erL == []:
+		print "1. MediaLib db scanning..."
+		db = sqlite3.connect(dbPath)	
+		
+		for a in db_ALBUM_pathL:
+			if i%1000 == 0:
+				print i,
+			i+=1
+			# Get single ALBUM entry via path_crc32
+			r = getFolderAlbumD_fromDB(None,db,a[0],[],'folder_tree_nodes')
+			# отбираем записи где появилась ошибка преобразования unicode связанная path
+			if 'error_message' in r:
+				#print '*',
+				if a[0] not in erL:
+					erL.append(a[0])
+				else:
+					# в процессе добавления альбомов появились дубликаты. Из-за некорректного алгоритма добавления
+					# Дубликаты надо собрать и исправить отдельно в БД 
+					dublicatL.append((a[0],a[1]))	
+					#print '=',
+		db.close()			
+		print		
+		print "		MediaLib containes UTF8 decoding issues:",len(erL)	
+		print "		MediaLib Album containes dublicates (dublicatL):",len(dublicatL)	
+	
+	time_stop_diff = int(time.time()-t_start)
+	print 'Finished DB scanning in %i sec.'%(time_stop_diff)
+	# check path existence for failed path_crc32
+	print
+	print "2. Checking path existence for failed path_crc32 from erL:",len(erL)
+	i = 0
+	t_2 = time.time()
+	
+	db = sqlite3.connect(dbPath)	
+	c = db.cursor()	
+	# !! Первый проход с подключением к бд с db.text_factory = str -> флаг 'no_utf8'
+	if 'no_utf8' in args:
+		print ' db.text_factory = str --> Activated'
+		db.text_factory = str	
+	else:
+		print ' db.text_factory = Default'
+	req = "select id_album, path, path_crc32 from ALBUM where path_crc32 in (%s)"%(str(erL)[1:-1])
+	try:
+		c.execute(req)
+	except Exception,e:
+		print e	
+		
+	try:	
+		r = c.fetchall()	
+	except Exception,e:
+		print e	
+		
+	#print 'Pathes for erL retrieved in %i sec'%(int(time.time()-t_2)) 
+	
+	t_2 = time.time()
+	for req_res_item in r:
+		#print 'dublicat',req_res_item
+		try:
+			album_path = req_res_item[1]
+		except	Exception, e:
+			print e
+			print 'Error: request res: %s, req: %s'%(str(r),str(req))
+			return {"erL":erL,"er_tb_deleteL":er_tb_deleteL,'convL':convL,'matchL':[]} 
+		if not os.path.exists(album_path):
+			er_tb_deleteL.append((req_res_item[2],req_res_item[1],req_res_item[0]))
+		else:
+			convL.append((req_res_item[2],req_res_item[1],req_res_item[0]))
 		if i%100 == 0:
 			print i,
 		i+=1	
 	
 	print		
-	print "		Media lib album not exists do be deleted issues:",len(er_tb_deleteL)	
+	print "		Media lib album not exists and to be deleted issues:",len(er_tb_deleteL)	
+	print "		Media lib album to be matched and ajusted (convL):",len(convL)	
 	
+	c.close()			
+	db.close()
+	time_stop_diff = int(time.time()-t_2)
+	print 'Finished conversionL generation in %i sec.'%(time_stop_diff)
+	
+	if set(erL) == set([a[0] for a in er_tb_deleteL]):
+		print '2.1 Success: erL  is in sync with er_tb_deleteL'
+	else:
+		print '2.1 Issue: erL  is NOT in sync with er_tb_deleteL'
+		#print set(erL)
+		#print set([a[0] for a in er_tb_deleteL])
 	# delete from ALBUM, TRACK
 	
 	ignL = [a[0] for a in er_tb_deleteL]
 	
 	
 	# match DB path and file system folder path	
+	t_2 = time.time()
 	matchL = []
+	
+	if 'fast_convL_processing' in args:
+		print 'fast_convL_processing is on' 
+		print "3. DB folders names converted only at convL:%i..."%(len(convL))
+		i = 0
+		t_2 = time.time()
+		for b in convL:	
+			db_fs_folder_path = b[1].decode('cp1251')
+			crc32_2 = zlib.crc32(db_fs_folder_path.encode('raw_unicode_escape'))
+			matchL_item = {'new_crc32':crc32_2,'old_crc32':b[0],'new_path':db_fs_folder_path,'id_album': b[2]}
+			if matchL_item not in matchL:
+				matchL.append({'new_crc32':crc32_2,'old_crc32':b[0],'new_path':db_fs_folder_path,'id_album': b[2]})
+				# Еще могут быть дубликаты с темже crc32 и разными 'id_album' поэтому надо дополнить matchL значиниями из списка дубликатов
+				convL_found = True	
+	
+			if i%1000 == 0:
+				print '%i[%i]'%(i,len(matchL)),
+			i+=1	
+					
+		
+		time_stop_diff = int(time.time()-t_2)	
+	
+		print
+		print 'Finished with fast mode in %i sec.'%(time_stop_diff)	
+		print "Matching found:",len(matchL)
+		return {"erL":erL,"er_tb_deleteL":er_tb_deleteL,'convL':convL,'matchL':matchL,'dublicatL':dublicatL}
+	
+	
+	
+	
 	if fs_folderL <> []:
 		print "3. DB and FS folders names matching..."
 		i = 0
 		for a in fs_folderL:
 			real_fs_folder_path = join(a[0],a[1])
-			if i%100 == 0:
-				print i,
-			i+=1
+
 			#print real_fs_folder_path
+			convL_found = False
 			for b in convL:
 				db_fs_folder_path = b[1].decode('cp1251')
+				
 				if real_fs_folder_path == db_fs_folder_path:
 					crc32_1 = zlib.crc32(real_fs_folder_path.encode('raw_unicode_escape'))
 					crc32_2 = zlib.crc32(db_fs_folder_path.encode('raw_unicode_escape'))
-					print "*",
-					matchL.append({'new_crc32':crc32_1,'old_crc32':b[0],'new_path':db_fs_folder_path,'id_album': b[2]})
+					#print "*",
+					matchL_item = {'new_crc32':crc32_1,'old_crc32':b[0],'new_path':db_fs_folder_path,'id_album': b[2]}
+					if matchL_item not in matchL:
+						matchL.append({'new_crc32':crc32_1,'old_crc32':b[0],'new_path':db_fs_folder_path,'id_album': b[2]})
+						# Еще могут быть дубликаты с темже crc32 и разными 'id_album' поэтому надо дополнить matchL значиниями из списка дубликатов
+						convL_found = True	
+			
+			# На всякий случай проверка, что хоть что-то нашли	
+			#if not convL_found:			
+			#	print '-',		
+			#	pass
+			#else:	
+			#	print '+',		
+				
+			if i%1000 == 0:
+				print '%i[%i]'%(i,len(matchL)),
+				#print [real_fs_folder_path], type(real_fs_folder_path)
+				#print [db_fs_folder_path], type(db_fs_folder_path)
+			i+=1	
 					
+		
+		time_stop_diff = int(time.time()-t_2)	
 		print
+		print 'Finished in %i sec.'%(time_stop_diff)	
 		print "Matching found:",len(matchL)
-	return {"erL":erL,"er_tb_deleteL":er_tb_deleteL,'convL':convL,'matchL':matchL}
+	return {"erL":erL,"er_tb_deleteL":er_tb_deleteL,'convL':convL,'matchL':matchL,'dublicatL':dublicatL}
 	
-def mass_album_table_update_path_crc32_ajust(matchL):
+def mass_album_track_table_update_path_crc32_ajust(matchL,mode):
+	# Функция исправления БД таблиц(ALBUM,..) на остновании списка matchL
+	# matchL[{'new_crc32':crc32_1,'old_crc32':b[0],'new_path':db_fs_folder_path,'id_album': b[2]},]
+	# resBuf_ml_folder_tree_buf_path = cfgD['ml_folder_tree_buf_path']
+	# f = open(resBuf_ml_folder_tree_buf_path,'r')
+	# Obj = pickle.load(f)
+	
 	#res = myMediaLib_tools.check_medialib_utf8_issue(Obj['folder_list'],[])
 	#ss = myMediaLib_tools.mass_album_table_update_path_crc32_ajust(res['matchL'])
 	#>>> f = open(resDBS['resBuf_save'],'r')
-	#>>> r = pickle.load(f)
+	#>>> Obj = pickle.load(f)
 	#>>> f.close()
 	#>>> r.keys()
-	
+	t_2 = time.time()
 	dbPath = cfgD['dbPath']
 	db = sqlite3.connect(dbPath)
 	requestD = {}
-	requestD['album'] = {'cursor':db.cursor(),'req':''}
-	requestD['album_cat_rel'] = {'cursor':db.cursor(),'req':''}
-	requestD['artist_album_ref'] = {'cursor':db.cursor(),'req':''}
-	requestD['album_reference'] = {'cursor':db.cursor(),'req':''}
-	requestD['album_reference_2'] = {'cursor':db.cursor(),'req':''}
-	requestD['track'] = {'cursor':db.cursor(),'req':''}
+	if mode.lower() == 'album':
+		mode_dif = 10
+		requestD['album'] = {'cursor':db.cursor(),'req':''}
+		requestD['album_cat_rel'] = {'cursor':db.cursor(),'req':''}
+		requestD['artist_album_ref'] = {'cursor':db.cursor(),'req':''}
+		requestD['album_reference'] = {'cursor':db.cursor(),'req':''}
+		requestD['album_reference_2'] = {'cursor':db.cursor(),'req':''}
+		requestD['track'] = {'cursor':db.cursor(),'req':''}
+	elif mode.lower() == 'track':
+		mode_dif = 1000
+		requestD['track'] = {'cursor':db.cursor(),'req':''}
+		requestD['track_tag'] = {'cursor':db.cursor(),'req':''}
+		
+		requestD['track_title'] = {'cursor':db.cursor(),'req':''}
+
+		
 	i=0
 	resL=[]
 	reqL = []
 	res = ''
+	print 'matchL:',len(matchL)
 	for a in matchL:
 		# update ALBUM
-		rec_m = (a['new_path'],a['new_crc32'],a['id_album'])
-		requestD['album']['req'] = """update album set path = "%s", path_crc32 = %s where id_album = %s"""%rec_m
-		
-		
-		# update album_cat_rel
-		rec_m = (a['new_crc32'],a['id_album'])
-		requestD['album_cat_rel']['req'] = """update album_cat_rel set album_crc32 = %s where id_album = %s"""%rec_m
-		#reqL.append(req)
-		
-		# update artist_album_ref
-		requestD['artist_album_ref']['req'] = """update artist_album_ref set album_crc32 = %s where id_album = %s"""%rec_m
-		#reqL.append(req)
-		
-		# update ALBUM_REFERENCE
-		requestD['album_reference']['req'] = """update ALBUM_REFERENCE set album_crc32 = %s where id_album = %s"""%rec_m
-		#reqL.append(req)
-		requestD['album_reference_2']['req'] = """update ALBUM_REFERENCE set album_crc32_ref = %s where id_album_ref = %s"""%rec_m
-		#reqL.append(req)
-		
-		rec_m = (a['new_crc32'],a['old_crc32'])
-		requestD['track']['req'] = """update track set album_crc32 = %s where album_crc32 = %s"""%rec_m
+		if mode.lower() == 'album':
+			rec_m = (a['new_path'],a['new_crc32'],a['id_album'])
+			requestD['album']['req'] = """update album set path = "%s", path_crc32 = %s where id_album = %s"""%rec_m
+			
+			
+			# update album_cat_rel
+			rec_m = (a['new_crc32'],a['id_album'])
+			requestD['album_cat_rel']['req'] = """update album_cat_rel set album_crc32 = %s where id_album = %s"""%rec_m
+			#reqL.append(req)
+			
+			# update artist_album_ref
+			requestD['artist_album_ref']['req'] = """update artist_album_ref set album_crc32 = %s where id_album = %s"""%rec_m
+			#reqL.append(req)
+			
+			# update ALBUM_REFERENCE
+			requestD['album_reference']['req'] = """update ALBUM_REFERENCE set album_crc32 = %s where id_album = %s"""%rec_m
+			#reqL.append(req)
+			requestD['album_reference_2']['req'] = """update ALBUM_REFERENCE set album_crc32_ref = %s where id_album_ref = %s"""%rec_m
+			#reqL.append(req)
+			
+			rec_m = (a['new_crc32'],a['old_crc32'])
+			requestD['track']['req'] = """update track set album_crc32 = %s where album_crc32 = %s"""%rec_m
+			
+		elif mode.lower() == 'track':
+			
+			if a['new_cue_fname'] == None:
+				rec_m = (a['new_path'],a['new_crc32'],a['id_track'])
+				requestD['track']['req'] = """update track set path = "%s", path_crc32 = %s  where id_track = %s"""%rec_m
+			else:
+				rec_m = (a['new_path'],a['new_crc32'],a['new_cue_fname'],a['id_track'])
+				requestD['track']['req'] = """update track set path = "%s", path_crc32 = %s, cue_fname = "%s" where id_track = %s"""%rec_m
+				
+			if a['new_title'] != None:
+				rec_m = (a['new_title'],a['id_track'])
+				requestD['track_title']['req'] = """update track set title = "%s" where id_track = %s"""%rec_m
+				
+			
+			rec_m = (a['new_crc32'],a['id_track'])
+			requestD['track_tag']['req'] = """update track_tag set path_crc32 = %s where id_track = %s"""%rec_m	
+			
+				
+			
+				
 		#reqL.append(req)
 		
 		for tabl_key in requestD:
@@ -930,14 +1524,17 @@ def mass_album_table_update_path_crc32_ajust(matchL):
 				#res = c.fetchall()
 			except Exception,e:
 				print e
-				requestD[tabl_key]['req']
+				print requestD[tabl_key]['req']
+				for tabl_key in requestD:
+					requestD[tabl_key]['cursor'].close()
+				db.close()				
 				logger.critical('Exception: %s'%(str(e)))
 				return res
 				
 		#res = c.fetchall()
 		#resL.append(res)	
 				
-		if i%10 == 0:
+		if i%mode_dif == 0:
 			print i,
 			
 		i+=1
@@ -946,9 +1543,12 @@ def mass_album_table_update_path_crc32_ajust(matchL):
 	
 	db.commit()
 	db.close()	
+	time_stop_diff = int(time.time()-t_2)
+	print
+	print 'Finished in %i sec.'%(time_stop_diff)	
 	return resL
 	
-def mass_album_table_delete_path_not_existed(del_path_crc32L):
+def mass_album_track_table_delete_path_not_existed(del_path_crc32L,mode):
 	#res = myMediaLib_tools.check_medialib_utf8_issue(Obj['folder_list'],[])
 	#ss = myMediaLib_tools.mass_album_table_update_path_crc32_ajust(res['matchL'])
 	#>>> f = open(resDBS['resBuf_save'],'r')
@@ -959,36 +1559,44 @@ def mass_album_table_delete_path_not_existed(del_path_crc32L):
 	dbPath = cfgD['dbPath']
 	db = sqlite3.connect(dbPath)
 	requestD = {}
-	requestD['album'] = {'cursor':db.cursor(),'req':''}
-	requestD['album_cat_rel'] = {'cursor':db.cursor(),'req':''}
-	requestD['artist_album_ref'] = {'cursor':db.cursor(),'req':''}
-	requestD['album_reference'] = {'cursor':db.cursor(),'req':''}
-	requestD['album_reference_2'] = {'cursor':db.cursor(),'req':''}
-	requestD['track'] = {'cursor':db.cursor(),'req':''}
+	if mode.lower() == 'album':
+		requestD['album'] = {'cursor':db.cursor(),'req':''}
+		requestD['album_cat_rel'] = {'cursor':db.cursor(),'req':''}
+		requestD['artist_album_ref'] = {'cursor':db.cursor(),'req':''}
+		requestD['album_reference'] = {'cursor':db.cursor(),'req':''}
+		requestD['album_reference_2'] = {'cursor':db.cursor(),'req':''}
+		requestD['track'] = {'cursor':db.cursor(),'req':''}
+	elif mode.lower() == 'track':
+		requestD['track'] = {'cursor':db.cursor(),'req':''}
+		
 	i=0
 	resL=[]
 	reqL = []
 	res = ''
 	for a in del_path_crc32L:
 		# delete from ALBUM
-		
-		requestD['album']['req'] = """delete from album where id_album = %s"""%(a)
-		
-		# delete from album_cat_rel
-		requestD['album_cat_rel']['req'] = """delete from album_cat_rel where id_album = %s"""%(a)
-		
-		# delete from artist_album_ref
-		requestD['artist_album_ref']['req'] = """delete from artist_album_ref  where id_album = %s"""%(a)
-		#reqL.append(req)
-		
-		# delete from  ALBUM_REFERENCE
-		requestD['album_reference']['req'] = """delete from  ALBUM_REFERENCE where id_album = %s"""%(a)
-		
-		requestD['album_reference_2']['req'] = """delete from ALBUM_REFERENCE  where id_album_ref = %s"""%(a)
-		#reqL.append(req)
-		
-		requestD['track']['req'] = """delete from track where album_crc32 = %s"""%(a)
-		#reqL.append(req)
+		if mode.lower() == 'album':	
+			requestD['album']['req'] = """delete from album where id_album = %s"""%(a[2])
+			
+			# delete from album_cat_rel
+			requestD['album_cat_rel']['req'] = """delete from album_cat_rel where id_album = %s"""%(a[2])
+			
+			# delete from artist_album_ref
+			requestD['artist_album_ref']['req'] = """delete from artist_album_ref  where id_album = %s"""%(a[2])
+			#reqL.append(req)
+			
+			# delete from  ALBUM_REFERENCE
+			requestD['album_reference']['req'] = """delete from  ALBUM_REFERENCE where id_album = %s"""%(a[2])
+			
+			requestD['album_reference_2']['req'] = """delete from ALBUM_REFERENCE  where id_album_ref = %s"""%(a[2])
+			#reqL.append(req)
+			
+			requestD['track']['req'] = """delete from track where album_crc32 = %s"""%(a[0])
+			#reqL.append(req)
+		elif mode.lower() == 'track':
+			
+			requestD['track']['req'] = """delete from track where id_track = %s"""%(a[1])
+			
 		
 		for tabl_key in requestD:
 			try:
@@ -1013,6 +1621,61 @@ def mass_album_table_delete_path_not_existed(del_path_crc32L):
 	db.commit()
 	db.close()	
 	return resL	
+	
+def unicode_migration_scenario():
+	cfgD = readConfigData(mymedialib_cfg)
+	resBuf_ml_folder_tree_buf_path = cfgD['ml_folder_tree_buf_path']
+	f = open(resBuf_ml_folder_tree_buf_path,'r')
+	Obj = pickle.load(f)
+	f.close()
+	
+	t = time.time()
+	check_res_before_migrationD = quick_check_medialib_utf8_issue('with_fetch_detailes')
+	print
+	print '*'*50
+	print 'Unicode issues ALBUM check'
+	print '*'*50
+	
+	#res_check_album = check_medialib_ALBUM_utf8_issue(Obj['folder_list'],[],'no_utf8','fast_convL_processing')
+	res_check_album = check_medialib_ALBUM_utf8_issue([],[],'no_utf8','fast_convL_processing')
+	print '*'*50
+	if res_check_album['er_tb_deleteL'] == []:
+		print 'Nothing to delete from album'
+	else:	
+		print 'Unicode issues ALBUM not existed delete'
+		res_del_albumD   = mass_album_track_table_delete_path_not_existed(res_check_album['er_tb_deleteL'],'album')
+		
+	print	
+	print '*'*50	
+	if res_check_album['matchL'] == []:	
+		print 'Nothing to ajust from album'
+	else:	
+		print 'Unicode issues ALBUM ajusting'
+		res_ajustD = mass_album_track_table_update_path_crc32_ajust(res_check_album['matchL'],'album')	
+	
+	# check TRACK
+	print '*'*50
+	print 'Unicode issues TRACK check'
+	print '*'*50
+	res_check_track = check_medialib_TRACK_utf8_issue([],[],'no_utf8','fast_convL_processing')
+	print '*'*50
+	if res_check_track['er_tb_deleteL'] == []:
+		print 'Nothing to delete from track'
+	else:	
+		print 'Unicode issues TRACK not existed delete'
+		res_delD = mass_album_track_table_delete_path_not_existed(res_check_track['er_tb_deleteL'],'track')
+		
+	print	
+	print '*'*50
+	if res_check_track['matchL'] == []:
+		print 'Nothing to ajust from album'
+	else:	
+		print 'Unicode issues TRACK ajusting'
+		res_ajustD = mass_album_track_table_update_path_crc32_ajust(res_check_track['matchL'],'track')	
+		
+	print '*'*50	
+	print "Ajusting scenario finished in %i sec"%(int(time.time()-t))
+	check_after_migrationD = quick_check_medialib_utf8_issue('with_fetch_detailes')
 	
 def get_parent_folder_stackL(path,stop_nodeL):
 	nodesL =[]

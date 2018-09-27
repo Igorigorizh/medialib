@@ -8,6 +8,7 @@ import socket
 import json
 import pickle
 import logging
+import operator
 import os
 import chardet
 from string import Template
@@ -56,10 +57,6 @@ class MediaLib_ViewGen(MediaLibPlayProcess_singletone_Wrapper):
 			view_elem_id_Dic['action_result'] = res
 			
 			json_reply = json.dumps(view_elem_id_Dic)
-		#if 'frame3' in view_elem_id_Dic:
-		#	for a in view_elem_id_Dic['frame3']:
-		#		del view_elem_id_Dic['frame3'][a]
-		#	view_elem_id_Dic['frame3'] = ''
 			print 'ajax_gen_action_confirmed = OK'
 		return json_reply
 		
@@ -70,7 +67,7 @@ class MediaLib_ViewGen(MediaLibPlayProcess_singletone_Wrapper):
 		
 	def	ajax_tag_admin_page_update(self,res,view_elem_id_Dic,dummy_2,modelDic):
 		
-		logger.info('we are in ajax_taga_admin_page_update %s res=%s:'%(str(view_elem_id_Dic),str(res)))
+		logger.info('we are in ajax_tag_admin_page_update %s res=%s:'%(str(view_elem_id_Dic),str(res)))
 		json_reply = {}
 		if 'action_name' in view_elem_id_Dic:
 			if res > 0:
@@ -84,8 +81,98 @@ class MediaLib_ViewGen(MediaLibPlayProcess_singletone_Wrapper):
 			else:
 				view_elem_id_Dic['action_result'] = 0
 			json_reply = json.dumps(view_elem_id_Dic)
+			
+		elif 'tag_init_data' in view_elem_id_Dic:
+			view_elem_id_Dic['action_result'] = 1
+			view_elem_id_Dic['tag_data'] = {}
+			
+			tagD =  modelDic['TagD']
+			tagCatD = {'ALL_GRP':[]}
+			tagCatLD = []
+			catL = []
+			for a in tagD:
+				if tagD[a]['tag_type'] not in tagCatD:
+					item = tagD[a]
+					item['key'] = a
+					tagCatD[tagD[a]['tag_type']]=[item]
+					
+				else:
+					item = tagD[a]
+					item['key'] = a
+					tagCatD[tagD[a]['tag_type']].append(item)
+					
+				tagCatD['ALL_GRP'].append(item)	
+					
+			
+			for a in tagCatD:
+				tagCatLD.append({'cat_name':a, 'tagL':tagCatD[a]})
+				catL.append(a)
+				tagCatD[a].sort(key=operator.itemgetter('tag_name'),reverse=False)
+					
+			catL.sort()
+			tagL = []
+			try:
+				tagL=[(tagD[a]['tag_name'],a) for a in tagD if 'tag_name' in tagD[a]]
+				tagL.sort() 
+				
+				tagL = [a[1] for a in tagL]
+			except:
+				tagL = []
+				print 'Error in tagL rendering of send_HtmlPage_tagAdmin_new'
+				
+				
+			TagResL = []
+			
+			#print 	'tagAdmin geneta 3'	
+			
+			form_mode =  ''
+			
+			js_tag_group_list = ''
+			# получаем все группы тэгов
+			tagGroupL = []
+			for a in tagL:
+				if tagD[a]['tag_type'] not in tagGroupL:
+					if 'tag_type' in tagD[a]:
+						tagGroupL.append(tagD[a]['tag_type'])
+			
+			for a in tagL:
+				try:
+					opt_elem = modelDic['Tmpl']['gen_dd_list_option_elem']['TMPL']%({'class':'','value':a,'selected':'','text':tagD[a]['tag_name']})
+					#print tagD[a]['tag_name']
+				except:
+					print """Erorr in tagD[a]['tag_name'] index:""",a	
+					continue
+				
+				#TagResL.append("""<OPTION VALUE="%s" > %s"""%(str(a),tagD[a]['tag_name'].encode('utf8')))
+				TagResL.append(opt_elem)
+			tag_list_content = '\n'.join(TagResL)
+			
+			for a in tagGroupL:
+
+				sel_option_js_contentL = []
+				for b in tagL:
+					try:
+						if tagD[b]['tag_type'] == a:
+							sel_option_js_contentL.append({'tag_name':tagD[b]['tag_name'],'group':b})
+						else:
+							continue
+					except:
+						print """Erorr in tagD[b]['tag_name'] index:""",b	
+						continue
+			print 'html_title-1'
+			
+			
+			view_elem_id_Dic['tag_data'] = tag_list_content
+			view_elem_id_Dic['tagCatLD'] = tagCatD
+			view_elem_id_Dic['catL'] = catL	
+			view_elem_id_Dic['tag_group'] = sel_option_js_contentL
+			view_elem_id_Dic['html_title'] = html_title
+			
+			
+			json_reply = json.dumps(view_elem_id_Dic)
 		
 		logger.debug('view_elem_id_Dic: %s'%(str(view_elem_id_Dic)))
+		
 		return json_reply
 		
 	def	ajax_tracks_preload_page_update(self,res,view_elem_id_Dic,dummy_2,modelDic):
@@ -756,7 +843,7 @@ class MediaLib_ViewGen(MediaLibPlayProcess_singletone_Wrapper):
 				
 			except:
 				try:
-					view_elem_id_Dic['search_result_frm'] = view_elem_id_Dic['search_result_frm'].decode('cp1251')
+					view_elem_id_Dic['search_result_frm'] = view_elem_id_Dic['search_result_frm'] #.decode('cp1251')
 					if 	'Search_Editable_BufD' in modelDic:
 						if modelDic['Search_Editable_BufD']['sD'] <> {}:
 							pass
@@ -1937,7 +2024,7 @@ class MediaLib_ViewGen(MediaLibPlayProcess_singletone_Wrapper):
 		
 		page = modelDic['Tmpl']['debug_page']['TMPL']%({'bookmark_tmpl':bookmark_part,
 														'host_name':modelDic['host_name'],
-														'html_title':html_title,
+														'html_title':'Media Lib tag admin',
 														'pic_get_text':'',
 														'host':modelDic['host'],
 														'debug_data':debug_data})		
@@ -1946,10 +2033,10 @@ class MediaLib_ViewGen(MediaLibPlayProcess_singletone_Wrapper):
 		return xmlrpclib.Binary(page)
 	def send_HtmlPage_tagAdmin_new(self,dummy_1,view_elem_id_Dic,dummy_2,modelDic):
 		
-		logger.info('And now!!! we are in send_HtmlPage_tagAdmin_new')
+		logger.info('in send_HtmlPage_tagAdmin_new - Start')
 		
 
-		search_term = 'Search_text'.encode('utf8')
+		search_term = 'Search_text'
 		if_chosen_elem = ''
 		search_part_tmpl = ''
 		sel_option_js_content_list = ''
@@ -1957,7 +2044,8 @@ class MediaLib_ViewGen(MediaLibPlayProcess_singletone_Wrapper):
 			menu_selD[a]=''
 		menu_selD['host_name']=modelDic['host_name']
 		
-		#html_title = 'Удаленная смотрелка-управлялка играющей музыки'.decode('cp1251').encode('utf8')
+		#print 	'tagAdmin geneta 1'	
+		
 		
 		#bookmark_part = pageConfigD['bookmark_part']
 		bookmark_part = '<BR>'
@@ -1969,7 +2057,7 @@ class MediaLib_ViewGen(MediaLibPlayProcess_singletone_Wrapper):
 		menu_selD['tag_admin_sel'] = """ class="selected" """
 		bookmark_part = modelDic['Tmpl']['bookmark_tmpl']['TMPL']%(menu_selD)
 		
-		#print 	'tagAdmin geneta 2'			
+		#	print 	'tagAdmin geneta 2'			
 			
 		tagD =  modelDic['TagD']
 		
@@ -1983,6 +2071,8 @@ class MediaLib_ViewGen(MediaLibPlayProcess_singletone_Wrapper):
 			tagL = []
 			print 'Error in tagL rendering of send_HtmlPage_tagAdmin_new'
 			
+		tagGrD = {}
+
 			
 		TagResL = []
 		
@@ -2001,19 +2091,8 @@ class MediaLib_ViewGen(MediaLibPlayProcess_singletone_Wrapper):
 			if tagD[a]['tag_type'] not in tagGroupL:
 				if 'tag_type' in tagD[a]:
 					tagGroupL.append(tagD[a]['tag_type'])
-		#for a in tagGroupL:
-			
+
 		
-		for a in tagL:
-			try:
-				opt_elem = modelDic['Tmpl']['gen_dd_list_option_elem']['TMPL']%({'class':'','value':str(a),'selected':'','text':tagD[a]['tag_name']})
-			except:
-				print """Erorr in tagD[a]['tag_name'] index:""",a	
-				continue
-				
-			#TagResL.append("""<OPTION VALUE="%s" > %s"""%(str(a),tagD[a]['tag_name'].encode('utf8')))
-			TagResL.append(opt_elem)
-		tag_list_content = '\n'.join(TagResL)	
 		page = ''
 			
 		#print 	'tagAdmin geneta 4'	
@@ -2024,71 +2103,33 @@ class MediaLib_ViewGen(MediaLibPlayProcess_singletone_Wrapper):
 		except:
 			print """Erorr in modelDic['Tmpl']['tag_adm_part_tmpl']"""
 			search_part_tmpl = ''
-			
-		scrpt_2_main = ''
-		scrpt_2_mainL = []	
 		
-		#print 	'tagAdmin geneta 5'	
-		sel_option_js_contentL = []
+		#html_title = u'Удаленная смотрелка-управлялка играющей музыки'
 		
-		
-		for a in tagL:
-			#scrpt_2_main =  scrpt_2_main + """ selbox.options[selbox.options.length] = new Option("%s","%s");\n"""%(modelDic['pD'][a]['title'].encode('utf8'),str(a))
-			try:
-				elem = modelDic['Tmpl']['gen_if_js_inside_elem']['TMPL']%({'text':tagD[a]['tag_name'],'value':str(a)})
-			except:
-				elem = 'Error in tmpl rendering',a
-				print """Erorr in modelDic['Tmpl']['gen_if_js_inside_elem'] index:""",a	
-			sel_option_js_contentL.append(elem)
-		
-		#print 	'tagAdmin geneta 5.1'		
-		# Вначале заполняем явно первую группу	
-		sel_option_js_content_list  = '\n'.join(sel_option_js_contentL)
-		
-		try:	
-			if_chosen_elem = modelDic['Tmpl']['gen_if_js_elem']['TMPL']%({'group':'ALL_GRP','cnt':tags_num,'sel_option_js_content_list':sel_option_js_content_list}) 
-		except:
-			print """Erorr in modelDic['Tmpl']['gen_if_js_elem']['TMPL']""",tags_num,sel_option_js_content_list
-			
-		scrpt_2_mainL.append(if_chosen_elem)
-		#print 	'tagAdmin geneta 5.2'
-		for a in tagGroupL:
-			#print 'GR=',a
-			sel_option_js_contentL = []
-			
-			for b in tagL:
-			#scrpt_2_main =  scrpt_2_main + """ selbox.options[selbox.options.length] = new Option("%s","%s");\n"""%(modelDic['pD'][a]['title'].encode('utf8'),str(a))
-				try:
-					if tagD[b]['tag_type'] == a:
-						elem = modelDic['Tmpl']['gen_if_js_inside_elem']['TMPL']%({'text':tagD[b]['tag_name'],'value':str(b)})
-						sel_option_js_contentL.append(elem)
-					else:
-						continue
-				except:
-					print """Erorr in tagD[b]['tag_name'] index:""",b	
-					continue
-					
-			sel_option_js_content_list  = '\n'.join(sel_option_js_contentL)	
-			if_chosen_elem = modelDic['Tmpl']['gen_if_js_elem']['TMPL']%({'group':str(a),'cnt':len(sel_option_js_contentL),'sel_option_js_content_list':sel_option_js_content_list}) 
-			scrpt_2_mainL.append(if_chosen_elem)	
-		
-		scrpt_2_main =  '\n'.join(scrpt_2_mainL)
-		
-		#print 	'tagAdmin geneta 6'		
-		page = modelDic['Tmpl']['tag_adm_page']['TMPL']%({'bookmark_tmpl':bookmark_part,
+		variableD =	{'bookmark_tmpl':bookmark_part,
 													'host_name':modelDic['host_name'],
 													'html_title':html_title,
 													'search_part_tmpl':search_part_tmpl,
 													'search_text':'Search_text',
 													'host':modelDic['host'],
-													'tag_list_content':tag_list_content,
+													'tag_list_content':'',
 													'tags_num':tags_num,
 													'tag_ancor':tag_ancor,
-													'scrpt_2_main':scrpt_2_main,
-													'form_mode':form_mode})		
-			
+													'form_mode':form_mode}
+													
+		#page = template_process(modelDic,'tag_adm_page',variableD)	
+		 
+		codec = chardet.detect(modelDic['Tmpl']['tag_adm_page']['TMPL'])	
+		print codec
+		tag_adm_template = modelDic['Tmpl']['tag_adm_page']['TMPL']
+		print 'Geneta 6.1'
+		try:
+			page = tag_adm_template%variableD
+		except Exception,e :	
+			logger.critical('Error: in send_HtmlPage_tagAdmin_new - %s'%(str(e)))	
 		
-		#print 	'tagAdmin geneta 7'	
+		print 	'tagAdmin geneta 7'	
+		logger.info('in send_HtmlPage_tagAdmin_new - Finished')
 		return xmlrpclib.Binary(page)
 		
 
@@ -3171,7 +3212,7 @@ def get_templ_vars(template_str):
 def template_process(modelDic,template_name,variableD):
 	cnt =0
 	res = ''
-	modelDic['Tmpl'][template_name]['TMPL']
+	#modelDic['Tmpl'][template_name]['TMPL']
 	while(1):
 		try:
 			res = modelDic['Tmpl'][template_name]['TMPL']%variableD

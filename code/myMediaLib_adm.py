@@ -18,6 +18,8 @@ import pickle
 import scandir
 import chardet
 
+from os.path import join
+
 import collections
 import shutil
 import subprocess
@@ -36,7 +38,7 @@ from mutagen.flac import FLAC
 from mutagen.monkeysaudio import MonkeysAudioInfo
 import acoustid
 import mutagen
-import discid
+
 import mktoc
 import mpd
 import musicbrainzngs
@@ -408,7 +410,7 @@ def group2listMaintain(dbPath,pD):
 	while (1):
 		plNavL = easygui.choicebox('test', "RssTool-text"  , getPlayListDic_Like_List(pD,grp2plD))
 		if plNavL == None:
-			#reply = easygui.ynbox('Сохранить базу назначений?'.decode('cp1251').encode('utf8'), '')
+			
 			if reqL <> []:
 				reply = easygui.ynbox('Сохранить базу назначений?', '')
 				if reply == 1:
@@ -456,7 +458,7 @@ def group2listMaintain(dbPath,pD):
 		
 		if grNavL == None:
 			continue
-		#reply = easygui.ynbox('Назначить лист группе'.decode('cp1251').encode('utf8'), '')
+		
 		reply = easygui.ynbox(message_final, '')
 		if reply == 1:
 			grp_key = str(grNavL.split(':')[0].strip())
@@ -492,8 +494,6 @@ def getMyMediaLibStat_Lists(medialibObj):
 		l = winamp_old.getTrackList(mlPath + a)
 		for b in l[1:]:
 			try:
-				#crc32 = zlib.crc32(b.decode('utf-8').encode('cp1251').lower())
-			
 				crc32 = zlib.crc32(b.lower())
 			except:
 				print 'CRC32 Error creation:',b
@@ -501,9 +501,10 @@ def getMyMediaLibStat_Lists(medialibObj):
 				
 			pos = b.lower().rfind('\\')
 			try:
-				crc32_d=zlib.crc32(b.decode('utf-8').encode('cp1251').lower()[:pos])
-				crc32_d=zlib.crc32(b.lower()[:pos])
-			except:
+				
+				crc32_d=zlib.crc32(b.lower()[:pos].encode('raw_unicode_escape'))
+			except Exception,e:
+				logger.critical('in getMyMediaLibStat_Lists %s'%(str(e)))
 				print '2:',b
 				#return b
 				continue
@@ -692,6 +693,7 @@ def collectAllMetaData(allmFD):
 		
 		try:
 			origname = 	allmFD[a]['orig_fname']
+			#print 'origname:',[origname]
 		except UnicodeDecodeError,e:
 			logger.critical('Exception in collectAllMetaData: %s'%(str(e)))	
 			print e, type(allmFD[a]['orig_fname']),[allmFD[a]['orig_fname']],a
@@ -705,6 +707,7 @@ def collectAllMetaData(allmFD):
 		
 		# Сбор метаданных для НЕ CUE 
 		try:	
+			logger.debug('in collectAllMetaData: before GetTrackInfoVia_ext call: filename %s'%(str([origname])))
 			metaD = GetTrackInfoVia_ext(origname,allmFD[a]['ftype'])
 		except Exception,e:
 			logger.critical('Exception in collectAllMetaData: %s'%(str(e)))
@@ -750,7 +753,8 @@ def getTableInfo(tab_name,db):
 def getVirtualAlbum_Indexes(db,*args):	
 	#db = sqlite3.connect(dbPath)
 	if db <> None:
-		db.text_factory = str
+		#db.text_factory = str
+		pass
 	else:
 		print 'Error in: getVirtualAlbum_Indexes'
 	c = db.cursor()
@@ -810,12 +814,12 @@ def getAlbumArtist_dbId_CRC32_mapping(db,*args):
 			logger.critical('Exception: %s'%(str(e)))
 			c.close()
 			db_encode = db.text_factory
-			db.text_factory = str
+			#db.text_factory = str
 			c = db.cursor()	
 			try:
 				r = c.execute(req)
 				l = c.fetchall()
-				db.text_factory = db_encode
+				#db.text_factory = db_encode
 			except Exception,e:
 				print 'Error 2 db encode:',e
 				logger.critical('Exception2: %s'%(str(e)))	
@@ -867,7 +871,7 @@ def getMedialibDb_Indexes(db,*args):
 		logger.critical('Exception: %s'%(str(e)))
 		c.close()
 		db_encode = db.text_factory
-		db.text_factory = str
+		#db.text_factory = str
 		c = db.cursor()	
 		try:
 			
@@ -944,7 +948,7 @@ def correctMediaLibDb_CRC32():
 	cfgD = readConfigData(mymedialib_cfg)
 	dbPath = cfgD['dbPath']
 	db = sqlite3.connect(dbPath)
-	db.text_factory = str
+	#db.text_factory = str
 	
 	c = db.cursor()
 	req = 'select id_track, path ,path_crc32,cue_num, cue_fname  from track'
@@ -977,7 +981,7 @@ def saveLibClast_to_DB(dbPath,allmFD,*args):
 	if 'save' in args:		
 		db = sqlite3.connect(dbPath)
 		c  = db.cursor()
-		db.text_factory = str
+		#db.text_factory = str
 	cnt = 0
 	for a in allmFD:
 		cnt += 1
@@ -999,7 +1003,7 @@ def saveLibClast_to_DB(dbPath,allmFD,*args):
 				except UnicodeEncodeError,e:
 					print 'errror at saving4',e,tag_nameD[tag]
 					logger.critical('in saveLibClast_to_DB dir - errror at saving 1199')
-					tag_nameD[tag] = allmFD[a]['metaD'][tag].encode('cp1251')
+					tag_nameD[tag] = allmFD[a]['metaD'][tag]
 					print 'Ok3'
 				except:
 					print 'errror at saving',tag_nameD[tag]
@@ -1720,7 +1724,8 @@ def mediaLib_intoDb_Load_withUpdateCheck(dbPath,init_dirL,creation_time,*args):
 	t_init = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 	print 'Collecting the path data start at:',time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 	
-	# 3. Предварительный сбор метаданных из указанной папки с проверкой CUE(image,tracs) и просто трэки в папке для не CUE
+	# 3. Предварительный сбор метаданных из указанной папки с проверкой CUE(image,tracs) и просто трэки в папке для не CUE 
+	# результирующий словарь allmFD, его ключи - это path_crc32
 	rD = collectMyMediaLib_folder_new(init_dirL)
 	if 'Error' in rD:
 		print '1245 Error after collectMyMediaLib_folder_new'
@@ -1733,6 +1738,9 @@ def mediaLib_intoDb_Load_withUpdateCheck(dbPath,init_dirL,creation_time,*args):
 	
 	# get PATH_CRC32 tracks keys 
 	set_rD_keys = set(rD['allmFD'].keys())
+	#if 'reload' in args:
+	#	difL = 	set_curDbL
+	#else:
 	difL = list(set_curDbL.intersection(set_rD_keys))
 	print 'intesection',len(difL),len(set_curDbL),len(set_rD_keys)
 	# ��������. �������� ���������� ������ ���� ���� ����������� ������ ������ � �� ��� ���� ��� �����������. ���� ������������. �� ����� �� ����������.
@@ -1775,6 +1783,7 @@ def mediaLib_intoDb_Load_withUpdateCheck(dbPath,init_dirL,creation_time,*args):
 			if 'reload' in args:
 				new_allmFD[a] = rD['allmFD'][a]
 				if 'db_id' in new_allmFD[a]: 
+					new_allmFD[a]['db_track'] = 'X'
 					new_allmFD[a]['db_id'] = indxD[a][0]
 					continue
 			
@@ -1785,6 +1794,7 @@ def mediaLib_intoDb_Load_withUpdateCheck(dbPath,init_dirL,creation_time,*args):
 				new_allmFD[a] = rD['allmFD'][a]
 				try:
 					new_allmFD[a]['db_id'] = indxD[a][0]
+					new_allmFD[a]['db_track'] = 'X'
 				except Exception, e:
 					logger.critical('Error in mediaLib_intoDb_Load_withUpdateCheck - last_modify_date check:[%s]'%(str(e)))	
 					print a,indxD[a]
@@ -1796,7 +1806,7 @@ def mediaLib_intoDb_Load_withUpdateCheck(dbPath,init_dirL,creation_time,*args):
 	
 	# 4. Только для дельты собрать недостающие метаданные из медиафайлов битрейт, время и т.д.
 	errorLog = collectAllMetaData(new_allmFD)
-	#collectAllMetaData(update_allmFD[a])
+	
 	resD = {}
 	lenResD = 0
 	
@@ -1937,7 +1947,8 @@ def getCurrentMetaData_fromDB_via_DbIdL_alterntv(DbIdL,db):
 		print 'Error: None db handler in getCurrentMetaData_fromDB_via_DbIdL_alterntv'
 	else:		
 	#db = sqlite3.connect(dbPath)	
-		db.text_factory = str
+		#db.text_factory = str
+		pass
 	logger.info('in getCurrentMetaData_fromDB_via_DbIdL_alterntv')	
 	c = db.cursor()
 	#print '4'
@@ -1965,7 +1976,7 @@ def getCurrentMetaData_fromDB_via_DbIdL(DbIdL,db,*args):
 		dbPath = cfgD['dbPath']
 		db = sqlite3.connect(dbPath)
 		db_init_flag = True
-		#db.text_factory = str
+		
 		
 	# get table metadata
 	fieldD = getTableInfo('track',db)
@@ -1982,7 +1993,7 @@ def getCurrentMetaData_fromDB_via_DbIdL(DbIdL,db,*args):
 	else:
 		req = 'select %s from track where id_track in (%s)'%(str_fld,str(DbIdL)[1:-1])
 	#print req
-	#db.text_factory = str
+	
 	logger.debug('in getCurrentMetaData_fromDB_via_DbIdL db.text_factory: [%s]'%(str(db.text_factory)))
 	
 	try:
@@ -2013,11 +2024,14 @@ def getCurrentMetaData_fromDB_via_DbIdL(DbIdL,db,*args):
 	#print '6'	
 	c_index = 0
 	for p in l_partL:
+		#print 'p=',p
 		for a in p:
 			lineD = {}
+			#print 'a=',a
 			for i in range(len(a)):
 				lineD[fieldL[i]] = a[i]
 			resD[lineD['path_crc32']] = 	lineD
+			#print 'lineD=',lineD['path_crc32']
 			if 'progress' in args:
 				if (c_index+p.index(a))%1000 ==0 and c_index+p.index(a) <> 0:
 #					c_index = c_index + 1000
@@ -2027,7 +2041,7 @@ def getCurrentMetaData_fromDB_via_DbIdL(DbIdL,db,*args):
 	c.close()
 	
 	#print '6'
-	
+	logger.debug('in getCurrentMetaData_fromDB_via_DbIdL, len resD=%i'%(len(resD)))	
 	for a in resD:
 		t = os.path.splitext(resD[a]['path'])[1]
 		format = ''
@@ -2043,7 +2057,8 @@ def getCurrentMetaData_fromDB_via_DbIdL(DbIdL,db,*args):
 	
 	if db_init_flag:
 		db.close()
-	logger.debug('in getCurrentMetaData_fromDB_via_DbIdL - Finished')		
+	
+	logger.debug('in getCurrentMetaData_fromDB_via_DbIdL - Finished, len resD=%i'%(len(resD)))		
 	return resD	
 	
 def getDbIdL_viaTagId(tagId,db):
@@ -2175,7 +2190,8 @@ def getDbIdL_viaArtistCRC32_List(artistCRC32L,db):
 def createPlayListBuffer(playL,indxD,db):
 	#l=myMediaLib_adm.createPlayListBuffer(Mobj.getCurPlayListAsList(),myMediaLib.getMedialibDb_Indexes(db),db)
 	if db <> None:
-		db.text_factory = str
+		#db.text_factory = str
+		pass
 	else:
 		print 'Error in: createPlayListBuffer'
 	playL_CRC32D = {}
@@ -2193,7 +2209,7 @@ def createPlayListBuffer(playL,indxD,db):
 			notFoundCRC32L.append(crc32)
 			#print a,fname
 			#return a
-		#crc32 = zlib.crc32((a.decode('cp1251').encode('utf8')).lower())
+		
 		last_modify_date = 0
 		try:
 			fname = a
@@ -2264,7 +2280,6 @@ def searchMediaLib_MetaData(dbPath,search_term,searchFieldL,listD):
 	logger.debug('in searchMediaLib_MetaData: [%s, %s] -Start'%(str(searchFieldL),str(type(search_term))))
 	print [search_term]
 	db = sqlite3.connect(dbPath)
-	#db.text_factory = str
 	c = db.cursor()
 	metaData_plD = {}
 	metaD = {}
@@ -2360,11 +2375,8 @@ def checkCue_inLibConsistenc_folder(init_dirL,*args):
 					origf = ''
 					ftype = ''
 					
-					try:
-						cue_name = (root+'\\'+a).decode('utf-8').encode('cp1251')
-				
-					except:
-						cue_name = (root+'\\'+a)
+
+					cue_name = (root+'\\'+a)
 
 					try:	
 						origfD = simple_parseCue(cue_name)	
@@ -2376,7 +2388,7 @@ def checkCue_inLibConsistenc_folder(init_dirL,*args):
 					try:
 						if os.path.exists(origfD['orig_file_path']):
 							cue_dirname = os.path.dirname(origfD['orig_file_path'])
-							check_dircrc32 =  zlib.crc32(cue_dirname.decode('cp1251').encode('utf-8').lower())
+							check_dircrc32 =  zlib.crc32(cue_dirname.lower())
 							if check_dircrc32 in cueDupl :
 								cueDupl[check_dircrc32]['dupL'].append((origfD['orig_file_path'],a)) 
 							else:
@@ -2391,7 +2403,7 @@ def checkCue_inLibConsistenc_folder(init_dirL,*args):
 								print origfD['fType']
 							origf = origfD['orig_file_path']
 							ftype = origfD['fType']
-							crc32 = zlib.crc32(origf.decode('cp1251').encode('utf-8').lower())
+							crc32 = zlib.crc32(origf.lower())
 							last_modify_date = 0
 							try:
 								last_modify_date = os.stat(cue_name).st_mtime
@@ -2424,10 +2436,10 @@ def checkCue_inLibConsistenc_folder(init_dirL,*args):
 					ftype = 'mp3'
 				
 				if	ftype <> None:
-					fname = (root.decode('cp1251').encode('utf-8')+'\\'+a.decode('cp1251').encode('utf-8')).lower() 
-					orig_fname = root+'\\'+a 
+					fname = (root+'\\'+a).lower() 
+					orig_fname = join(root,a) 
 					
-					crc32 = zlib.crc32(fname)
+					crc32 = zlib.crc32(fname.encode('raw_unicode_escape'))
 					#if crc32 == 1133272172:
 					#	return fname
 					last_modify_date = 0
@@ -2443,11 +2455,11 @@ def checkCue_inLibConsistenc_folder(init_dirL,*args):
 					#print root
 					if crc32 in cueD:
 						for b in cueD[crc32]['songL']:
-							crc32_i = zlib.crc32((b.decode('cp1251').encode('utf-8')).lower())
+							crc32_i = zlib.crc32(b.lower().encode('raw_unicode_escape'))
 							pos = b.rfind(',')
-							allmFD[crc32_i] = {'orig_fname':cueD[crc32]['file'],'last_modify_date':cueD[crc32]['last_modify_date'],'album':album,'album_crc32':zlib.crc32((root.decode('cp1251').encode('utf-8')).lower()),'file':b.lower(),'cueNameIndx':b[:pos],'ftype':ftype,'cue':'X'}
+							allmFD[crc32_i] = {'orig_fname':cueD[crc32]['file'],'last_modify_date':cueD[crc32]['last_modify_date'],'album':album,'album_crc32':zlib.crc32(root.lower().encode('raw_unicode_escape')),'file':b.lower(),'cueNameIndx':b[:pos],'ftype':ftype,'cue':'X'}
 					else:
-						allmFD[crc32] = {'orig_fname':orig_fname,'last_modify_date':last_modify_date,'album':album,'album_crc32':zlib.crc32((root.decode('cp1251').encode('utf-8')).lower()),'file':fname,'ftype':ftype,'cueNameIndx':None}
+						allmFD[crc32] = {'orig_fname':orig_fname,'last_modify_date':last_modify_date,'album':album,'album_crc32':zlib.crc32(root.lower().encode('raw_unicode_escape')),'file':fname,'ftype':ftype,'cueNameIndx':None}
 			
 			if 'stat' not in args:
 				continue
@@ -2720,7 +2732,9 @@ def db_request_wrapper(db,request,*args):
 		dbPath = cfgD['dbPath']
 		db = sqlite3.connect(dbPath)
 		db_init_flag = True
-		#db.text_factory = str	
+		if 'no_utf8' in args:
+			# this DB setting is a last optional non Unicode instruction
+			db.text_factory = str	
 	
 	
 	c = db.cursor()
@@ -2730,6 +2744,7 @@ def db_request_wrapper(db,request,*args):
 		c.execute(request)
 	except Exception,e:
 		logger.critical('Exception: in db_request_wrapper %s'%(str(e)))
+		print 'Exception: in db_request_wrapper %s'%(str(e))
 		return res
 	
 	
@@ -2801,8 +2816,11 @@ def createPlayList_viaAlbumCRC32(albumCRC32,db):
 	relL = [item['key'] for item in album_rel_Dic]
 	if relL <> []:
 		dbIdL =  getDbIdL_viaAlbumCRC32_List(None,relL,db)
+		logger.debug('2809 in createPlayList_viaAlbumCRC32: relL <> []: [%i]'%(len(dbIdL)))
 	else:
 		dbIdL =  getDbIdL_viaAlbumCRC32(albumCRC32,db)
+		logger.debug('2812 in createPlayList_viaAlbumCRC32: relL == []: [%i]'%(len(dbIdL)))
+		
 	metaD = getCurrentMetaData_fromDB_via_DbIdL(dbIdL,db)
 	logger.debug('in createPlayList_viaAlbumCRC32: metaD[%s]'%(str(metaD)))
 	resL = createPlayList_fromMetaDataD(metaD)
@@ -2853,7 +2871,7 @@ def getArtistAlbum_indexL_viaCategId(dbPath,categId,mode_L,categ_key):
 	# ��� ������� ��������
 	
 	db = sqlite3.connect(dbPath)
-	db.text_factory = str
+	#db.text_factory = str
 	
 	c = db.cursor()
 	if type(categId) == str:
@@ -3113,7 +3131,7 @@ def getCategoryProfileDic(dbPath,*args):
 	folderD = {}
 	cat_prof_itemDL = []
 	db = sqlite3.connect(dbPath)
-	db.text_factory = str
+	#db.text_factory = str
 	c = db.cursor()
 	
 	if 'general_cat_folder' in args:
@@ -3186,7 +3204,7 @@ def getPlaylistGroupRelDic(db):
 			folderL = []
 			if a[7] <> None:
 				folderL = [str(b) for b in a[7].split(';') if b<>'']
-			groupD[str(a[1])] =  {'group_id':int(a[0]),'group_key':str(a[1]),'num':int(a[2]),'short_name':str(a[4]),'descr':a[3].decode('utf8'),'play_tag':a[5],'color_set':a[6],'ref_folderL':folderL}
+			groupD[str(a[1])] =  {'group_id':int(a[0]),'group_key':str(a[1]),'num':int(a[2]),'short_name':str(a[4]),'descr':a[3],'play_tag':a[5],'color_set':a[6],'ref_folderL':folderL}
 		except:
 			print 'error at getPlaylistGroupRelDic:',str(a[1]),str(a[4])
 			continue
@@ -3225,7 +3243,13 @@ def loadTemplates_viaCFG(fname):
 		if 'fname' not in configDict[a]:
 			continue
 		f = open(cur_dir+'\\'+configDict[a]['fname'],'r')
-		configDict[a]['TMPL'] = f.read()
+		line = f.read()
+		# try:
+			# configDict[a]['TMPL'] = line.decode('utf8')
+		# except Exception,e:
+			# logger.critical("Error at loadTemplates_viaCFG[%s]: %s "%(a,str(e)))
+		configDict[a]['TMPL'] = line
+			
 		f.close()
 	return configDict
 	
@@ -3272,7 +3296,9 @@ def readConfigData(fname):
 				chkL = [b.strip() for b in  path_strL if b <> '']
 				for path in chkL:
 					if not os.path.exists(path):
-						print 'Wrong  path!:',path, "-->Check in config:'audio_files_path_list='"
+						print 'Wrong  path! 3294:',[path], "-->Check in config:'audio_files_path_list='"
+						#logger.critical("Wrong  path!:'%s, '-->Check in config:audio_files_path_list="%(str([path])))
+						logger.critical("Wrong  path! -->Check in config:audio_files_path_list=")
 					else:	
 						configDict[key].append(path)
 				continue		
@@ -3302,7 +3328,8 @@ def getTrackList(sPlaylistFilepath):
         if ( not line[0]=='#' ) and ( not '#EXTM3U'in line):
 			try:
 				playlist.append(line.rstrip().decode('utf8').encode('cp1251'))
-			except UnicodeEncodeError:
+			except UnicodeEncodeError,e:
+				logger.warning('3320 Error in getTrackList:%s'%(str(e)))
 				playlist.append(line.rstrip())
 				
 	#	playlist.append(line)
@@ -3471,9 +3498,12 @@ def collect_albums_folders(init_dirL,*args):
 	
 def collectMyMediaLib_folder_new(init_dirL,*args):
 # Предварительный сбор метаданных для каждого из трэков из списка папок, с проверкой CUE и регистрацией последних изменений
+# результат в allmFD - ключи это path_crc32 для трэка в дальнейшем
+# path_crc32 для CUE - это CRC32(cue_file_name-запятая-порядковый номер трэка)  origfD['cue_f_name']+','+str(i)
+
 # ���� ��������� ����������� �� ������ ���� � CRC32 c ������ CUE
 #r = myMediaLib_adm.collectMyMediaLib_folder_new(['G:\\MUSIC\\ORIGINAL_MUSIC'])
-	logger.info('in collectMyMediaLib_folder_new dir:[%s] - Start'%(str(init_dirL)))
+	logger.info('in collectMyMediaLib_folder_new dir:[%s].... - Start'%(str(init_dirL))[:500])
 	cnt = 0
 	allmFD = {}
 	albumDirL = []
@@ -3541,7 +3571,8 @@ def collectMyMediaLib_folder_new(init_dirL,*args):
 				if a[a.rfind('.'):].lower().find('.cue') >= 0:
 					origf = ''
 					ftype = ''
-					cue_name = (root+'\\'+a)
+					#cue_name = (root+'\\'+a)
+					cue_name = join(root,a)
 
 					try:	
 						# извлечение части метаданных для CUE образа или трэков
@@ -3549,8 +3580,8 @@ def collectMyMediaLib_folder_new(init_dirL,*args):
 						origfD = parseCue(cue_name)
 						
 					except Exception, e:
-						print '2955:',e,
-						print 'parseCue-args',[cue_name]
+						logger.critical('Error: 2955 in collectMyMediaLib_folder_new after parseCue[%s] '%(str(e)))
+						logger.critical('Error: 2955 detailes cue_name:[%s] '%(str([cue_name])))
 						return {'Error':e,'origfD':origfD,'parseCue-args':cue_name}
 					
 					ftype = origfD['fType']
@@ -3561,6 +3592,7 @@ def collectMyMediaLib_folder_new(init_dirL,*args):
 						try:
 							last_modify_date = os.stat(origfD['cue_f_name']).st_mtime
 						except:
+							logger.critical('Error: 3590 in collectMyMediaLib_folder_new at last_modify_date cue_f_name:[%s] '%(origfD['cue_f_name']))
 							print 'eroror cue time',origfD['cue_f_name']
 							pass
 					
@@ -3604,6 +3636,7 @@ def collectMyMediaLib_folder_new(init_dirL,*args):
 							try:
 								last_modify_date = os.stat(cue_name).st_mtime
 							except:
+								logger.critical('Error: 3634 in collectMyMediaLib_folder_new at last_modify_date orig_file_pathL:[%s] '%(origfD['orig_file_pathL'][0]))
 								print 'eroror cue time',origfD['orig_file_pathL'][0]
 								pass
 								
@@ -3629,7 +3662,10 @@ def collectMyMediaLib_folder_new(init_dirL,*args):
 				
 				if	ftype <> None:
 					fname = (root+'\\'+a)
-					orig_fname = root+'\\'+a 
+					orig_fname = join(root,a)
+					#print type(root),type(a),type(orig_fname)
+					#logger.debug('3652 in collectMyMediaLib_folder_new. orig_fname:[%s] [%s]'%(root,a))
+					
 					
 					crc32 = zlib.crc32(fname.encode('raw_unicode_escape'))
 					#if crc32 == 1133272172:
@@ -3639,13 +3675,14 @@ def collectMyMediaLib_folder_new(init_dirL,*args):
 					try:
 						last_modify_date = os.stat(orig_fname).st_mtime
 					except:
+						logger.critical('Error: 3673 in collectMyMediaLib_folder_new at last_modify_date')
 						pass
 					
 					
 					pos = root.rfind('\\')
 					#pos_1 = a[:pos_2-2].rfind('\\')+1
 					album = root[pos+1:]
-					
+					#logger.debug('3667 in collectMyMediaLib_folder_new. orig_fname:[%s] [%s]'%(orig_fname,str(type(orig_fname))))
 					
 					#print root
 					
@@ -3758,7 +3795,7 @@ def get_all_artists_in_metaD(metaD,search_obj_key,search_termL,*args):
 	cfgD = readConfigData(mymedialib_cfg)
 	dbPath = cfgD['dbPath']
 	db = sqlite3.connect(dbPath)
-	db.text_factory = str
+	#db.text_factory = str
 	
 	
 	ref_artL = [a[0] for a in getAll_Main_Artist_fromDB(db)]
@@ -3795,11 +3832,13 @@ def get_all_artists_in_metaD(metaD,search_obj_key,search_termL,*args):
 				try:
 					if search_term.lower().strip() not in metaD[a][search_obj_key].decode('utf-8').lower().strip() and search_term.lower().strip() <> '':
 						continue
-				except UnicodeDecodeError:	
+				except UnicodeDecodeError,e:	
+					logger.warning('3820 Error in get_all_artists_in_metaD:%s'%(str(e)))
 					try:
 						if search_term.lower().strip() not in metaD[a][search_obj_key].decode('cp1251').lower().strip() and search_term.lower().strip() <> '':
 							continue
 					except UnicodeDecodeError:	
+						logger.critical('3825 Error in get_all_artists_in_metaD:%s'%(str(e)))
 						print 'Decoding error with key in get_all_artists_in_metaD',a 
 						continue
 						
@@ -4040,7 +4079,7 @@ def getAlbumD_fromDB(dbPath,db,albumCRC32,albumCRC32L,*args):
 	if db == None:
 		db = sqlite3.connect(dbPath)	
 		extDbFlag = True
-		db.text_factory = str
+		#db.text_factory = str
 		
 	
 		
@@ -4178,7 +4217,7 @@ def getAlbumD_fromDB(dbPath,db,albumCRC32,albumCRC32L,*args):
 def getArtistD_fromDB(dbPath,artistCRC32,artistCRC32L,*args):
 
 	db = sqlite3.connect(dbPath)
-	db.text_factory = str
+	#db.text_factory = str
 	fieldD = getTableInfo('artist',db)
 	fieldL = [fieldD[a]['field_name']for a in fieldD]
 		
@@ -4289,7 +4328,7 @@ def getArtist_Album_relationD_and_simpleMetaD_viaCRC32L(dbPath,db,artistCRC32L,a
 	if db == None:
 		db = sqlite3.connect(dbPath)	
 		extDbFlag = True
-		db.text_factory = str
+		#db.text_factory = str
 		
 	c = db.cursor()
 	
@@ -4416,7 +4455,7 @@ def getArtist_Album_list_db_via_search_term(dbPath,search_termD,max_elem,*args):
 	objectL = []
 	
 	db = sqlite3.connect(dbPath)
-	db.text_factory = str
+	#db.text_factory = str
 	
 	c = db.cursor()
 	stop_list = ['the','a','and']
@@ -4482,7 +4521,7 @@ def getArtist_Album_metaD_fromDB(dbPath,search_termD,folderL,artistCRC32,albumCR
 	albumD = {}
 	
 	db = sqlite3.connect(dbPath)	
-	db.text_factory = str
+	#db.text_factory = str
 		
 	fieldD = getTableInfo('artist',db)
 	fieldL = [fieldD[a]['field_name']for a in fieldD]
@@ -4814,7 +4853,8 @@ def getArtist_Album_metaD_fromDB(dbPath,search_termD,folderL,artistCRC32,albumCR
 	
 def getAll_Main_Artist_fromDB(db,*args):
 	if db <> None:
-		db.text_factory = str
+		#db.text_factory = str
+		pass
 	else:
 		print 'Error: in getAll_Main_Artist_fromDB'
 	resD = {}
@@ -4839,7 +4879,7 @@ def getAll_Main_Artist_fromDB(db,*args):
 
 def get_artist_ref_relation_type(dbPath,artist_CRC32):
 	db = sqlite3.connect(dbPath)
-	db.text_factory = str
+	#db.text_factory = str
 	c = db.cursor()
 	req = """select * from ARTIST_REFERENCE where artist_crc32 = %s"""%(str(artist_CRC32))
 	c.execute(req)
@@ -4865,7 +4905,7 @@ def getAlbum_relation_metaD(dbPath,db,albumCRC32,*args):
 	if db == None:
 		db = sqlite3.connect(dbPath)	
 		extDbFlag = True
-		db.text_factory = str
+		#db.text_factory = str
 		
 	c = db.cursor()
 		
@@ -4923,7 +4963,7 @@ def getAlbum_relation_metaD(dbPath,db,albumCRC32,*args):
 def getArtist_relation_metaD(dbPath,artistCRC32,*args):	
 	# ������� ��������� ��������� ����� �� ���������� ������� � � ����
 	db = sqlite3.connect(dbPath)
-	db.text_factory = str
+	#db.text_factory = str
 	c = db.cursor()
 		
 	resD = {}
@@ -4981,7 +5021,7 @@ def getAll_Related_to_main_Artist_fromDB(dbPath,db,artistCRC32,*args):
 	if db == None:
 		db = sqlite3.connect(dbPath)	
 		extDbFlag = True
-		db.text_factory = str
+		#db.text_factory = str
 	c = db.cursor()
 		
 	resD = {}
@@ -5624,7 +5664,7 @@ def saveAlbum_intoDB_via_artistD(dbPath,albumD,artist_crc32,album_crc32,db,*args
 	
 def modifyAlbum_viaCRC32(dbPath,album_crc32,attrsD):
 	db = sqlite3.connect(dbPath)	
-	db.text_factory = str	
+	#db.text_factory = str	
 	
 	
 	searchTerms = ''
@@ -5682,7 +5722,7 @@ def modifyAlbum_viaCRC32(dbPath,album_crc32,attrsD):
 
 def modifyArtist_viaCRC32(dbPath,artist_crc32,attrsD):
 	db = sqlite3.connect(dbPath)	
-	db.text_factory = str	
+	#db.text_factory = str	
 	
 	
 	searchTerms = ''
@@ -5740,7 +5780,7 @@ def saveArtistD_intoDB(dbPath,artistName,searchTerm,main,object_type,refArtist_C
 	if db == None:
 		db = sqlite3.connect(dbPath)	
 		extDbFlag = False
-		db.text_factory = str	
+		#db.text_factory = str	
 	
 	try:
 		artist_crc32 = zlib.crc32(artistName)
@@ -5863,7 +5903,7 @@ def saveAlbum_simple_intoDB(dbPath,albumName,searchTerm,main,object_type,refalbu
 	if db == None:
 		db = sqlite3.connect(dbPath)	
 		extDbFlag = False
-		db.text_factory = str	
+		#db.text_factory = str	
 	
 	search_term_crc32 = None
 	add_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())	
@@ -6115,7 +6155,7 @@ def get_Tasks_in_queue(dbPath):
 	
 def maintain_Task_for_event(dbPath,event_id,param,*args):
 	db = sqlite3.connect(dbPath)
-	db.text_factory = str
+	#db.text_factory = str
 	c = db.cursor()
 	req = """select * from event_control where id_event = %s """%(event_id)	
 	r = c.execute(req)
@@ -6145,7 +6185,7 @@ def maintain_Task_for_event(dbPath,event_id,param,*args):
 		
 def triggerBatchJob_via_event(dbPath,event,param,*args):
 	db = sqlite3.connect(dbPath)
-	db.text_factory = str
+	#db.text_factory = str
 	c = db.cursor()
 	# �������� ��� �������� ����� ��� �� ������
 	req = """select * from event_control where event = "%s" and running = 1 and finish_date_time is NULL """%(event)
@@ -6325,762 +6365,6 @@ def checkReplicaMapping(track_metaD,format,replica_mapD):
 		else:
 			return {'message':'no_replica','track':replica_path}
 
-def do_cue_2_track_split(codec_path,album_path,*args):		
-	# !!! Relocated to tolls ------------------------	
-	mode = ''
-	modeL = []
-	replace_flag = False
-	image_cue = ''
-	image_name = ''
-	origfD = {}
-	newL = []
-	part_l = []
-	prog = ''
-	params = ()
-	origfD = {}	
-	orig_cue_title_cnt = 0
-	f_numb = 0
-	real_track_numb=0
-	mess = ''
-	error_logL=[]
-	if not os.path.exists(codec_path):
-		print '---!Codecs path Error:%s - not exists'%codec_path
-		error_logL.append('[CUE check]:---!Codecs path Error:%s - not exists'%codec_path)
-		return {'RC':-1,'f_numb':0,'orig_cue_title_numb':0,'title_numb':0,'mode':modeL,'to_be_split':False,'error_logL':error_logL}	
-	
-	if not os.path.exists(album_path):
-		print '---!Album path Error:%s - not exists'%album_path
-		error_logL.append('[CUE check]:---!Album path Error:%s - not exists'%album_path)
-		return {'RC':-1,'f_numb':0,'orig_cue_title_numb':0,'title_numb':0,'mode':modeL,'to_be_split':False,'error_logL':error_logL}
-	
-	filesL = os.listdir(album_path)
-
-	for a in filesL:
-		if '.cuetemp' in a:
-			print a,"-----"
-			if os.path.exists(album_path+a):
-				os.remove(album_path+a)
-				continue
-			if a=='temp.wav':
-				if os.path.exists(album_path+a):
-					os.remove(album_path+a)
-	
-	stop_list_punct = ['.',';',',','/','\\','_','&','(',')','*','%','?','!','-',':','  ']
-
-	if 'convert_cue_delete' in args:
-		if os.path.exists(album_path+'convert_cue\\'):
-			
-			for f_name in os.listdir(album_path+'convert_cue\\'):
-				os.remove(album_path+'convert_cue\\'+f_name)
-					
-			if os.listdir(album_path+'convert_cue\\') == []:
-				os.rmdir(album_path+"convert_cue\\")
-				print '--->   '+album_path+"convert_cue\\"+" --> is deleted"
-		else:
-			print '--->   '+album_path+"convert_cue\\"+" --> was not found"
-		return {'RC':0,'f_numb':f_numb,'orig_cue_title_numb':0,'title_numb':0,'mode':modeL}	
-	
-	
-	cue_cnt = 0
-	#Валидация CUE через соответствие реальным данным для цели дальнейшей разбивки
-	# Либо это нормальный CUE (TITLES > 1 и образ физически есть) -> нужна разбивка на трэки - ОК 
-	# Либо это любой в тч 'битый' CUE, но есть отдельные трэки -> разбивка не нужна проверить соотв. количества трэков и титлов в #`CUE приоритет tracks и сверка с КУЕ
-	
-	to_be_split=False
-	error_logL=[]
-	for a in filesL:
-		#print a
-		if a.lower().rfind('.cue')>0:
-			
-			image_cue = a
-			
-			try:	
-				origfD = simple_parseCue(album_path+image_cue)	
-			except Exception,e:
-				print e
-				
-				return {'RC':-1,'f_numb':0,'orig_cue_title_numb':0,'title_numb':0,'mode':['cue_corrupted'],'to_be_split':False}
-				
-			cue_cnt+=1
-			if cue_cnt>1:
-				print '--!-- Error Critical! several CUE Files! Keep only one CUE!'
-				error_logL.append('[CUE Split]:--!-- Error Critical! several CUE Files! Keep only one CUE!')
-				return {'RC':-1,'f_numb':0,'orig_cue_title_numb':0,'title_numb':0,'mode':['cue','cue_error'],'to_be_split':False,'error_logL':error_logL}
-			
-			if 'cue' not in modeL:
-				modeL.append('cue')
-						
-			if 'orig_file_path' in origfD:
-				orig_cue_title_cnt = origfD['cue_tracks_number']
-				if os.path.exists(origfD['orig_file_path']):
-					if orig_cue_title_cnt>0:
-						to_be_split=True
-						
-				else:
-					modeL.append('cue_error')
-					
-		else:
-			ext=''
-			pos = a.rfind('.')
-			if pos>0:
-				ext=a[pos+1:]
-				if ext in ['ape','mp3','flac']:
-					real_track_numb+=1
-					
-					if 'tracks' not in modeL:
-						modeL.append('tracks')
-	
-	RC = 0	
-	
-	# это обычный образ CUE	уделяем категорию tracks	
-	if real_track_numb == 1 and 'cue' in modeL:
-		modeL.remove('tracks') 
-		RC = origfD['cue_tracks_number']
-	elif 'tracks' in modeL:
-		if real_track_numb > 1:
-			RC = real_track_numb	
-	
-		
-	#1. ОК - single CUE, 1 -original image, several tracks frof cue -> split is possible
-	#2. ОК - several tracks > 1 ape,mp3,flac - no mix of them -> no split 
-	#3. OK 2. tracks > 1 + splited CUE files from CUE tracks = cue title - Good cue can me ignored  -> no needed
-	#4.  2. tracks > 1 + cue with no existed 1 image file  - BAD cue can me ignored  -> no needed
-	#5.  2. tracks > 1 + cue with no existed several slitted tracks files - BAD cue can me ignored  -> no needed
-	
-	# В этом месте необходимо иметь образ wav и ссылку на него во временном CUE
-	discID = None	
-	try:
-		discID=Calculate_DiscID(album_path+image_cue)
-		print 
-	except Exception,e:
-		print "Error in DiscID calc:",e
-		
-	
-	if 'is_cue' in args or not	to_be_split:
-		return {'RC':RC,'to_be_split':to_be_split,'orig_cue_title_numb':orig_cue_title_cnt,'mode':modeL,'title_numb':0,'f_numb':real_track_numb,'discID':discID}
-	
-	
-	print 'image_cue=',image_cue		
-	
-	if not os.path.exists(album_path+'convert_cue\\'):
-		os.mkdir(album_path+'convert_cue\\')
-		
-	#print 'origfD - OK',origfD
-	
-	image_name = origfD['orig_file_path']
-		
-	format = ''
-	if origfD['orig_file_path'].lower().rfind('.ape') >0:
-		format = 'ape'
-	elif origfD['orig_file_path'].lower().rfind('.flac') >0:
-		format = 'flac'	
-	
-	f = open(album_path+image_cue,'r')
-	l = f.readlines()
-	f.close()
-	
-	
-	
-	# Пересобирирем CUE с новым именем образа temp.wav
-	title_cnt = 0
-	track_flag = False
-	for line_str in l:
-		if """.ape"w""".lower() in line_str.replace(' ','').lower() :
-			newL.append("""FILE "temp.wav"  WAVE\n""")
-			continue
-		elif """.flac"w""".lower() in line_str.replace(' ','').lower():
-			newL.append("""FILE "temp.wav"  WAVE\n""")
-			continue	
-		elif "title" in line_str.strip().lower()[0:]: 	
-			if track_flag:	
-				for a in stop_list_punct:
-					line_str = line_str.replace(a,' ')
-				
-				pos = line_str.rfind('"')
-				if pos > 0:
-					line_str = line_str[:pos].rstrip()+'"'
-
-					
-				line_str = line_str.strip()+"\n"
-			
-				#print line_str,
-				title_cnt+=1
-			else:
-				# значит встретился TITLE первый раз и его надо пропустить
-				continue
-				
-				
-		if line_str.lower().strip().find('track ') == 0:
-			track_flag=True 	
-		
-		newL.append(line_str)
-	try:			
-		f=open(album_path+image_cue+'temp','w')
-	except OSError,e:
-			print 'Error in do_cue_2_track_split 5564:', e
-			return {'RC':-1,'to_be_split':to_be_split,'f_numb':f_numb,'orig_cue_title_numb':orig_cue_title_cnt,'title_numb':title_cnt,'mode':modeL}
-	f.writelines(newL)
-	f.close()	
-		
-	if format == 'ape':
-		params = ('mac',"\""+image_name+"\"","\""+album_path+'temp.wav'+"\"",'-d')
-		prog = 'mac.exe'
-	if format == 'flac':
-		prog = 'flac.exe'
-		params = ('flac','-d','-f',"\""+image_name+"\"",'-o',"\""+album_path+'temp.wav'+"\"")
-	if prog <> '':	
-		try:
-			print "Decompressing with:",prog
-			r = os.spawnve(os.P_WAIT, codec_path+prog, params , os.environ)		
-		except OSError,e:
-			print 'Error in do_cue_2_track_split 5576:', e, "-->", codec_path,prog,image_name
-			return {'RC':-1,'to_be_split':to_be_split,'f_numb':f_numb,'orig_cue_title_numb':orig_cue_title_cnt,'title_numb':title_cnt,'mode':modeL}
-			
-	else:
-		return {'RC':-1,'to_be_split':to_be_split,'f_numb':f_numb,'orig_cue_title_numb':orig_cue_title_cnt,'title_numb':title_cnt,'mode':modeL}
-			
-	image_cue = album_path+image_cue+'temp'
-	image_name = album_path+'temp.wav'
-	
-	tempwav_exists = False
-	if os.path.exists(image_name):
-		tempwav_exists = True
-	else:	
-		for a in os.listdir(album_path):
-			if 'temp.wav' == a:
-				tempwav_exists = True
-				break
-			
-	if not tempwav_exists:			
-		mess = '--!Critical Error at decompressing [%s] not found. Decompressing failed - check image file and try manual decompr.'%image_name
-		print mess
-		return {'RC':-2,'to_be_split':to_be_split,'f_numb':f_numb,'orig_cue_title_numb':orig_cue_title_cnt,'title_numb':title_cnt,'mode':modeL,'error_logL':[mess]}
-	
-		
-	output_dir = ('-d',""" "%sconvert_cue" """%(album_path))
-	output_form = output_dir + ('-t',""" "(%n).%t" """)
-	tr_name_conv = ('-m',":-/_*x")
-		
-	extract_list = ''
-	try:
-		part_l = ','.join([str(int(b[1:-1])) for b in key_cueD[a]['track_numL']])
-		extract_list = ('-x', part_l)
-	except:
-		pass
-	if 	part_l == '':
-		extract_list = ''
-		
-
-		#params = ('shntool','split',"\""+image_name+"\"",'-O','always')+tr_name_conv+extract_list+('-f',"\""+image_cue+"\"")+output_form
-	print "Splitting from:",format	
-	params = ('shntool','split',"\""+image_name+"\"",'-O','always')+('-f',"\""+image_cue+"\"")+output_form
-	
-	try:	
-		r = os.spawnve(os.P_WAIT, codec_path+'shntool.exe',params, os.environ)
-	except Exception,e:
-		mess = 'Error in do_cue_2_track_split 5612:', e, "shntool.exe not found"
-		print mess
-		return {'RC':-2,'to_be_split':to_be_split,'f_numb':f_numb,'orig_cue_title_numb':orig_cue_title_cnt,'title_numb':title_cnt,'mode':modeL,'error_logL':['Error at Splitting:shntool.exe not found']}
-		
-	if '.wav' in image_name and tempwav_exists:
-		if 'temp' in image_cue:
-			os.remove(image_cue)
-		if 'temp.wav' in image_name:
-			os.remove(image_name)
-			
-	
-		
-	for a in os.listdir(album_path+'convert_cue\\'):
-		if a.lower().rfind('.wav')>0:
-			new_name = album_path+'convert_cue\\'+a	
-			if "pregap.wav" in new_name:
-				print "pregap.wav --> deleted"
-				os.remove(new_name)
-			
-	f_numb = len(os.listdir(album_path+'convert_cue\\'))		
-	if orig_cue_title_cnt == title_cnt == f_numb:
-		res_str = " --OK-- Successfully splitted:%i files"%orig_cue_title_cnt
-	else:
-		res_str = " --- Warning!----: %i files skipped at splitting."%(orig_cue_title_cnt-f_numb)
-		
-	print f_numb,title_cnt,orig_cue_title_cnt	
-	print res_str
-		
-	return {'RC':1,'to_be_split':to_be_split,'f_numb':f_numb,'orig_cue_title_numb':orig_cue_title_cnt,'title_numb':title_cnt,'mode':modeL}		
-
-def  do_mass_album_FP_and_AccId(codec_path,album_path,*args):	
-	# !!! Relocated to tolls ------------------------
-	# Генерация FP и AccuesticIDs по альбомам из указанной дирректории, для загрузок двойных альбомов и других массовых загрузок
-	# d=myMediaLib_adm.do_mass_album_FP_and_AccId('c:\\LocalCodecs','C:\Temp\SharedPreprCD4Lib')
-	
-	if not os.path.exists(codec_path):
-		print '---!Codecs path Error:%s - not exists'%codec_path
-		return 
-	
-	if not os.path.exists(album_path):
-		print '---!Album path Error:%s - not exists'%album_path
-		return 
-	
-	
-	dirL = collect_albums_folders([album_path])
-	print "Folders structure build with folders:",len(dirL)
-	fpDL = []
-	cnt=1
-	t_all_start = time.time()
-	for a in dirL:
-		album_path = a+"\\"
-		print cnt, ' of:',len(dirL),'-->', album_path
-		t_start = time.time()
-		try:
-			cnt+=1
-			fpRD = generate_FP_file_in_album(codec_path,album_path,*args)
-			process_time = 	int(time.time()-t_start)
-			fpRD['album_path']=album_path
-			fpRD['process_time'] = process_time
-			fpDL.append(fpRD)	
-			print 'album finished in:',	process_time, "time since starting the job:",int(time.time()-t_all_start)
-			
-			print
-		except Exception,e:	
-			print "Exception with FP generation %s: \n in %s"%(str(e),str(a))			
-			
-	d = pickle.dumps(fpDL)
-	fname='fpgen_%s.dump'%str(int(time.time()))
-	f = open(album_path+fname,'w')
-	f.write(d)
-	f.close()
-	time_stop_diff = time.time()-t_all_start
-	print '\n\n\n'
-	print "*********************************************************************"
-	print "**********Generation Summary. All takes:%i sec.***********************"%(int(time_stop_diff))
-	print "*********************************************************************\n"
-	for a in fpDL:
-		if a['RC'] < 0:
-			print "RC=(",a['RC'],")",a['album_path'],'IN TIME:',a['process_time']
-			print '*****************************'
-			for b in a['error_logL']:
-				print b
-			print '*****************************'
-			print
-			
-		if 'RC' in a['splitRes']:
-			if a['splitRes']['RC']==-1:
-				
-				print "CUE-RC=(",a['splitRes']['RC'],")",a['album_path'],'IN TIME:',a['process_time']
-				print '*****************************'
-			elif a['splitRes']['RC']==-4:
-				if 'error_logL' in a['splitRes']:
-					for b in a['error_logL']:
-						print b
-						print '*****************************'
-						print
-					
-			
-	print 'Some statistics:'
-	print "Collected: albums%i, pro album %i sec."%(len(fpDL),int(time_stop_diff/len(fpDL)))	
-	print "Skipped [FP is ready]:",len([a for a in fpDL if a['process_time'] < 2])
-	print "Error while generation FP:",len([a['RC'] for a in fpDL if a['RC'] < 0])
-	print "Albums with bad FP:",len([a['RC'] for a in fpDL if a['RC'] < 0])
-	print "Albums with OK FP:",len([a['RC'] for a in fpDL if a['RC'] > 0])
-	
-	return fpDL
-	
-def get_acoustID_from_FP_collection(fpDL):
-	API_KEY = 'cSpUJKpD'
-	resD = {}
-	album_OK_cnt = 0
-	album_missed_cnt = 0
-	album_partly_covered=0
-	album_RC_ge_0_cnt = 0
-	meta = ["recordings","recordingids","releases","releaseids","releasegroups","releasegroupids", "tracks", "compress", "usermeta", "sources"]
-	meta = ["recordings"]
-
-	
-	fpDL_len = len([a['RC'] for a in fpDL if a['RC']>0])  
-	for a in fpDL:
-		if a['RC']>0:
-			album_RC_ge_0_cnt +=1
-			print a['album_path']
-			track_OK_cnt = 0
-			for trackD in a['FP']:
-				duration, fp = trackD['fp']
-				time.sleep(.3)
-				response = acoustid.lookup(API_KEY, fp, duration,meta)
-				res = acoustid.parse_lookup_result(response)
-				trackD['recording_idL']=[]
-				for score, recording_id, title, artist in res:
-					resD = {'score':score,'recording_id': recording_id,'title':title, 'artist':artist}
-					trackD['recording_idL'].append(resD)
-
-				if len(trackD['recording_idL'])> 0:
-					track_OK_cnt+=1
-					print	len(trackD['recording_idL']),
-			if track_OK_cnt == 0:
-				print "[ :-( Album missed"
-				album_missed_cnt+=1
-			elif	len(a['FP'])	> track_OK_cnt:
-				album_partly_covered +=1
-				print "[ Partly covered: %i of %i tracks."%(track_OK_cnt,len(a['FP']))
-				
-			elif	len(a['FP'])	== track_OK_cnt:
-				album_OK_cnt+=1
-				print "[ Album - OK: %i tracks.  "%track_OK_cnt
-			print album_RC_ge_0_cnt,' .Total OK:{0} -> [{3:.0%}] Missed:{1} -> [{4:.0%}] Partly: {2} -> [{5:.0%}] from {6}.'.format(album_OK_cnt,album_missed_cnt,album_partly_covered,
-			float(album_OK_cnt)/fpDL_len,float(album_missed_cnt)/fpDL_len,float(album_partly_covered)/fpDL_len,fpDL_len)	
-		print
-	return resD
-
-def Calculate_DiscID(cue_name):
-	# Вычисляет DiscId только для CUE c реальным wav образом в ссылке
-	# Для работы необходимо сгенерировать временный CUE, распаковать образ в wav и сделать ссылку в CUE на этот WAVE
-	# cue файл не содержит времени трэков. врямя вычисляется как разница между предыдущим и текущим трэком
-	# но для последнего трэка это невозможно, т.к. нет информации о конце файла. т.е. нужен образ для вычисления
-	# последнего фрейма. А это возможно только при наличии физического образа
-	
-	errorLog = []
-	f = open(cue_name)
-	#parsedH = mktoc.parser.CueParser('.',False)
-	parsedH = mktoc.parser.CueParser()
-	try:
-		cue = parsedH.parse(f)
-	except mktoc.parser.FileNotFoundError, e:
-		print 'WAV not found:[%s --> is not wav] at discID calc:'%str(e)
-		errorLog.append('WAV not found:[%s --> is not wav] at discID calc:'%str(e))
-		return {'error_logL':errorLog}
-		
-	f.close()
-	start_offset = 150
-	result = None
-
-	offsetL = []
-	for a in  cue._tracks:
-		if len(a.indexes)>1:
-			track_frames = a.indexes[0].time.frames+a.indexes[1].len_.frames
-
-		else:
-			track_frames = a.indexes[0].time.frames
-		offsetL.append(track_frames+start_offset)
-
-	total = start_offset+a.indexes[0].time.frames+a.indexes[0].len_.frames
-	discID = discid.put(1,len(cue._tracks),total,offsetL)
-	if discID:
-		try:
-			result = musicbrainzngs.get_releases_by_discid(discID,includes=["artists"])
-		except musicbrainzngs.ResponseError,e:
-			print 'Error in musicbrainzngs get TOC:',e
-			print (1,len(cue._tracks),total,offsetL)
-			errorLog.append('Error in musicbrainzngs get TOC:'+str(e))
-			return {'error_logL':errorLog,'discID':discID}
-
-		if result:
-			for a in result["disc"]["release-list"][0]:
-				if a == 'artist-credit':
-					for b in result["disc"]["release-list"][0][a]:
-						if type(b) == dict:
-							print b['artist']
-				elif a == 'id':
-					print result["disc"]["release-list"][0][a]
-			return {'discID':discID,'mbResult':result}
-		errorLog.append('Error (no-result) in musicbrainzngs get TOC.')	
-		return {'error_logL':errorLog,'discID':discID}	
-			
-	else:
-		return {'error_logL':['discID not calculated']}	
-
-
-	
-def generate_FP_file_in_album(codec_path,album_path,*args):
-	# modified in 03.2017
-	# создает или читает уже созданный файл FP для трэков альбома
-	# album_path это корневой каталог в котором лежат папки альбомов 
-	#  пример для отладки: album_path = cfgD['preprocessAlb4libPath']+os.listdir(cfgD['preprocessAlb4libPath'])[0]
-	# проблема 
-	# 
-	# Надо принять реление о чтении из файла FP или пере/генерации нового
-	# args: 'retrieve_FP_only','force_create'
-	result = ''
-	temp_dir = ''
-	convDL = []
-	file_trackL =[]
-	fp_f_nameL =[]
-	is_FP_regeneration_needed = False
-	
-	error_logL =[]
-	
-	#----------  Delete this later--------------------
-	if os.path.exists(album_path +'medialib_fngp.ffp'):
-		os.remove(album_path +'medialib_fngp.ffp')
-		
-	#if os.path.exists(album_path +'MdLbShrmFngp.fp'):
-	#	os.remove(album_path +'MdLbShrmFngp.fp')
-		
-		#----------  Delete this later--------------------	
-	
-	# -------------  Чтение FP если нашелся в папке.-----------------------
-	# Принятие решения о его релевантности физическому контенту. если ОК - то читать данные из него, если нет,
-	#	то перегенерация
-	#----------------------------------------------------------------------
-	if os.path.exists(album_path+'MdLbShrmFngp.fp'):
-		if 'force_create' not in args:
-			print '----FP----- already exist in: %s, existed FP is retrieved.'%(album_path)
-			
-			# Проверить актуальность существующего MdLbShrmFngp.fp по количеству FP в нем.
-			# если это CUE то сравнить с кол-вом треков по CUE 
-			f = open(album_path+'MdLbShrmFngp.fp','r')
-			FPl = f.readlines()
-			f.close()
-			
-			filesL = os.listdir(album_path)
-			
-			
-			formatL = ['.wav(','.mp3(','.ape(','.flac(']
-			for a in formatL:
-				pos = FPl[0].find(a)
-				if pos > 0:
-					format = a
-					break
-			#считаем кол-во реальных трэков в папке
-			real_track_numb = 0
-			for a in filesL:
-				ext=''
-				pos = a.rfind('.')
-				if pos>0:
-					ext=a[pos+1:]
-					if ext in ['ape','mp3','flac']:
-						file_trackL.append(a)
-						real_track_numb+=1
-			
-			# Собираем FP и имена файлов из существующего файла FP
-			from_FP_f_names_str = ''
-			#Scntool похоже имеет bug и генерирует дубликаты, нужно проверять на дубликаты и 
-			#игнорировать второй файл при чтеннии и при генерации общего файла FP
-			checkDuplL =[]
-			for fp_line in FPl:
-				fp = []
-				pos = fp_line.find(format)
-				if pos > 0:
-					fp_f_name = fp_line[:pos+len(format)-1]
-					FP_str = fp_line[pos+len(format)-1:]
-					fp = eval(FP_str)
-					if fp in checkDuplL:
-						print "Duplicate found:",fp_f_name,fp[0],'  will be skipped.'
-						continue
-					else:	
-						checkDuplL.append(fp)
-					fp_f_nameL.append(fp_f_name)
-					convDL.append({"fname":fp_f_name,"fp":fp})
-					from_FP_f_names_str += fp_f_name 
-					if fp_f_name not in filesL:
-						# убеждаемся, что это точно не отдельные файлы, а есть CUE+image
-						pass
-				
-			# Читаем сue если он есть.
-			checkCueD = do_cue_2_track_split(codec_path,album_path,'is_cue')
-			print " =============retrive finished",checkCueD['mode'],checkCueD['to_be_split'],checkCueD['f_numb'],checkCueD['RC']
-			
-			if 'cue' in checkCueD['mode'] and checkCueD['to_be_split']:
-				#Если количество в FP совпадает с количеством Titles из CUE -> ОК выводим из FP
-				if checkCueD['orig_cue_title_numb'] == len(convDL):
-					return {'RC':len(convDL),'FP':convDL,'splitRes':{'mode':format[1:-1]},'error_logL':error_logL}	
-				else:
-					error_logL.append("Error in retrieved FP file. FP items number %i <> CUE Titles number %i. Continue to new FP generation."%(len(convDL),checkCueD['orig_cue_title_numb']))
-					print [a['fname'] for a in convDL]
-					print "Error in retrieved FP file. FP items number %i <> CUE Titles number %i. Continue to new FP generation."%(len(convDL),checkCueD['orig_cue_title_numb'])
-					
-
-			elif 'tracks' in checkCueD['mode']:
-				
-				if checkCueD['f_numb'] > 1:
-				
-					for a in filesL:
-						
-						if format[:-1] in a: 
-							# это точно трэк, проверяе его присутсвие в FP общей строке
-							if a not in from_FP_f_names_str:
-								is_FP_regeneration_needed = True
-								break
-								
-					if checkCueD['f_numb'] == len(convDL):
-						if not is_FP_regeneration_needed:
-							return {'RC':len(convDL),'FP':convDL,'splitRes':{'mode':format[1:-1]},'error_logL':error_logL}
-					else:
-						
-						if checkCueD['f_numb'] > len(convDL):
-							for a in file_trackL:
-								if a not in fp_f_nameL:
-									
-									error_logL.append('[FP validation]:Track is missing in FP: %s'%a)
-						print "---!Error Wrong FP: check album, check FP generation, delete FP and and restart FP generation",checkCueD['f_numb'],len(convDL)
-						return {'RC':-1,'FP':convDL,'splitRes':{'mode':format[1:-1]},'error_logL':error_logL}
-				if checkCueD['RC'] == -1:
-					return {'RC':-1,'FP':convDL,'splitRes':{'mode':format[1:-1]},'error_logL':error_logL}
-	
-	if 'retrieve_FP_only' in args:
-		return {'RC':-3,'FP':convDL,'splitRes':{'mode':format[1:-1]},'error_logL':error_logL}
-		
-	# Разбиваем на треки если это необходимо для CUE	
-	if 	'convert_cue_delete' in args:
-		splitRes = do_cue_2_track_split(codec_path,album_path,'convert_cue_delete')
-			
-	else :
-		splitRes = do_cue_2_track_split(codec_path,album_path)
-		#if splitRes['RC'] == -1:
-		#	return {'RC':-1,'FP':[],'splitRes':splitRes}
-		if 'cue_error' in splitRes['mode'] and not splitRes['to_be_split'] and splitRes['f_numb'] == 1:
-			print "---!Error Wrong CUE: check album, check/correct CUE and restart FP generation:"+str(splitRes['f_numb'])
-			error_logL.append('[CUE Validation error at split in FP generation]:tracks:%s,titles'%(str(splitRes['f_numb']),str(splitRes['orig_cue_title_numb'])))
-			error_logL.append('[CUE Validation error at split in FP generation]: probaly cue with wav image')
-			
-			return {'RC':-1,'FP':convDL,'splitRes':splitRes,'error_logL':error_logL}
-		
-		print 'Result = ',splitRes['mode'],splitRes['f_numb'],splitRes['orig_cue_title_numb'],splitRes['RC'],splitRes['to_be_split']
-		#r=1
-		
-	if splitRes['RC'] == -2:
-		# Image data corruption or system error
-		return {'RC':-2,'FP':convDL,'splitRes':{'mode':splitRes['mode']},'error_logL':splitRes['error_logL']}			
-		
-	# Если успешно разбили на трэки	
-	convDL = []
-	DirL =[]
-	if 'cue' in splitRes['mode'] and splitRes['to_be_split']:
-		
-		result = ''
-		convL = []
-		
-		temp_dir = 'convert_cue\\'
-		#print os.listdir(album_path+'convert_cue\\')
-		DirL = os.listdir(album_path+'convert_cue\\')
-		
-		for a in DirL:
-			#print 'curent file:',a
-			
-			if a.lower().rfind('.wav')>0:
-				new_name = album_path+temp_dir+a	
-				#if "pregap.wav" in new_name:
-				#	print "pregap.wav --> skipped"
-				#	continue
-				fp = acoustid.fingerprint_file(new_name)
-				result = result + a + str(fp)+"\n"
-				convL.append(new_name)
-				convDL.append({"fname":new_name,"fp":fp})
-				print "*",
-				
-	elif 'tracks' in splitRes['mode']:
-	# Это уже было потрэковая компоновка без CUE	
-		format = ''
-		convL = []
-		checkDuplL = []
-		for a in os.listdir(album_path):
-			#print a
-			if a.lower().rfind('.ape')>0:
-				if format <> '' and format <> 'ape':
-					print 'Mixed formats in folder: skipped ',a
-					error_logL.append('[FP before generation check]:Mixed formats in folder: skipped: %s'%a)
-					return {'RC':0,'FP':[],'splitRes':splitRes,'error_logL':error_logL}
-				format = 'ape'	
-			elif a.lower().rfind('.flac')>0:
-				if format <> '' and format <> 'flac':
-					print 'Mixed formats in folder: skipped ',a
-					error_logL.append('[FP before generation check]:Mixed formats in folder: skipped: %s'%a)
-					return {'RC':0,'FP':[],'splitRes':splitRes,'error_logL':error_logL}
-				format = 'flac'	
-			elif a.lower().rfind('.mp3')>0:
-				if format <> '' and format <> 'mp3':
-					print 'Mixed formats in folder: skipped ',a
-					error_logL.append('[FP before generation check]:Mixed formats in folder: skipped: %s'%a)
-					
-				format = 'mp3'
-			else:
-				continue
-	
-			new_name = album_path+a
-			DirL.append(new_name)
-			splitRes['f_numb']=len(DirL)
-			splitRes['mode'] = format
-			try:
-				
-				fp = acoustid.fingerprint_file(new_name)
-				
-				#	params = ('fpcalc',new_name)
-				#	p = subprocess.Popen(params, stdout=subprocess.PIPE)
-				#	r = result + p.communicate()[0]
-			except Exception,e:
-				print "Error in Fingerprint 5706 Probably broken file-> trying to decode to wav:",e,new_name
-				temp_dir = 'convert_wav\\'
-				new_name = album_path+temp_dir+a+'.wav'
-				if not os.path.exists(album_path+temp_dir):
-					os.mkdir(album_path+temp_dir)
-				r = convertLosless_2_lossy('',codec_path,{},"\""+album_path+a+"\"",'',temp_dir,'stop_and_save_wav')
-				if r == -1:
-					print "File is broken and be skipped:",a
-					error_logL.append('[FP regenerate attemp]:File is broken and be skipped: %s'%a)
-					continue
-				print "Single Conversion res:",r,album_path+a
-				if os.path.exists(new_name):
-					try:
-						os.remove(new_name)
-					except Exception,e:	
-						print "Exception with remooving %s:%s"%(a,str(e))
-				try:		
-					os.rename(album_path+temp_dir+'temp.wav', new_name)
-				except Exception,e:	
-						print "Exception with renaming %s:%s"%(a,str(e))
-						error_logL.append("[After conversion nenaming: Exception with renaming %s:%s"%(a,str(e)))
-											
-						return {'RC':-1,'FP':[],'splitRes':splitRes,'error_logL':error_logL}
-				fp = acoustid.fingerprint_file(new_name)		
-			
-			if fp in checkDuplL:
-				print "Duplicate found: %s,%s and will be skipped. Shntool Issue fixed"%(fp_f_name,str(fp[0]))
-				error_logL.append()
-				continue
-			else:	
-				checkDuplL.append(fp)
-						
-			result = result + a + str(fp)+"\n"
-			
-			convL.append(new_name)
-			convDL.append({"fname":new_name,"fp":fp})
-			print "*",
-	
-	res_str = ''
-	if 	len(convDL) == len(DirL):
-		res_str = " --OK-- "
-	else:
-		res_str = " some FP was not generated due to issue."
-		
-	print 'Conversion fineshed:',len(convDL), '-->saved FP,',  len(DirL), "--> files converted.",res_str
-		
-	if result <> ''  and convL <> []:
-		f_name = album_path +temp_dir+'names.txt'
-		
-		s = '\n'.join(convL)
-		#print "file  is ??",f_name	
-		f = open(f_name,'w')
-		f.write(s)
-		f.close()
-		#print "file  is OK",f_name
-		convL.append(album_path +temp_dir+'names.txt')
-		
-		f = open(album_path + 'MdLbShrmFngp.fp','wb')
-		f.write(result)
-		f.close()		
-	
-	for temp_dir in ['convert_wav\\','convert_cue\\']:
-		if os.path.exists(album_path+temp_dir):
-			
-			if len(os.listdir(album_path+temp_dir)) == 0:
-				os.rmdir(album_path+temp_dir)
-			else:
-				for a in os.listdir(album_path+temp_dir):
-					os.remove(album_path+temp_dir+a)
-				
-				if len(os.listdir(album_path+temp_dir)) == 0:
-					os.rmdir(album_path+temp_dir)	
-		
-	return {'RC':len(convDL),'FP':convDL,'splitRes':splitRes,'error_logL':error_logL}	
-		
 		
 		
 def convertLosless_2_lossy(format,codec_path,codecD,f_name,dest_dir,temp_dir,*args):
@@ -7611,6 +6895,7 @@ def getPlaylistsfromXML(mlPath):
 	return playListD	
 	
 def getCoverPage(url,dest_dir):
+	logger.debug('in getCoverPage dest dir[%s] - Start'%(dest_dir))
 	h = urlopenWithCheck(url)
 	#print h[0].headers.dict
 	httpCheckL = ['http:\\','http://','https://','https:\\']
@@ -7630,6 +6915,7 @@ def getCoverPage(url,dest_dir):
 		
 	if pos == -1:
 		print 'WRONG pos=',pos,url
+		logger.critical('Error 6913: in getCoverPage WRONG pos - Finished')
 		return -1
 		
 	if 	dest_dir[-1] <> '\\':
@@ -7653,13 +6939,14 @@ def getCoverPage(url,dest_dir):
 			os.remove(dest_dir+'cover_320.jpg')
 			#startfile(dest_dir+'cover.jpg')
 			print 'Cover page get 22!!!'
+			logger.debug('in getCoverPage 1 - Finished')
 			return 1
 	else:
 		print 'rebug- ',h[0].headers.dict	
 	print 'Error at picture getting'
 	print "the headers are:"
 	print h[0].headers.dict
-		
+	logger.critical('Error 6944: in getCoverPage 2 - Finished')	
 	return -1		
 	
 def cue_check_and_error_correct(fName,separator,seqL,*args):
@@ -7879,7 +7166,7 @@ def RebootServer(message='Rebooting', timeout=1, bForce=1, bReboot=1):
 
 def registerRadio(dbPath,radioUrl,RadioName,existed_station,bitrate):
 	db = sqlite3.connect(dbPath)
-	db.text_factory = str
+	#db.text_factory = str
 	t_date = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())
 	
 	lastrowid = None
@@ -8195,10 +7482,9 @@ def collect_images_for_album(album_crc32):
 				parent_dirL.append(parent)
 				#print '7444',parent_dirL
 		if len(parent_dirL)	== 1:
-			for root, dirs, files in os.walk(parent_dirL[0].decode('utf8')):
+			for root, dirs, files in scandir.walk(parent_dirL[0].decode('utf8')):
 				#print 'root',root
 				if root in parent_dirL[0]:
-					
 					continue
 				if root in pathL:
 					continue
@@ -8210,9 +7496,9 @@ def collect_images_for_album(album_crc32):
 						if f_name[f_name.rfind('.'):].lower().find('.jpg') >= 0 or f_name[f_name.rfind('.'):].lower().find('.pdf') >= 0 or f_name[f_name.rfind('.'):].lower().find('.png') >= 0:
 							print "7459",f_name
 							separate_image_dir_indicator = True	
-							f_path = root+'\\'+f_name
+							f_path = join(root,f_name)
 							if os.path.exists(f_path):
-								crc32 = zlib.crc32(f_path.decode('cp1251').encode('utf-8').lower())
+								crc32 = zlib.crc32(f_path.lower().encode('raw_unicode_escape'))
 								
 								if 'cover' in f_name.lower():
 									
@@ -8246,7 +7532,7 @@ def collect_images_for_album(album_crc32):
 				if a[a.rfind('.'):].lower().find('.jpg') >= 0 or a[a.rfind('.'):].lower().find('.pdf') >= 0 or a[a.rfind('.'):].lower().find('.png') >= 0:
 					f_path = root+'\\'+a
 					if os.path.exists(f_path):
-						crc32 = zlib.crc32(f_path.decode('cp1251').encode('utf-8').lower())
+						crc32 = zlib.crc32(f_path.lower().encode('raw_unicode_escape'))
 						#imageLD[crc32]=f_path
 						if 'cover' in a.lower():
 							if a == 'cover_100.jpg' or a == 'cover_320.jpg':
@@ -8284,12 +7570,18 @@ def getFolderAlbumD_fromDB(dbPath,db,albumCRC32,albumCRC32L,*args):
 		#print req
 		c.execute(req)
 	except Exception, e:
+		c.close()
+		if extDbFlag:
+			db.close()	
 		return {'error_message':e,'path_crc32':mode_str}
 	
 	try:
 		db_ALBUM_pathL =c.fetchall()
 	except Exception, e:
 		#print e,mode_str
+		c.close()
+		if extDbFlag:
+			db.close()
 		return {'error_message':e,'path_crc32':mode_str}
 	c.close()
 	if extDbFlag:

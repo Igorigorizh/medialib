@@ -1,0 +1,13 @@
+album:
+	assgn_albume_forArt_tbl-
+	assgn_album_from_rel_tbl+
+	assgn_album_rel_tbl+
+	assgn_artist_inAlb_tbl +
+	
+artist:
+		assgn_artist_rel_tbl-
+		assgn_artists_all_relLD+
+		assgn_artists_main_to_relLD+
+		assgn_artists_from_main_relLD+
+		
+		assgn_album_rel_tbl

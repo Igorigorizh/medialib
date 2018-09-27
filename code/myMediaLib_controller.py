@@ -226,17 +226,16 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		self.__logger.debug('get_modelDic tracking--->')
 		cnt = 0
 		if 'tag_name' in view_elem_id_Dic:
-			
+			self.__logger.debug('-------tracking------>tag_name')
 			try:
 				# в данном случае ожидается что переменная PlayControl_CurStatusD имеет значение возвращенное из метода контроллера int
 				if type(PlayControl_CurStatusD) == int:
 					res = PlayControl_CurStatusD
 					modelDic['tag_name'] = self.__model_instance.MediaLibPlayProcessDic_viaKey('TagD','local')[res]['tag_name']
-					self.__logger.debug(loggerWrapper('tag_name=',modelDic['tag_name']))
+					self.__logger.debug('tag_name=',modelDic['tag_name'])
 					
 			except Exception,e:
-				
-				self.__logger.critical(loggerWrapper('Exception in get_modelDic for tag_name',modelDic['tag_name']))
+				self.__logger.critical('Exception in get_modelDic for tag_name %s'%(modelDic['tag_name']))
 				modelDic['tag_name'] = 'NA_'
 			cnt=1
 			
@@ -318,7 +317,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			modelDic['host'] = socket.gethostname()
 			#port = int(self.__configDict['player_cntrl_port'])
 			modelDic['host_name'] = modelDic['host']+'/medialib'
-			modelDic['html_title'] = 'Music Navigation System'.decode('cp1251').encode('utf8')
+			modelDic['html_title'] = 'Music Navigation System'
 			modelDic['host_image_name'] = modelDic['host']+'/images'
 			modelDic['Tmpl'] = self.__model_instance.MediaLibPlayProcessDic_viaKey('Tmpl','local')
 			self.__logger.debug('gen_page_elements get is OK')
@@ -583,7 +582,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		
 		
 		db = sqlite3.connect(self.__model_instance.getMediaLibPlayProcessContext()['dbPath'])		
-		db.text_factory = str
+		#db.text_factory = str
 		c = db.cursor()
 		req = 'select path,path_crc32,cue_num from track where id_track = %s'%(str(id))
 			
@@ -859,6 +858,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			print 'dispatcher: OK2'
 		
 		#print "new song num:",pc['track_CRC32']
+		self.__logger.debug('in command_dispatcher Before get_modelDic 862')
 		if do_profile:
 			cProfile.run("modelDic = self.get_modelDic(view_elemD,pc)",  '_profile_get_modelDic1') 
 		else:	
@@ -2820,21 +2820,28 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		cnt = 0
 		for track_crc32, item in meta_tracks_structD.items():
 			cnt+=1
-			#print 'track_crc32:',track_crc32
+			print 'track_crc32:',track_crc32
 			try:
 				item['metaD']['number'] = int(item['metaD']['tracknumber'])
 			except Exception, e:
 				self.__logger.critical('Exception [%s] in map_meta_album_tracks_struct_to_view_json  [number] crc32 %s'%(str(e),str(track_crc32)))	
 				item['metaD']['number'] = cnt
 			
+			print 1.2
+			print item['metaD'].keys()
+			print item.keys()
 			item['metaD']['track_crc32'] = track_crc32
+			print 1.3
 			item['metaD']['time_sec'] = int(item['metaD']['time_sec'])
+			print 1.4
 			item['metaD']['db_track'] = item['db_track']
+			print 1.5,item['db_track']
 			item['metaD']['db_artist'] = item['db_artist']
 			
 			NSA = '-'
+			print 2
 			if item['album_crc32'] not in album_listD:
-				#print 3, item['album_crc32'], album_artistD.keys()
+				print 3, item['album_crc32'], album_artistD.keys()
 				if len(album_artistD[item['album_crc32']]['artistDataD']) > 1:
 					NSA = 'X'
 				
@@ -3114,7 +3121,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		# 1 Для режима add проверка, что элементы не существуют в базе.
 		if mode == "add":
 			db = sqlite3.connect(self.__model_instance.getMediaLibPlayProcessContext()['dbPath'])
-			db.text_factory = str
+			#db.text_factory = str
 			c = db.cursor()
 			
 			
@@ -3978,6 +3985,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				#	print resDBS[key]['metaD']['pos_num'],resDBS[key]['metaD']['title'].encode('raw_unicode_escape')
 				if 'Error' in resDBS or new_allmFD == {}:
 					print 'print Error 3846'
+					self.__logger.critical('Error: 3846 in get_tracks_4_selected_folder after mediaLib_intoDb_Load_withUpdateCheck')		
 					self.__modelDic['tracks_preload_proc_buf_db'] = {
 																			'tracks_view':{'dataD':{'initial':{'album':'error','artist':'error'}}}}
 					return 1
@@ -4536,6 +4544,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		
 	def get_artist_live_search_variants(self,commandD):	
 		print 'get_artist_live_search_variants!!!!:',commandD	
+		self.__logger.debug('in get_artist_live_search_variants: [%s] - Start'%(str(commandD)))
 		
 		# Если метаданные еще не получены то нижестоящая фукция их соберет, если уже были собраны,то из нее быстрый выход
 		
@@ -4558,11 +4567,12 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 						input_variantL.append(a)
 		if 	input_variantL == [] and 'get_artist_live_search_variants_opt'	in 	commandD:
 			input_variantL = ArtistL
-		print 'in get_artist_live_search_variants OK=',len(input_variantL)
+		
+		self.__logger.debug('in get_artist_live_search_variants - Finished')
 		return input_variantL				
 	def get_artist_meta_buf_live_search_variants(self,commandD):	
 		
-		self.__logger.info('get_artist_meta_buf_live_search_variants: [%s] '%(str(commandD)))
+		self.__logger.debug('get_artist_meta_buf_live_search_variants: [%s] - Start'%(str(commandD)))
 		
 		# Если метаданные еще не получены то нижестоящая фукция их соберет, если уже были собраны,то из нее быстрый выход
 		
@@ -4580,7 +4590,8 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 					if (a,1) not in input_variantL:
 						input_variantL.append((a,1))					
 			
-		print 'in get_artist_meta_buf_live_search_variants OK='
+		
+		self.__logger.debug('get_artist_meta_buf_live_search_variants - Finished')
 		return input_variantL
 	
 		
@@ -4635,14 +4646,12 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 		
 		# Проверить что картинка для РАДИО, проверить есть ли папка для нее по узлу из шаблона. если нет создать е???
 		dest_dir = self.__model_instance.getCurAlbumDir()
-		print 'dest_dir=',dest_dir
 		
-		self.__logger.debug('Pic PrepareOK for %s %s'%(str(dest_dir),str(url)))
+		self.__logger.debug('Pic PrepareOK for %s %s'%(dest_dir,url))
 			
 		try:
 			if getCoverPage(url,dest_dir) == -1:
-				self.__logger.error('error in getting pic')
-				
+				self.__logger.critical('Error 4644: in getting pic')
 		except Exception,e:
 			self.__logger.critical('Exception: Strange exception in picture getting: %s'%e)
 		
@@ -4847,7 +4856,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 				object_type = object_dbD['object_type']
 				
 			artist = object_dbD['artist']
-			#artist = object_dbD['artist'].encode('cp1251')
+			
 			#print '------>', type(artist),artist
 			#print json.dumps(artist)
 			self.__modelDic['edit_object_struc'] = {'artist_crc32':object_crc32,
@@ -4865,7 +4874,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			
 			print 'album:',object_crc32
 			object_dbD=getAlbumD_fromDB(dbPath,None,object_crc32,[])['albumD'][object_crc32]
-			object_dbD['path']= object_dbD['path'].replace('\\',':').decode('cp1251').encode('utf8')
+			object_dbD['path']= object_dbD['path'].replace('\\',':')
 			
 			try:
 				search_term = object_dbD['search_term'].strip().lower()
@@ -5435,7 +5444,7 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 	def get_track_search_list_for_tag_id(self,commandD):	
 		# возвращает список "поискового" типа для выбранного tag_id
 		
-		self.__logger.debug('in get_track_search_list_for_tag_id: [%s] '%(str(commandD)))
+		self.__logger.debug('in get_track_search_list_for_tag_id: [%s] - Start'%(str(commandD)))
 		
 		tagId = int(commandD['tag_id'])
 		db = sqlite3.connect(self.__model_instance.getMediaLibPlayProcessContext()['dbPath'])		
@@ -5445,12 +5454,13 @@ class MediaLib_Controller(MediaLibPlayProcess_singletone_Wrapper):
 			#print sD
 			#print sD[sD.keys()[0]].keys()
 		db.close()
-		
-				
 		search_term = self.__model_instance.MediaLibPlayProcessDic_viaKey('TagD','local')[tagId]['tag_name']
 		
-		self.__logger.debug('search_term[%s], len(sD):%s,tagId: [%s]'%(str(search_term),str(len(sD)),str(tagId)))
+		
+		self.__logger.debug('search_term[%s], len(sD):%s,tagId: [%s]'%(search_term,str(len(sD)),str(tagId)))
+		
 		self.__model_instance.setSearchBufD(search_term,sD,tagId,'tag_tracks',{})
+		self.__logger.debug('in get_track_search_list_for_tag_id: [%s] - Finished'%(str(commandD)))
 		return -1	
 		
 	def get_artist_search_list_for_object_id(self,commandD):	
